@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos AI OS - 智能体详情</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --brand: #d92d20;
+        --shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      button, input { font: inherit; }
+
+      .desktop-stage { width: 100%; display: flex; justify-content: center; }
+
+      .app-window {
+        width: min(1280px, calc(100vw - 32px));
+        height: min(980px, calc(100vh - 32px));
+        min-height: 720px;
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        overflow: hidden;
+        border-radius: 28px;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .detail-shell { display: grid; grid-template-rows: 72px 1fr; min-width: 0; }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        border-bottom: 1px solid rgba(235, 209, 204, 0.42);
+        background:
+          radial-gradient(circle at 18% 0%, rgba(217, 45, 32, 0.08), transparent 22%),
+          rgba(255, 252, 251, 0.8);
+      }
+
+      .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+      .ghost-icon, .avatar-btn {
+        width: 36px; height: 36px; border: 0; border-radius: 50%;
+        background: transparent; cursor: pointer; color: #4d3835;
+      }
+
+      .detail-content {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .detail-main {
+        padding: 20px 16px 16px;
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        gap: 12px;
+      }
+
+      .detail-top {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .detail-top small { color: #9b7f7a; font-weight: 700; }
+      .detail-top h2 { margin: 6px 0 0; font-size: 30px; line-height: 1.1; }
+      .detail-actions { display: flex; gap: 10px; }
+
+      .primary-btn, .outline-btn {
+        min-height: 38px; padding: 0 16px; border-radius: 999px; cursor: pointer;
+      }
+
+      .primary-btn {
+        border: 0; color: #fff; background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+        box-shadow: 0 10px 18px rgba(217, 45, 32, 0.18);
+      }
+
+      .outline-btn {
+        border: 1px solid rgba(235, 209, 204, 0.95); background: #fff; color: #5a403c;
+      }
+
+      .form-card, .canvas-card {
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(238, 225, 223, 0.9);
+        box-shadow: 0 18px 36px rgba(164, 70, 36, 0.05);
+      }
+
+      .form-card { padding: 14px; }
+      .field + .field { margin-top: 12px; }
+      .field label { display: block; margin-bottom: 8px; font-size: 12px; color: #8e7671; font-weight: 700; }
+      .input-like { min-height: 44px; padding: 10px 14px; border-radius: 16px; background: #f6f0ef; color: #41302d; line-height: 1.55; }
+
+      .canvas-card {
+        padding: 12px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      .canvas-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 13px;
+        color: #7e6662;
+        font-weight: 700;
+      }
+
+      .minor { display: flex; gap: 8px; }
+      .minor-pill { padding: 4px 8px; border-radius: 999px; background: #f3efee; font-size: 10px; color: #8b7672; }
+
+      .canvas-surface {
+        border-radius: 24px;
+        border: 1px solid rgba(240, 216, 212, 0.86);
+        background: linear-gradient(180deg, #fffdfd 0%, #fff7f6 100%);
+        position: relative;
+        min-height: 250px;
+        overflow: hidden;
+      }
+
+      .flow-node {
+        position: absolute;
+        min-width: 150px;
+        padding: 12px;
+        border-radius: 18px;
+        background: #fff;
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        box-shadow: 0 14px 28px rgba(171, 54, 35, 0.06);
+      }
+
+      .flow-node small { display: block; font-size: 10px; color: #ac8f89; margin-bottom: 4px; }
+      .flow-node strong { display: block; font-size: 13px; margin-bottom: 4px; }
+      .flow-link { position: absolute; height: 2px; background: rgba(217, 45, 32, 0.18); }
+
+      .canvas-toolbar { margin-top: 12px; display: flex; justify-content: center; }
+      .floating-tools {
+        display: inline-flex; gap: 8px; padding: 8px; border-radius: 18px; background: #fff;
+        box-shadow: 0 10px 22px rgba(171, 54, 35, 0.12);
+      }
+      .floating-tools button {
+        width: 30px; height: 30px; border: 0; border-radius: 50%; background: #f5efee; color: #6e5c58;
+      }
+
+      .detail-side {
+        border-left: 1px solid rgba(233, 215, 213, 0.72);
+        background: linear-gradient(180deg, #f8f3f2 0%, #fdfafa 100%);
+        padding: 16px 14px 14px;
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        gap: 14px;
+      }
+
+      .side-section h4 { margin: 0 0 10px; font-size: 12px; color: #86726e; }
+      .model-list, .skill-tags { display: grid; gap: 10px; }
+
+      .model-item {
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        border-radius: 16px; border: 1px solid rgba(235, 209, 204, 0.9);
+        background: rgba(255, 255, 255, 0.92); padding: 10px 12px;
+      }
+      .model-item.active { border-color: var(--brand); }
+      .model-item .left { display: flex; align-items: center; gap: 10px; }
+      .model-chip {
+        width: 28px; height: 28px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
+        background: #ffe8e4; color: var(--brand); font-size: 11px; font-weight: 800;
+      }
+
+      .skill-tag {
+        display: inline-flex; align-items: center; min-height: 30px; padding: 0 12px; border-radius: 999px;
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: linear-gradient(180deg, #fff1ef 0%, #f8e2df 100%);
+        color: #6c4f4a; font-size: 12px;
+      }
+
+      .runtime-card {
+        border-radius: 22px; background: #1f1c1b; color: #f6efee; padding: 16px;
+        display: grid; grid-template-rows: auto 1fr auto; gap: 12px;
+      }
+      .runtime-log {
+        min-height: 0; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 11px; line-height: 1.7; color: #d6c7c4;
+      }
+      .runtime-input { display: flex; gap: 8px; }
+      .runtime-input input {
+        flex: 1; height: 36px; border: 0; border-radius: 12px; background: rgba(255, 255, 255, 0.08);
+        color: #fff; padding: 0 12px; outline: none;
+      }
+      .runtime-input button {
+        width: 36px; height: 36px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%); color: #fff;
+      }
+
+      @media (max-width: 1100px) {
+        body { padding: 0; }
+        .app-window { width: 100vw; height: 100vh; min-height: 100vh; border-radius: 0; }
+        .detail-content { grid-template-columns: 1fr; }
+        .detail-side { border-left: 0; border-top: 1px solid rgba(233, 215, 213, 0.72); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="detail-shell">
+          <header class="topbar">
+            <div></div>
+            <div class="topbar-right">
+              <button class="ghost-icon" type="button">◌</button>
+              <button class="ghost-icon" type="button">◎</button>
+            </div>
+          </header>
+
+          <div class="detail-content">
+            <div class="detail-main">
+              <div class="detail-top">
+                <div>
+                  <small id="detailVersion">智能体配置</small>
+                  <h2 id="detailTitle">精准分析师 v2.4</h2>
+                </div>
+                <div class="detail-actions">
+                  <a class="outline-btn" href="./agents-center.html" style="text-decoration:none;display:inline-flex;align-items:center;">放弃</a>
+                  <button class="primary-btn" id="deployBtn" type="button">部署智能体</button>
+                </div>
+              </div>
+
+              <div class="form-card">
+                <div class="field">
+                  <label>角色描述</label>
+                  <div class="input-like" id="detailRole">专注 Q3 市场波动的高级财务分析师</div>
+                </div>
+                <div class="field">
+                  <label>主要目标定义</label>
+                  <div class="input-like" id="detailGoal">将实时 SEC 文件综合成可操作的见解</div>
+                </div>
+              </div>
+
+              <div class="canvas-card">
+                <div class="canvas-title">
+                  <span>逻辑流编排</span>
+                  <div class="minor">
+                    <span class="minor-pill" id="flowBadge">v2.4</span>
+                    <span class="minor-pill">自动保存</span>
+                  </div>
+                </div>
+                <div class="canvas-surface" id="flowCanvas"></div>
+                <div class="canvas-toolbar">
+                  <div class="floating-tools">
+                    <button type="button">＋</button>
+                    <button type="button">☝</button>
+                    <button type="button">↗</button>
+                    <button type="button">⌕</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="detail-side">
+              <div class="side-section">
+                <h4>专注模型</h4>
+                <div class="model-list" id="modelList"></div>
+              </div>
+              <div class="side-section">
+                <h4>激活技能</h4>
+                <div class="skill-tags" id="skillTags"></div>
+              </div>
+              <div class="side-section runtime-card">
+                <div>
+                  <h4 style="margin: 0 0 8px; color: #fff;">测试运行控制台</h4>
+                  <div style="font-size: 11px; color: #a99895;">测试运行智能体的台本</div>
+                </div>
+                <div class="runtime-log" id="runtimeLog"></div>
+                <div class="runtime-input">
+                  <input id="runtimeInput" type="text" placeholder="输入测试查询..." />
+                  <button id="runtimeSend" type="button">➤</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "agents",
+        fixed: false,
+        showHistory: true,
+        historyTitle: "历史对话",
+        historyContainerId: "historyList",
+        primaryLabel: "+ 新对话",
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "./agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+
+      const agents = {
+        "agent-analyst": {
+          name: "精准分析师 v2.4",
+          version: "v2.4",
+          role: "专注 Q3 市场波动的高级财务分析师",
+          goal: "将实时 SEC 文件综合成可操作的见解",
+          models: [
+            { code: "C3", name: "Claude 3.5", active: true },
+            { code: "G4", name: "GPT-4o", active: false }
+          ],
+          skills: ["网页检索", "SQL", "大模型"],
+          flow: [
+            { x: 90, y: 62, title: "触发器", text: "入站 API 请求", sub: "Webhook JSON 负载监听" },
+            { x: 300, y: 42, title: "托管器", text: "核心处理模块", sub: "Claude 3.5 Sonnet / 财务分析脚本" }
+          ]
+        },
+        "agent-market": {
+          name: "市场研究助手",
+          version: "v1.8",
+          role: "负责行业扫描、信号聚类与摘要生成的研究助理",
+          goal: "按行业和时间窗口输出竞争态势简报",
+          models: [
+            { code: "C3", name: "Claude 3.5", active: false },
+            { code: "G4", name: "GPT-4o", active: true }
+          ],
+          skills: ["网页检索", "文件搜索", "图表生成"],
+          flow: [
+            { x: 100, y: 70, title: "研究任务", text: "接收行业关键词", sub: "按国家 / 行业过滤" },
+            { x: 314, y: 146, title: "摘要器", text: "形成竞争快照", sub: "自动生成研究结论" }
+          ]
+        },
+        "agent-code": {
+          name: "代码架构师",
+          version: "v3.1",
+          role: "审查复杂系统结构并提供重构计划的工程智能体",
+          goal: "对遗留系统做架构拆解、风险识别与分步迁移",
+          models: [
+            { code: "C3", name: "Claude 3.5", active: true },
+            { code: "G4", name: "GPT-4o", active: false }
+          ],
+          skills: ["代码解释", "文件搜索", "MCP 调试"],
+          flow: [
+            { x: 90, y: 50, title: "仓库接入", text: "分析代码结构", sub: "索引模块依赖关系" },
+            { x: 318, y: 130, title: "改造器", text: "给出迁移路径", sub: "产出重构建议清单" }
+          ]
+        },
+        "agent-review": {
+          name: "内容审核专家",
+          version: "v1.2",
+          role: "审核社区生成内容并标记风险因子的内容守门员",
+          goal: "识别高风险表达并给出可用改写建议",
+          models: [
+            { code: "C3", name: "Claude 3.5", active: false },
+            { code: "G4", name: "GPT-4o", active: true }
+          ],
+          skills: ["敏感词审查", "图像理解", "回执记录"],
+          flow: [
+            { x: 86, y: 84, title: "输入队列", text: "收集待审内容", sub: "文本 / 图像 / 链接" },
+            { x: 302, y: 64, title: "审核器", text: "执行规则与模型评审", sub: "输出审核结论" }
+          ]
+        }
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      const selectedId = params.get("id") || "agent-analyst";
+      const agent = agents[selectedId] || agents["agent-analyst"];
+
+      document.getElementById("detailTitle").textContent = agent.name;
+      document.getElementById("flowBadge").textContent = agent.version;
+      document.getElementById("detailRole").textContent = agent.role;
+      document.getElementById("detailGoal").textContent = agent.goal;
+
+      document.getElementById("modelList").innerHTML = agent.models
+        .map(
+          (model) => `
+            <div class="model-item ${model.active ? "active" : ""}">
+              <div class="left">
+                <span class="model-chip">${model.code}</span>
+                <div><div style="font-size: 13px; font-weight: 700;">${model.name}</div></div>
+              </div>
+              <div style="color:${model.active ? "var(--brand)" : "#8b7672"}; font-weight:700;">${model.active ? "✓" : ""}</div>
+            </div>
+          `
+        )
+        .join("");
+
+      document.getElementById("skillTags").innerHTML = agent.skills.map((skill) => `<span class="skill-tag">${skill}</span>`).join("");
+
+      document.getElementById("flowCanvas").innerHTML = `
+        <div class="flow-link" style="left: 212px; top: 124px; width: 100px;"></div>
+        ${agent.flow
+          .map(
+            (node) => `
+              <div class="flow-node" style="left:${node.x}px; top:${node.y}px;">
+                <small>${node.title}</small>
+                <strong>${node.text}</strong>
+                <div style="font-size:11px;color:#8a7875;">${node.sub}</div>
+              </div>
+            `
+          )
+          .join("")}
+      `;
+
+      const logs = [
+        "[14:32:17] 接收测试输入。",
+        "[14:32:17] 日志：调用核心检索节点。",
+        "[14:32:29] 用户：分析 LLM 竞品公司的财报。",
+        "[14:32:46] 节点输出：正在启动市场标签聚类..."
+      ];
+      const runtimeLog = document.getElementById("runtimeLog");
+      runtimeLog.innerHTML = logs.map((log) => `<div>${log}</div>`).join("");
+
+      document.getElementById("runtimeSend").addEventListener("click", () => {
+        const input = document.getElementById("runtimeInput");
+        const value = input.value.trim();
+        if (!value) return;
+        runtimeLog.innerHTML += `<div>[14:36:22] 用户：${value}</div><div>[14:36:41] 输出：已将测试请求路由到 ${agent.name}。</div>`;
+        runtimeLog.scrollTop = runtimeLog.scrollHeight;
+        input.value = "";
+      });
+    </script>
+  </body>
+</html>

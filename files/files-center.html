@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Hubitos AI OS - 文件中心</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              error: "#ba1a1a",
+              "on-secondary-container": "#610001",
+              "on-primary-fixed": "#410000",
+              "tertiary-container": "#7e6e6e",
+              "on-tertiary-fixed-variant": "#514443",
+              "on-tertiary-container": "#fff6f5",
+              outline: "#906f6a",
+              "on-background": "#1c1b1b",
+              "on-secondary-fixed": "#410000",
+              "inverse-surface": "#313030",
+              "primary-fixed": "#ffdad5",
+              "surface-container-low": "#f6f3f2",
+              "surface-bright": "#fcf9f8",
+              "on-tertiary": "#ffffff",
+              "surface-dim": "#dcd9d9",
+              "surface-tint": "#bc140d",
+              "on-surface-variant": "#5c403b",
+              "outline-variant": "#e5bdb7",
+              "on-primary": "#ffffff",
+              "inverse-primary": "#ffb4a8",
+              surface: "#fcf9f8",
+              primary: "#b50c08",
+              "secondary-container": "#fe5c4a",
+              "inverse-on-surface": "#f3f0ef",
+              "primary-container": "#d92d20",
+              tertiary: "#655655",
+              "on-surface": "#1c1b1b",
+              "secondary-fixed-dim": "#ffb4a9",
+              "secondary-fixed": "#ffdad5",
+              "on-secondary-fixed-variant": "#920706",
+              "tertiary-fixed": "#f2dedd",
+              "on-tertiary-fixed": "#241919",
+              secondary: "#b4261c",
+              "on-primary-fixed-variant": "#930002",
+              background: "#fcf9f8",
+              "surface-variant": "#e5e2e1",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-primary-container": "#fff6f5",
+              "surface-container": "#f0edec",
+              "tertiary-fixed-dim": "#d6c2c1",
+              "primary-fixed-dim": "#ffb4a8",
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e5e2e1",
+              "surface-container-high": "#eae7e7"
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              "2xl": "1rem",
+              "3xl": "1.5rem",
+              full: "9999px"
+            },
+            fontFamily: {
+              headline: ["Inter", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+              label: ["Inter", "sans-serif"]
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        min-height: 100%;
+        color: #241b1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      html {
+        min-height: 100%;
+      }
+
+      .files-shell {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .files-window {
+        position: relative;
+        width: min(1728px, calc(100vw - 32px));
+        height: min(980px, calc(100vh - 32px));
+        min-height: 720px;
+        border-radius: 28px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(24px);
+      }
+
+      .ambient-shadow {
+        shadow: 0 32px 32px rgba(181, 12, 8, 0.06);
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e5bdb7;
+        border-radius: 10px;
+      }
+
+      .market-tabs {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .market-tab {
+        position: relative;
+        min-height: 56px;
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        color: #9c8885;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .market-tab.active {
+        color: #b50c08;
+      }
+
+      .market-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 3px;
+        border-radius: 999px;
+        background: #d92d20;
+      }
+
+      .toolbar-search {
+        position: relative;
+      }
+
+      .toolbar-search input {
+        width: 320px;
+        height: 40px;
+        padding: 0 18px 0 44px;
+        border: 1px solid rgba(238, 220, 217, 0.95);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #352523;
+        outline: none;
+      }
+
+      .toolbar-search .material-symbols-outlined {
+        position: absolute;
+        left: 16px;
+        top: 10px;
+        font-size: 18px;
+        color: #a18d89;
+      }
+
+      @media (max-width: 1280px) {
+        body {
+          padding: 0;
+        }
+
+        .files-window {
+          width: 100vw;
+          height: 100vh;
+          min-height: 100vh;
+          border-radius: 0;
+        }
+      }
+    </style>
+  </head>
+  <body class="text-on-surface">
+    <div class="files-shell">
+    <div class="files-window">
+    <div id="sharedSidebar"></div>
+
+    <header class="hubitos-shell-header fixed top-4 z-30 flex items-center justify-between border-b border-[#edd6d1]/70 bg-[#fcf9f8]/86 px-8 py-0 backdrop-blur-xl">
+      <div class="market-tabs" id="libraryTabs">
+        <button data-scope="all" class="market-tab active" type="button">全部文件</button>
+        <button data-scope="recent" class="market-tab" type="button">最近使用</button>
+        <button data-scope="generated" class="market-tab" type="button">生成记录</button>
+        <button data-scope="favorites" class="market-tab" type="button">收藏</button>
+        <button data-scope="trash" class="market-tab" type="button">回收站</button>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="toolbar-search">
+          <input id="searchInput" placeholder="搜索 AI 资产..." type="text" />
+          <span class="material-symbols-outlined">search</span>
+        </div>
+        <button id="uploadBtn" class="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(181,12,8,0.1)] transition-all hover:bg-primary/90">
+          <span class="material-symbols-outlined text-lg">upload</span>
+          上传文件
+        </button>
+        <button class="rounded-full p-2 text-on-surface-variant transition-all hover:bg-tertiary-fixed">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-white shadow-sm">
+          <img alt="Editorial Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ1NVJyJuUTaF9TBjY_szIdW4FTLnvc9WHcKcnLg-QM2H6soVuZjB9EmlGM6bWLhatUn6cfJZge8Ogi7oTRLOy7LSfYK-zcd3WXsW9os059OWZeoDUq-sTL3v8Blb_Jf6xl-yPLH9AgfozTVN9lTGQvJ4wrlISHcXYmYrTHKckThGmghc6D9UzvRu4er-rOYNfpNq35iK_LcEzfSXfByg1XYTKxci9-d-ZkPxSjRpF38CNgwuNB7kFsWIpv9ovZikgZWeB_hcu248" />
+        </div>
+      </div>
+    </header>
+
+    <main class="hubitos-shell-main flex h-[calc(100vh-32px)] gap-6 overflow-hidden px-8 pt-24">
+      <section class="flex min-w-0 flex-1 flex-col">
+        <header class="mb-5">
+          <div class="flex items-end justify-between">
+            <div class="flex flex-wrap items-center gap-2" id="tagFilters"></div>
+            <div class="flex gap-2 rounded-full bg-surface-container-high p-1">
+              <button id="gridViewBtn" class="rounded-full bg-white p-2 text-primary shadow-sm">
+                <span class="material-symbols-outlined text-lg">grid_view</span>
+              </button>
+              <button id="listViewBtn" class="p-2 text-on-surface-variant">
+                <span class="material-symbols-outlined text-lg">list</span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div id="folderCards" class="mb-4 grid grid-cols-4 gap-4"></div>
+
+        <div class="custom-scrollbar flex-1 space-y-6 overflow-y-auto pb-12 pr-2">
+          <div class="flex items-center justify-between">
+            <h4 id="sectionTitle" class="text-xs font-black uppercase tracking-[0.1em] text-on-surface-variant/60">最近生成</h4>
+            <button id="clearTrashBtn" class="hidden text-xs font-bold text-primary">清空回收站</button>
+          </div>
+
+          <div id="filesGrid" class="grid grid-cols-2 gap-4"></div>
+        </div>
+      </section>
+
+      <aside class="flex h-full w-[400px] flex-col pb-8">
+        <div class="flex flex-1 flex-col rounded-[2.5rem] border border-outline-variant/10 bg-surface-container-high/40 p-1">
+          <div class="flex flex-1 flex-col overflow-hidden rounded-[2.2rem] bg-white shadow-sm">
+            <div class="border-b border-surface-container-low p-6">
+              <div class="mb-4 flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">当前选中</span>
+                <div class="flex gap-1">
+                  <button id="closePreviewBtn" class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-low transition-colors hover:bg-primary-fixed">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                  </button>
+                </div>
+              </div>
+              <h3 id="previewTitle" class="mb-2 text-lg font-bold leading-snug text-on-surface">品牌识别提案 v2.docx</h3>
+              <div id="previewTime" class="mb-3 text-xs font-medium text-on-surface-variant">10月24日, 14:22</div>
+              <div id="previewBadges" class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-primary-fixed px-3 py-1 text-[10px] font-bold text-primary">已优化</span>
+                <span class="rounded-full bg-tertiary-fixed px-3 py-1 text-[10px] font-bold text-tertiary">GPT-4o MINI</span>
+              </div>
+            </div>
+
+            <div class="custom-scrollbar flex-1 space-y-6 overflow-y-auto p-6">
+              <div class="space-y-3">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">文档片段</label>
+                <div id="previewSnippet" class="rounded-2xl border border-dashed border-outline-variant/30 bg-surface-container-low/50 p-4 text-[13px] italic leading-relaxed text-on-surface-variant">
+                  “即将开展的活动的视觉方向侧重于‘极简粗犷主义’，采用 Hubitos 深红和纯白的强对比色调。此版本根据创意总监关于间距的反馈进行了调整...”
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">调用的 Skills / MCP</label>
+                <div id="insightList" class="space-y-2"></div>
+              </div>
+            </div>
+
+            <div class="border-t border-surface-container-low bg-surface-container-lowest p-5">
+              <button id="aiEditBtn" class="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-bold text-white shadow-[0_16px_24px_rgba(181,12,8,0.15)] transition-transform active:scale-[0.98]">
+                <span class="material-symbols-outlined text-lg">smart_toy</span>
+                使用 AI 编辑
+              </button>
+              <div class="mt-3 grid grid-cols-2 gap-3">
+                <button id="exportBtn" class="flex items-center justify-center gap-2 rounded-full bg-surface-container-high py-2.5 text-xs font-bold text-on-surface">
+                  <span class="material-symbols-outlined text-sm">download</span>
+                  导出
+                </button>
+                <button id="deleteBtn" class="flex items-center justify-center gap-2 rounded-full bg-surface-container-high py-2.5 text-xs font-bold text-on-surface">
+                  <span id="deleteIcon" class="material-symbols-outlined text-sm">delete</span>
+                  <span id="deleteLabel">删除</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+    </div>
+    </div>
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "files",
+        fixed: true,
+        showHistory: true,
+        historyTitle: "历史对话",
+        historyContainerId: "historyList",
+        primaryLabel: "+ 新对话",
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        filesHref: "./files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+    </script>
+    <script>
+      const state = {
+        view: "grid",
+        scope: "all",
+        search: "",
+        tag: "all",
+        selectedFileId: "file-docx-1",
+        folders: [
+          { id: "assets", name: "我的资产", count: 1204, size: "4.2 GB", icon: "folder", tone: "primary", scope: "all" },
+          { id: "drafts", name: "草稿箱", count: 4, size: "12 MB", icon: "drafts", tone: "neutral", scope: "generated" },
+          { id: "favorites", name: "收藏夹", count: 18, size: "302 MB", icon: "star", tone: "neutral", scope: "favorites" }
+        ],
+        tags: ["all", "文档", "图片", "表格", "上传", "智能体", "技能"],
+        files: [
+          {
+            id: "file-pdf-1",
+            name: "Q4 市场分析 - 东京.pdf",
+            size: "2.4 MB",
+            type: "文档",
+            scope: "generated",
+            favorite: false,
+            trashed: false,
+            source: "由智能体 X 生成",
+            sourceTone: "primary",
+            sourceIcon: "auto_awesome",
+            folder: "我的资产",
+            tags: ["文档", "智能体"],
+            createdAt: "10月24日, 14:22",
+            engine: "智能体 X - 创意型",
+            previewMode: "image",
+            previewImage:
+              "https://lh3.googleusercontent.com/aida-public/AB6AXuDalGzNWHoAZGHpx01Um9V-ck0We6af-uvrL7tqQXelXV76Y0EDEHSeBqB7WB5gwvsstKg7qv9r6dOnvFoVjYukfxCAoxyyN0h-ge7H4E1X__RnNpRMPpRlxg0fSxgttuDebtn1Eozn4v8RGrq2LVYPuPaNoB_tfIMvvM4VEveQlN3x0q4Gr8WHE2Reu9U_hHlIaDVfJBUEsCjsrd5riCofPhg8zUFjGieNGB0nby5cPzuvWm4A64KoDPHKxr9JrIvY5U6I-Z8umbY",
+            snippet:
+              "“东京市场分析已经沉淀为季度洞察报告，包含趋势判断、对手动作与建议优先级，可继续转成汇报版 PDF 或对话摘要。”",
+            insights: ["Skill · 市场分析总结", "Skill · 报告结构提炼", "MCP · 云端文档导出"]
+          },
+          {
+            id: "file-docx-1",
+            name: "品牌识别提案 v2.docx",
+            size: "450 KB",
+            type: "文档",
+            scope: "recent",
+            favorite: true,
+            trashed: false,
+            source: "来自对话 #102",
+            sourceTone: "tertiary",
+            sourceIcon: "chat_bubble",
+            folder: "我的资产",
+            tags: ["文档"],
+            createdAt: "10月24日, 14:22",
+            engine: "GPT-4o MINI",
+            previewMode: "icon",
+            previewIcon: "description",
+            previewIconTone: "primary",
+            snippet:
+              "“即将开展的活动的视觉方向侧重于极简粗犷主义，采用 Hubitos 深红和纯白的强对比色调。此版本根据创意总监关于间距的反馈进行了调整。”",
+            insights: ["Skill · PRD 写作助手", "Skill · 文档润色", "MCP · Word 导出服务"]
+          },
+          {
+            id: "file-xlsx-1",
+            name: "法律合规矩阵.xlsx",
+            size: "1.1 MB",
+            type: "表格",
+            scope: "generated",
+            favorite: false,
+            trashed: false,
+            source: "通过技能合成",
+            sourceTone: "primary",
+            sourceIcon: "auto_awesome",
+            folder: "草稿箱",
+            tags: ["表格", "技能"],
+            createdAt: "10月23日, 18:40",
+            engine: "Skill Pipeline",
+            previewMode: "image",
+            previewImage:
+              "https://lh3.googleusercontent.com/aida-public/AB6AXuCUqL1fNULqvTiIL8YxePBYZaOI7C0jZ8JX5zVPAHJzaScI7eUiOiUBijUOHV9GG90pJ5nh3jTiVFWC9WBL3p2_uD_fzD0UXVNBoVu_6-r5hny2eluTAYQhOFGzG58jiJl95Zext8BdH9cfZO4aH2wa0kFwoPvsqkkoBu7PaYX8AJBh79PcrsZ-TOo2MTWZIxJn5T41ol9k_47EjMLGC7bdWMd26mCyXVL5N-eTCWgwq3HhDx7N4V2SzYmL40xgTD5IqZO3P7qO8Lw",
+            snippet:
+              "“表格已按风险等级、合规条线、责任部门进行结构化拆分，可继续导出 Excel 或汇总为周报。”",
+            insights: ["Skill · 表格结构整理", "Skill · 风险等级归类", "MCP · Excel 渲染器"]
+          },
+          {
+            id: "file-csv-1",
+            name: "原始竞争对手数据.csv",
+            size: "14.8 MB",
+            type: "上传",
+            scope: "all",
+            favorite: false,
+            trashed: false,
+            source: "外部上传",
+            sourceTone: "neutral",
+            sourceIcon: "upload",
+            folder: "我的资产",
+            tags: ["表格", "上传"],
+            createdAt: "10月22日, 11:10",
+            engine: "手动上传",
+            previewMode: "icon",
+            previewIcon: "attachment",
+            previewIconTone: "tertiary",
+            snippet:
+              "“该 CSV 已导入云端，可继续用 AI 做清洗、分类、对比分析，并转为图表或报告。”",
+            insights: ["Skill · 数据清洗", "Skill · 竞品对比生成", "MCP · CSV 解析连接器"]
+          },
+          {
+            id: "file-md-1",
+            name: "Hubitos_AI_OS_PRD.md",
+            size: "182 KB",
+            type: "文档",
+            scope: "recent",
+            favorite: true,
+            trashed: false,
+            source: "来自对话 #128",
+            sourceTone: "tertiary",
+            sourceIcon: "chat_bubble",
+            folder: "我的资产",
+            tags: ["文档", "上传"],
+            createdAt: "10月25日, 09:30",
+            engine: "Hubitos Pro",
+            previewMode: "icon",
+            previewIcon: "description",
+            previewIconTone: "primary",
+            snippet:
+              "“PRD 已完成项目概述、功能架构、路线图与商业模式章节，可继续用 AI 编辑或导出 Word。”",
+            insights: ["Skill · PRD 扩写", "Skill · 演示稿改写", "MCP · 文档存储连接器"]
+          },
+          {
+            id: "file-trash-1",
+            name: "旧版市场摘要.pdf",
+            size: "980 KB",
+            type: "文档",
+            scope: "trash",
+            favorite: false,
+            trashed: true,
+            source: "回收站文件",
+            sourceTone: "neutral",
+            sourceIcon: "delete",
+            folder: "回收站",
+            tags: ["文档"],
+            createdAt: "10月18日, 10:08",
+            engine: "旧版资产",
+            previewMode: "icon",
+            previewIcon: "picture_as_pdf",
+            previewIconTone: "primary",
+            snippet: "“该文件已进入回收站，可恢复或彻底删除。”",
+            insights: ["Skill · 回收站恢复检查", "MCP · 文件审计日志"]
+          }
+        ]
+      };
+
+      const refs = {
+        searchInput: document.getElementById("searchInput"),
+        uploadBtn: document.getElementById("uploadBtn"),
+        gridViewBtn: document.getElementById("gridViewBtn"),
+        listViewBtn: document.getElementById("listViewBtn"),
+        folderCards: document.getElementById("folderCards"),
+        libraryTabs: document.getElementById("libraryTabs"),
+        tagFilters: document.getElementById("tagFilters"),
+        sectionTitle: document.getElementById("sectionTitle"),
+        clearTrashBtn: document.getElementById("clearTrashBtn"),
+        filesGrid: document.getElementById("filesGrid"),
+        previewTitle: document.getElementById("previewTitle"),
+        previewTime: document.getElementById("previewTime"),
+        previewBadges: document.getElementById("previewBadges"),
+        previewSnippet: document.getElementById("previewSnippet"),
+        insightList: document.getElementById("insightList"),
+        aiEditBtn: document.getElementById("aiEditBtn"),
+        exportBtn: document.getElementById("exportBtn"),
+        deleteBtn: document.getElementById("deleteBtn"),
+        deleteLabel: document.getElementById("deleteLabel"),
+        deleteIcon: document.getElementById("deleteIcon"),
+        closePreviewBtn: document.getElementById("closePreviewBtn")
+      };
+
+      function escapeHtml(text) {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function getVisibleFiles() {
+        return state.files.filter((file) => {
+          if (state.scope === "trash") {
+            if (!file.trashed) return false;
+          } else {
+            if (file.trashed) return false;
+            if (state.scope === "recent" && file.scope !== "recent") return false;
+            if (state.scope === "generated" && file.scope !== "generated") return false;
+            if (state.scope === "favorites" && !file.favorite) return false;
+          }
+
+          if (state.tag !== "all" && !file.tags.includes(state.tag) && file.type !== state.tag) return false;
+          if (state.search && !file.name.toLowerCase().includes(state.search.toLowerCase())) return false;
+          return true;
+        });
+      }
+
+      function getSelectedFile() {
+        const visible = getVisibleFiles();
+        const selected = visible.find((file) => file.id === state.selectedFileId);
+        return selected || visible[0] || state.files[0];
+      }
+
+      function renderFolders() {
+        refs.folderCards.innerHTML =
+          state.folders
+            .map((folder) => `
+              <button class="group cursor-pointer rounded-[1.75rem] border border-outline-variant/10 bg-white p-4 text-left shadow-[0_8px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_12px_24px_rgba(181,12,8,0.04)]" data-folder-scope="${folder.scope}" type="button">
+                <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl ${folder.tone === "primary" ? "bg-primary-fixed text-primary group-hover:bg-primary group-hover:text-white" : "bg-surface-container-high text-on-surface-variant group-hover:bg-on-surface-variant group-hover:text-white"} transition-all">
+                  <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">${folder.icon}</span>
+                </div>
+                <h3 class="text-sm font-bold text-on-surface">${escapeHtml(folder.name)}</h3>
+                <p class="mt-1 text-[11px] font-medium text-on-surface-variant">${folder.count} 项 • ${folder.size}</p>
+              </button>
+            `)
+            .join("") +
+          `
+            <button id="newFolderBtn" class="group flex cursor-pointer flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-outline-variant/40 bg-surface-container-low/40 p-4 text-on-surface-variant transition-all hover:border-primary/40 hover:bg-primary-fixed/20" type="button">
+              <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-primary">
+                <span class="material-symbols-outlined">add</span>
+              </div>
+              <span class="text-[11px] font-bold">新建文件夹</span>
+            </button>
+          `;
+      }
+
+      function renderTabs() {
+        Array.from(refs.libraryTabs.querySelectorAll("[data-scope]")).forEach((button) => {
+          const active = button.dataset.scope === state.scope;
+          button.className = active ? "market-tab active" : "market-tab";
+        });
+      }
+
+      function renderTags() {
+        refs.tagFilters.innerHTML = state.tags
+          .map((tag) => {
+            const active = state.tag === tag;
+            const label = tag === "all" ? "全部" : tag;
+            return `<button class="${active ? "border border-[#f0c9c0] bg-[#fff1ed] text-[#e13b2d]" : "border border-transparent bg-[#f3efee] text-[#685a57]"} rounded-full px-[22px] py-2.5 text-[13px] font-bold leading-none shadow-none transition-colors" data-tag="${tag}" type="button">${label}</button>`;
+          })
+          .join("");
+      }
+
+      function cardPreview(file) {
+        if (file.previewMode === "image") {
+          return `<img alt="File Preview" class="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105" src="${file.previewImage}" />`;
+        }
+        return `<div class="flex h-full w-full items-center justify-center ${file.previewIconTone === "primary" ? "bg-primary-fixed/20" : "bg-tertiary-fixed/20"}"><span class="material-symbols-outlined text-5xl ${file.previewIconTone === "primary" ? "text-primary" : "text-tertiary"} opacity-40">${file.previewIcon}</span></div>`;
+      }
+
+      function renderFiles() {
+        const files = getVisibleFiles();
+        refs.sectionTitle.textContent =
+          state.scope === "trash"
+            ? "回收站"
+            : state.scope === "recent"
+              ? "最近使用"
+              : state.scope === "generated"
+                ? "生成记录"
+                : state.scope === "favorites"
+                  ? "收藏文件"
+                  : "最近生成";
+        refs.clearTrashBtn.classList.toggle("hidden", state.scope !== "trash");
+        refs.filesGrid.className =
+          state.view === "grid"
+            ? "grid grid-cols-2 gap-4"
+            : "grid grid-cols-1 gap-3";
+        refs.filesGrid.innerHTML = files.length
+          ? files
+              .map((file) => `
+                <button class="group flex cursor-pointer ${state.view === "grid" ? "flex-col gap-4 rounded-3xl p-5" : "items-center gap-4 rounded-2xl p-4"} border ${file.id === state.selectedFileId ? "border-primary/40 ring-2 ring-primary/10" : "border-outline-variant/20"} bg-surface-container-lowest text-left shadow-[0_32px_32px_rgba(181,12,8,0.02)] transition-all hover:border-primary/30" data-file-id="${file.id}" type="button">
+                  <div class="relative ${state.view === "grid" ? "h-32 overflow-hidden rounded-2xl bg-surface-container-low" : "h-20 w-28 shrink-0 overflow-hidden rounded-2xl bg-surface-container-low"}">
+                    ${cardPreview(file)}
+                    <div class="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold ${file.sourceTone === "primary" ? "text-primary ring-primary/10 hover:bg-primary hover:text-white" : file.sourceTone === "tertiary" ? "text-tertiary ring-tertiary/10 hover:bg-tertiary hover:text-white" : "text-on-surface-variant ring-on-surface-variant/10 hover:bg-on-surface-variant hover:text-white"} shadow-sm ring-1 transition-colors">
+                      <span class="material-symbols-outlined text-xs">${file.sourceIcon}</span>
+                      ${escapeHtml(file.source)}
+                    </div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <h5 class="truncate text-sm font-bold text-on-surface">${escapeHtml(file.name)}</h5>
+                        <div class="mt-2 flex flex-wrap items-center gap-2">
+                          <span class="text-[11px] text-on-surface-variant">${file.size}</span>
+                          <span class="rounded-full bg-surface-container-high px-2 py-1 text-[10px] font-bold text-on-surface-variant">${file.type}</span>
+                          ${file.favorite ? '<span class="rounded-full bg-primary-fixed px-2 py-1 text-[10px] font-bold text-primary">收藏</span>' : ""}
+                        </div>
+                      </div>
+                      <span class="material-symbols-outlined text-lg text-on-surface-variant">more_vert</span>
+                    </div>
+                  </div>
+                </button>
+              `)
+              .join("")
+          : `<div class="col-span-2 rounded-3xl border border-dashed border-outline-variant/40 bg-white/70 p-10 text-center text-sm font-medium text-on-surface-variant">没有匹配到文件，试试调整标签、搜索词或切换到其他分类。</div>`;
+      }
+
+      function renderPreview() {
+        const file = getSelectedFile();
+        refs.previewTitle.textContent = file.name;
+        refs.previewTime.textContent = file.createdAt;
+        refs.previewBadges.innerHTML = `
+          <span class="rounded-full bg-primary-fixed px-3 py-1 text-[10px] font-bold text-primary">${file.type}</span>
+          <span class="rounded-full bg-tertiary-fixed px-3 py-1 text-[10px] font-bold text-tertiary">${file.engine}</span>
+          <span class="rounded-full bg-surface-container-high px-3 py-1 text-[10px] font-bold text-on-surface-variant">${file.folder}</span>
+          ${file.tags.map((tag) => `<span class="rounded-full bg-surface-container-low px-3 py-1 text-[10px] font-bold text-on-surface-variant">${tag}</span>`).join("")}
+        `;
+        refs.previewSnippet.textContent = file.snippet;
+        refs.insightList.innerHTML = file.insights
+          .map(
+            (item, index) => `
+              <div class="flex items-center gap-3 rounded-xl border border-outline-variant/20 bg-white p-3">
+                <span class="material-symbols-outlined text-lg text-primary">${item.startsWith("MCP") ? "extension" : "bolt"}</span>
+                <span class="text-xs font-medium text-on-surface">${item}</span>
+                <span class="material-symbols-outlined ml-auto text-sm text-on-surface-variant/40">chevron_right</span>
+              </div>
+            `
+          )
+          .join("");
+        refs.deleteLabel.textContent = file.trashed ? "恢复" : "删除";
+        refs.deleteIcon.textContent = file.trashed ? "restore_from_trash" : "delete";
+      }
+
+      function renderViewButtons() {
+        refs.gridViewBtn.className = state.view === "grid" ? "rounded-full bg-white p-2 text-primary shadow-sm" : "p-2 text-on-surface-variant";
+        refs.listViewBtn.className = state.view === "list" ? "rounded-full bg-white p-2 text-primary shadow-sm" : "p-2 text-on-surface-variant";
+      }
+
+      function render() {
+        renderFolders();
+        renderTabs();
+        renderTags();
+        renderFiles();
+        renderPreview();
+        renderViewButtons();
+      }
+
+      refs.searchInput.addEventListener("input", (event) => {
+        state.search = event.target.value.trim();
+        render();
+      });
+
+      refs.libraryTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-scope]");
+        if (!button) return;
+        state.scope = button.dataset.scope;
+        render();
+      });
+
+      refs.tagFilters.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-tag]");
+        if (!button) return;
+        state.tag = button.dataset.tag;
+        render();
+      });
+
+      refs.gridViewBtn.addEventListener("click", () => {
+        state.view = "grid";
+        renderViewButtons();
+        renderFiles();
+      });
+
+      refs.listViewBtn.addEventListener("click", () => {
+        state.view = "list";
+        renderViewButtons();
+        renderFiles();
+      });
+
+      refs.folderCards.addEventListener("click", (event) => {
+        const scopeButton = event.target.closest("[data-folder-scope]");
+        if (scopeButton) {
+          state.scope = scopeButton.dataset.folderScope;
+          render();
+          return;
+        }
+        const newFolder = event.target.closest("#newFolderBtn");
+        if (newFolder) {
+          const index = state.folders.length + 1;
+          state.folders.push({
+            id: `folder-${Date.now()}`,
+            name: `新文件夹 ${index}`,
+            count: 0,
+            size: "0 MB",
+            icon: "folder",
+            tone: "primary",
+            scope: "all"
+          });
+          renderFolders();
+        }
+      });
+
+      refs.filesGrid.addEventListener("click", (event) => {
+        const fileButton = event.target.closest("[data-file-id]");
+        if (!fileButton) return;
+        state.selectedFileId = fileButton.dataset.fileId;
+        renderFiles();
+        renderPreview();
+      });
+
+      refs.uploadBtn.addEventListener("click", () => {
+        const uploaded = {
+          id: `upload-${Date.now()}`,
+          name: `上传文件_${state.files.length + 1}.pdf`,
+          size: "860 KB",
+          type: "上传",
+          scope: "recent",
+          favorite: false,
+          trashed: false,
+          source: "外部上传",
+          sourceTone: "neutral",
+          sourceIcon: "upload",
+          folder: "我的资产",
+          tags: ["上传", "文档"],
+          createdAt: "今天, 刚刚",
+          engine: "手动上传",
+          previewMode: "icon",
+          previewIcon: "picture_as_pdf",
+          previewIconTone: "primary",
+          snippet: "“新上传文件已进入云端文件夹，可继续用 AI 做总结、改写、翻译或结构化输出。”",
+          insights: ["总结内容", "生成 PRD", "继续用 AI 编辑"]
+        };
+        state.files.unshift(uploaded);
+        state.selectedFileId = uploaded.id;
+        state.scope = "recent";
+        render();
+      });
+
+      refs.aiEditBtn.addEventListener("click", () => {
+        const file = getSelectedFile();
+        alert(`已将《${file.name}》带入 AI 编辑流程。`);
+      });
+
+      refs.exportBtn.addEventListener("click", () => {
+        const file = getSelectedFile();
+        alert(`准备导出《${file.name}》。`);
+      });
+
+      refs.deleteBtn.addEventListener("click", () => {
+        const file = getSelectedFile();
+        if (file.trashed) {
+          file.trashed = false;
+          state.scope = "all";
+        } else {
+          file.trashed = true;
+          state.scope = "trash";
+        }
+        render();
+      });
+
+      refs.clearTrashBtn.addEventListener("click", () => {
+        state.files = state.files.filter((file) => !file.trashed);
+        state.scope = "all";
+        render();
+      });
+
+      refs.closePreviewBtn.addEventListener("click", () => {
+        const visible = getVisibleFiles();
+        if (visible.length > 1) {
+          state.selectedFileId = visible[0].id;
+        }
+        renderPreview();
+        renderFiles();
+      });
+
+      render();
+    </script>
+  </body>
+</html>

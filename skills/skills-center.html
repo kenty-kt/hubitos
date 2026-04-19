@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos AI OS - 技能市场</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --muted: #7b6a66;
+        --brand: #d92d20;
+        --brand-deep: #b91e13;
+        --line: rgba(236, 214, 209, 0.92);
+        --card: rgba(255, 255, 255, 0.96);
+        --shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+      }
+
+      .desktop-stage {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-window {
+        width: min(1728px, calc(100vw - 32px));
+        height: min(980px, calc(100vh - 32px));
+        min-height: 720px;
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        overflow: hidden;
+        border-radius: 28px;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .skills-shell {
+        display: grid;
+        grid-template-rows: 72px 1fr;
+        min-width: 0;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        border-bottom: 1px solid rgba(235, 209, 204, 0.42);
+        background:
+          radial-gradient(circle at 18% 0%, rgba(217, 45, 32, 0.08), transparent 22%),
+          rgba(255, 252, 251, 0.86);
+      }
+
+      .topbar-left,
+      .topbar-right,
+      .market-tabs,
+      .category-tabs,
+      .card-tags,
+      .card-footer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .market-tabs {
+        gap: 28px;
+      }
+
+      .market-tab {
+        position: relative;
+        min-height: 72px;
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        color: #9c8885;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .market-tab.active {
+        color: var(--brand);
+      }
+
+      .market-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand);
+      }
+
+      .search-shell {
+        position: relative;
+      }
+
+      .search-shell input {
+        width: 318px;
+        height: 40px;
+        padding: 0 18px 0 44px;
+        border: 1px solid rgba(238, 220, 217, 0.95);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #352523;
+        outline: none;
+      }
+
+      .search-shell .icon {
+        position: absolute;
+        left: 16px;
+        top: 10px;
+        color: #a18d89;
+        font-size: 15px;
+      }
+
+      .primary-btn,
+      .install-btn,
+      .category-chip {
+        min-height: 38px;
+        padding: 0 18px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .primary-btn {
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+        box-shadow: 0 12px 20px rgba(217, 45, 32, 0.18);
+      }
+
+      .avatar-btn,
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: transparent;
+        color: #604945;
+        cursor: pointer;
+      }
+
+      .avatar-btn {
+        background: linear-gradient(180deg, #fbe1dd 0%, #f5c4bb 100%);
+      }
+
+      .skills-main {
+        min-width: 0;
+        min-height: 0;
+        padding: 20px 24px 22px;
+        overflow: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #e5bdb7 transparent;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 16px;
+      }
+
+      .skills-main::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .skills-main::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .skills-main::-webkit-scrollbar-thumb {
+        background: #e5bdb7;
+        border-radius: 999px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .category-tabs {
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .category-chip {
+        min-height: 34px;
+        padding: 0 19px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #685a57;
+        background: #f3efee;
+        border: 1px solid transparent;
+      }
+
+      .category-chip.active {
+        color: #e13b2d;
+        background: #fff1ed;
+        border-color: #f0c9c0;
+        box-shadow: none;
+      }
+
+      .sort-indicator {
+        color: #8f7a76;
+        font-size: 14px;
+      }
+
+      .skills-grid {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-auto-rows: 255px;
+        gap: 16px;
+        align-content: start;
+      }
+
+      .skill-card {
+        height: 255px;
+        border-radius: 28px;
+        border: 1px solid rgba(244, 232, 229, 0.96);
+        background: var(--card);
+        box-shadow: 0 18px 38px rgba(171, 54, 35, 0.05);
+        padding: 16px 16px 14px;
+        display: grid;
+        grid-template-rows: auto auto 1fr auto auto;
+        gap: 12px;
+      }
+
+      .skill-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .skill-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #fff1ef 0%, #ffe5e1 100%);
+        color: var(--brand);
+        font-size: 30px;
+        font-weight: 700;
+      }
+
+      .rating-pill,
+      .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: #f9eeec;
+        color: #7a605c;
+        font-size: 12px;
+      }
+
+      .skill-label {
+        color: #957d79;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .skill-card h3 {
+        margin: 4px 0 0;
+        font-size: 20px;
+        line-height: 1.25;
+      }
+
+      .skill-copy {
+        color: #735652;
+        font-size: 14px;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .card-tags {
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tag-pill {
+        background: #f5f0ef;
+      }
+
+      .card-footer {
+        justify-content: space-between;
+        padding-top: 12px;
+        border-top: 1px solid rgba(241, 226, 223, 0.96);
+      }
+
+      .install-meta {
+        color: #8d7773;
+        font-size: 13px;
+      }
+
+      .install-btn {
+        min-width: 94px;
+        color: var(--brand);
+        background: #efe5e4;
+      }
+
+      .install-btn.installed {
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+      }
+
+      .toast {
+        position: fixed;
+        right: 28px;
+        bottom: 28px;
+        min-width: 220px;
+        max-width: 360px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(28, 20, 19, 0.92);
+        color: #fff6f4;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        transition: 0.2s ease;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 1480px) {
+        .skills-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 1220px) {
+        body {
+          padding: 0;
+        }
+
+        .app-window {
+          width: 100vw;
+          height: 100vh;
+          min-height: 100vh;
+          border-radius: 0;
+        }
+
+        .topbar {
+          padding: 16px;
+          height: auto;
+          flex-wrap: wrap;
+        }
+
+        .skills-main {
+          padding: 16px;
+        }
+
+        .skills-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="skills-shell">
+          <header class="topbar">
+            <div class="topbar-left">
+              <div class="market-tabs" id="marketTabs">
+                <button class="market-tab active" data-market="market" type="button">市场</button>
+                <button class="market-tab" data-market="installed" type="button">我的安装</button>
+                <button class="market-tab" data-market="developer" type="button">开发者中心</button>
+              </div>
+            </div>
+            <div class="topbar-right">
+              <div class="search-shell">
+                <span class="icon">⌕</span>
+                <input id="searchInput" type="text" placeholder="搜索全球 AI 技能..." />
+              </div>
+              <button class="primary-btn" id="runTaskBtn" type="button">执行任务</button>
+              <button class="icon-btn" type="button">◌</button>
+              <button class="avatar-btn" type="button">K</button>
+            </div>
+          </header>
+
+          <main class="skills-main">
+            <section class="toolbar">
+              <div class="category-tabs" id="categoryTabs">
+                <button class="category-chip active" data-category="all" type="button">热门</button>
+                <button class="category-chip" data-category="writing" type="button">写作</button>
+                <button class="category-chip" data-category="coding" type="button">编程</button>
+                <button class="category-chip" data-category="analysis" type="button">数据分析</button>
+                <button class="category-chip" data-category="design" type="button">视觉设计</button>
+                <button class="category-chip" data-category="ops" type="button">效率工具</button>
+              </div>
+              <div class="sort-indicator" id="sortLabel">排序: 最近更新</div>
+            </section>
+
+            <section class="skills-grid" id="skillsGrid"></section>
+          </main>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "skills",
+        fixed: false,
+        showHistory: true,
+        historyTitle: "历史对话",
+        historyContainerId: "historyList",
+        primaryLabel: "+ 新对话",
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "./skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+
+      const state = {
+        market: "market",
+        category: "all",
+        query: "",
+        skills: [
+          { id: "seo-pro", category: "analysis", label: "数据分析", name: "SEO 优化专家", desc: "全自动分析关键词竞争度，并生成符合搜索算法的高转化内容结构。", icon: "↗", rating: 4.9, installs: "12.4k", installed: false, tags: ["关键词", "增长", "内容策略"] },
+          { id: "refactor-bot", category: "coding", label: "编程助手", name: "代码重构助手", desc: "自动检测代码坏味道并提供符合 SOLID 原则的重构建议和拆分计划。", icon: "⌘", rating: 5.0, installs: "8.9k", installed: false, tags: ["重构", "审查", "工程效率"] },
+          { id: "finance-sheet", category: "analysis", label: "财务金融", name: "财务报表分析", desc: "深入洞察现金流、资产负债表趋势，提供专业级别的财务异常识别。", icon: "▥", rating: 4.8, installs: "4.2k", installed: false, tags: ["财报", "趋势预测", "风控"] },
+          { id: "translate-local", category: "writing", label: "多语言", name: "本地化翻译官", desc: "不仅是翻译，更能针对目标市场文化语境调整文本语气与转化表达。", icon: "文", rating: 4.7, installs: "21k", installed: true, tags: ["翻译", "本地化", "营销"] },
+          { id: "mindmap-maker", category: "ops", label: "效率工具", name: "思维导图生成器", desc: "从长篇文章或视频脚本中自动提取逻辑骨干并生成结构清晰的脑图。", icon: "◎", rating: 4.9, installs: "15.7k", installed: false, tags: ["总结", "脑图", "提纲"] },
+          { id: "ui-auditor", category: "design", label: "创意设计", name: "UI 调色板大师", desc: "基于品牌调性自动生成符合 WCAG 无障碍标准的界面配色与组件建议。", icon: "✎", rating: 4.6, installs: "7.1k", installed: false, tags: ["配色", "品牌", "无障碍"] },
+          { id: "brand-watch", category: "analysis", label: "数字营销", name: "舆情监控哨兵", desc: "全网实时监控品牌关键词，并对负面情绪进行 AI 聚类与应对建议输出。", icon: "△", rating: 4.9, installs: "3.8k", installed: false, tags: ["舆情", "监控", "品牌"] },
+          { id: "contract-scan", category: "writing", label: "法律政务", name: "合同合规扫描", desc: "深度检测商业合同中的潜在法律风险与隐藏条款缺陷，形成审阅纪要。", icon: "▤", rating: 4.5, installs: "6.5k", installed: false, tags: ["合同", "审查", "合规"] }
+        ]
+      };
+
+      const refs = {
+        marketTabs: document.getElementById("marketTabs"),
+        categoryTabs: document.getElementById("categoryTabs"),
+        searchInput: document.getElementById("searchInput"),
+        skillsGrid: document.getElementById("skillsGrid"),
+        sortLabel: document.getElementById("sortLabel"),
+        toast: document.getElementById("toast")
+      };
+
+      function escapeHtml(text) {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function showToast(message) {
+        refs.toast.textContent = message;
+        refs.toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => refs.toast.classList.remove("show"), 2400);
+      }
+
+      function renderTabs(container, key, current) {
+        Array.from(container.querySelectorAll("[data-" + key + "]")).forEach((button) => {
+          button.classList.toggle("active", button.dataset[key] === current);
+        });
+      }
+
+      function filteredSkills() {
+        return state.skills.filter((skill) => {
+          if (state.market === "installed" && !skill.installed) return false;
+          if (state.category !== "all" && skill.category !== state.category) return false;
+          if (
+            state.query &&
+            !`${skill.name} ${skill.desc} ${skill.tags.join(" ")}`.toLowerCase().includes(state.query.toLowerCase())
+          ) {
+            return false;
+          }
+          return true;
+        });
+      }
+
+      function renderSkills() {
+        const skills = filteredSkills();
+        refs.sortLabel.textContent =
+          state.market === "installed" ? "排序: 最近使用" : state.market === "developer" ? "排序: 收益潜力" : "排序: 最近更新";
+
+        refs.skillsGrid.innerHTML = skills
+          .map(
+            (skill) => `
+              <article class="skill-card">
+                <div class="skill-head">
+                  <div class="skill-icon">${escapeHtml(skill.icon)}</div>
+                  <div class="rating-pill">☆ ${escapeHtml(skill.rating)}</div>
+                </div>
+                <div>
+                  <div class="skill-label">${escapeHtml(skill.label)}</div>
+                  <h3>${escapeHtml(skill.name)}</h3>
+                </div>
+                <div class="skill-copy">${escapeHtml(skill.desc)}</div>
+                <div class="card-tags">
+                  ${skill.tags.map((tag) => `<span class="tag-pill">${escapeHtml(tag)}</span>`).join("")}
+                </div>
+                <div class="card-footer">
+                  <div class="install-meta">${escapeHtml(skill.installs)} 安装</div>
+                  <button class="install-btn ${skill.installed ? "installed" : ""}" data-install-id="${escapeHtml(skill.id)}" type="button">
+                    ${skill.installed ? "已安装" : "安装"}
+                  </button>
+                </div>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      refs.marketTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-market]");
+        if (!button) return;
+        state.market = button.dataset.market;
+        renderTabs(refs.marketTabs, "market", state.market);
+        renderSkills();
+      });
+
+      refs.categoryTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-category]");
+        if (!button) return;
+        state.category = button.dataset.category;
+        renderTabs(refs.categoryTabs, "category", state.category);
+        renderSkills();
+      });
+
+      refs.searchInput.addEventListener("input", (event) => {
+        state.query = event.target.value.trim();
+        renderSkills();
+      });
+
+      refs.skillsGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-install-id]");
+        if (!button) return;
+        const skill = state.skills.find((item) => item.id === button.dataset.installId);
+        if (!skill) return;
+        skill.installed = !skill.installed;
+        renderSkills();
+        showToast(skill.installed ? `已安装 ${skill.name}` : `已移除 ${skill.name}`);
+      });
+
+      document.getElementById("runTaskBtn").addEventListener("click", () => {
+        showToast("可从技能市场直接发起任务执行");
+      });
+
+      renderTabs(refs.marketTabs, "market", state.market);
+      renderTabs(refs.categoryTabs, "category", state.category);
+      renderSkills();
+    </script>
+  </body>
+</html>

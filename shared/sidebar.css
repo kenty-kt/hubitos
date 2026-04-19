@@ -1,0 +1,154 @@
+:root {
+  --hubitos-sidebar-width: 188px;
+  --hubitos-brand: #d92d20;
+  --hubitos-line: rgba(233, 215, 213, 0.72);
+}
+
+.hubitos-sidebar {
+  width: var(--hubitos-sidebar-width);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 18px 24px;
+  background: linear-gradient(180deg, rgba(247, 242, 241, 0.96), rgba(255, 252, 251, 0.96));
+  border-right: 1px solid var(--hubitos-line);
+}
+
+.hubitos-sidebar.is-fixed {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 40;
+}
+
+.hubitos-brand-block {
+  margin-bottom: 34px;
+}
+
+.hubitos-brand-name {
+  font-size: 31px;
+  line-height: 1;
+  color: var(--hubitos-brand);
+  letter-spacing: -0.03em;
+}
+
+.hubitos-brand-subtitle {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #766562;
+}
+
+.hubitos-main-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.hubitos-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: #553f3b;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.hubitos-nav-item.is-active {
+  background: #ffffff;
+  color: var(--hubitos-brand);
+  box-shadow: inset 0 0 0 1px rgba(217, 45, 32, 0.08);
+}
+
+.hubitos-nav-icon {
+  width: 14px;
+  text-align: center;
+}
+
+.hubitos-sidebar-section {
+  margin-top: 38px;
+}
+
+.hubitos-sidebar-title {
+  margin: 0 4px 12px;
+  font-size: 11px;
+  color: #8b7975;
+  letter-spacing: 0.06em;
+}
+
+.hubitos-sidebar-body {
+  display: grid;
+  gap: 6px;
+}
+
+.history-list {
+  display: grid;
+  gap: 6px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 8px;
+  border-radius: 12px;
+  border: 0;
+  background: transparent;
+  color: #6a5855;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.history-item.active,
+.history-item:hover {
+  background: rgba(217, 45, 32, 0.05);
+}
+
+.history-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.history-delete {
+  opacity: 0.55;
+  font-size: 11px;
+}
+
+.hubitos-sidebar-footer {
+  display: grid;
+  gap: 18px;
+}
+
+.hubitos-primary-action {
+  border: 0;
+  min-height: 36px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(180deg, #e53426 0%, #c9190f 100%);
+  box-shadow: 0 12px 24px rgba(217, 45, 32, 0.28);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.hubitos-settings-link {
+  justify-self: start;
+  border: 0;
+  background: transparent;
+  color: #6f5f5c;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.hubitos-shell-header {
+  margin-left: var(--hubitos-sidebar-width);
+  width: calc(100% - var(--hubitos-sidebar-width));
+}
+
+.hubitos-shell-main {
+  margin-left: var(--hubitos-sidebar-width);
+}

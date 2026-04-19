@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos AI OS - 我的智能体</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --muted: #786866;
+        --brand: #d92d20;
+        --brand-deep: #a61b13;
+        --success: #169c64;
+        --warning: #f79009;
+        --shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .desktop-stage {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-window {
+        width: min(1728px, calc(100vw - 32px));
+        height: min(980px, calc(100vh - 32px));
+        min-height: 720px;
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        overflow: hidden;
+        border-radius: 28px;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .agents-shell {
+        display: grid;
+        grid-template-rows: 72px 1fr;
+        min-width: 0;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        border-bottom: 1px solid rgba(235, 209, 204, 0.42);
+        background:
+          radial-gradient(circle at 18% 0%, rgba(217, 45, 32, 0.08), transparent 22%),
+          rgba(255, 252, 251, 0.86);
+      }
+
+      .topbar-left,
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .market-tabs {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+
+      .market-tab {
+        position: relative;
+        min-height: 72px;
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        color: #9c8885;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        border: 0;
+        outline: none;
+        box-shadow: none;
+      }
+
+      .market-tab.active {
+        color: var(--brand);
+      }
+
+      .market-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand);
+      }
+
+      .search-shell {
+        position: relative;
+      }
+
+      .search-shell input {
+        width: 318px;
+        height: 40px;
+        padding: 0 18px 0 44px;
+        border: 1px solid rgba(238, 220, 217, 0.95);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #352523;
+        outline: none;
+      }
+
+      .search-shell .icon {
+        position: absolute;
+        left: 16px;
+        top: 10px;
+        color: #a18d89;
+        font-size: 15px;
+      }
+
+      .ghost-icon,
+      .avatar-btn {
+        width: 38px;
+        height: 38px;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        cursor: pointer;
+        color: #604945;
+      }
+
+      .avatar-btn {
+        background: linear-gradient(180deg, #fbe1dd 0%, #f5c4bb 100%);
+      }
+
+      .primary-btn,
+      .outline-btn {
+        min-height: 38px;
+        padding: 0 18px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .primary-btn {
+        border: 0;
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+        box-shadow: 0 12px 20px rgba(217, 45, 32, 0.18);
+      }
+
+      .outline-btn {
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: #fff;
+        color: #5a403c;
+      }
+
+      .agents-list-panel {
+        min-width: 0;
+        padding: 26px 22px 22px;
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        gap: 18px;
+      }
+
+      .page-header h1 {
+        margin: 0;
+        font-size: 38px;
+        line-height: 1.1;
+      }
+
+      .page-header p {
+        margin: 8px 0 0;
+        color: #8a7875;
+        font-size: 14px;
+      }
+
+      .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .segmented {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .seg-btn {
+        min-height: 42px;
+        padding: 0 22px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: #f3efee;
+        color: #685a57;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .seg-btn.active {
+        background: #fff1ed;
+        border-color: #f0c9c0;
+        color: #e13b2d;
+      }
+
+      .view-switch {
+        display: flex;
+        gap: 8px;
+      }
+
+      .view-btn {
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 12px;
+        background: #f3efee;
+        color: #786866;
+        cursor: pointer;
+      }
+
+      .view-btn.active {
+        background: #fff;
+        color: var(--brand);
+        box-shadow: inset 0 0 0 1px rgba(217, 45, 32, 0.08);
+      }
+
+      .agents-grid {
+        min-height: 0;
+        overflow: auto;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        padding-right: 4px;
+        align-items: start;
+      }
+
+      .agent-card {
+        min-height: 214px;
+        border-radius: 30px;
+        border: 1px solid rgba(244, 232, 229, 0.96);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 38px rgba(171, 54, 35, 0.04);
+        padding: 16px 14px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        cursor: pointer;
+        text-align: left;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .agent-card.active {
+        border-color: rgba(217, 45, 32, 0.2);
+        box-shadow: 0 22px 44px rgba(171, 54, 35, 0.08);
+      }
+
+      .agent-avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: linear-gradient(180deg, #fff5f3 0%, #fde6e2 100%);
+        color: #1f5666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        flex: 0 0 auto;
+        border: 1px solid rgba(244, 210, 205, 0.96);
+      }
+
+      .agent-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 0 14px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .status-pill.green {
+        background: #effdf4;
+        color: var(--success);
+        border: 1px solid rgba(22, 156, 100, 0.16);
+      }
+
+      .status-pill.orange {
+        background: #fff3f1;
+        color: var(--brand);
+        border: 1px solid rgba(217, 45, 32, 0.18);
+      }
+
+      .status-pill.gray {
+        background: #f6f0ef;
+        color: #7f6d69;
+        border: 1px solid rgba(231, 218, 214, 0.92);
+      }
+
+      .agent-card h3 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.2;
+        font-weight: 500;
+        color: #241b1a;
+      }
+
+      .agent-card p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.4;
+        color: #735652;
+        text-decoration: none;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .agent-meta {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+        border-top: 1px solid rgba(245, 233, 230, 0.96);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: #a28f8b;
+        font-weight: 700;
+      }
+
+      .agent-more {
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: 0;
+        color: #6e514c;
+      }
+
+      @media (max-width: 1480px) {
+        .agents-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .agent-card {
+          min-height: 204px;
+        }
+      }
+
+      @media (max-width: 1280px) {
+        body {
+          padding: 0;
+        }
+
+        .app-window {
+          width: 100vw;
+          height: 100vh;
+          min-height: 100vh;
+          border-radius: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="agents-shell">
+          <header class="topbar">
+            <div class="topbar-left">
+              <div class="market-tabs" id="scopeTabs">
+                <button class="market-tab active" data-scope="mine" type="button">我的智能体</button>
+                <button class="market-tab" data-scope="all" type="button">All Agents</button>
+                <button class="market-tab" data-scope="production" type="button">Production</button>
+                <button class="market-tab" data-scope="drafts" type="button">Drafts</button>
+              </div>
+            </div>
+            <div class="topbar-right">
+              <div class="search-shell">
+                <span class="icon">⌕</span>
+                <input id="searchInput" type="text" placeholder="Search agents, skills, or models..." />
+              </div>
+              <button class="outline-btn" id="importBtn" type="button">⇪ 导入</button>
+              <button class="primary-btn" id="newAgentBtn" type="button">＋ 新建智能体</button>
+              <button class="ghost-icon" type="button">◌</button>
+              <button class="avatar-btn" type="button">K</button>
+            </div>
+          </header>
+
+          <section class="agents-list-panel">
+            <div class="header-actions">
+              <div class="segmented" id="tagTabs">
+                <button class="seg-btn active" data-tag="all" type="button">全部</button>
+                <button class="seg-btn" data-tag="finance" type="button">金融</button>
+                <button class="seg-btn" data-tag="research" type="button">研究</button>
+                <button class="seg-btn" data-tag="engineering" type="button">工程</button>
+              </div>
+              <div class="view-switch">
+                <button id="gridBtn" class="view-btn active" type="button">▥</button>
+              </div>
+            </div>
+
+            <div class="agents-grid" id="agentsGrid"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "agents",
+        fixed: false,
+        showHistory: true,
+        historyTitle: "历史对话",
+        historyContainerId: "historyList",
+        primaryLabel: "+ 新对话",
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "./agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+
+      const state = {
+        scope: "mine",
+        tag: "all",
+        query: "",
+        selectedId: "agent-analyst",
+        agents: [
+          {
+            id: "agent-analyst",
+            name: "精准分析师 v2.4",
+            version: "v2.4",
+            scope: "production",
+            mine: true,
+            tag: "finance",
+            status: { text: "已发布", tone: "green" },
+            icon: "◫",
+            desc: "High-precision financial data modeling and predictive market sentiment analysis engine."
+          },
+          {
+            id: "agent-market",
+            name: "市场研究助手",
+            version: "v1.8",
+            scope: "drafts",
+            mine: true,
+            tag: "research",
+            status: { text: "私有", tone: "gray" },
+            icon: "◎",
+            desc: "Real-time competitive intelligence and market-trend synthesis for retail sectors."
+          },
+          {
+            id: "agent-code",
+            name: "代码架构师",
+            version: "v3.1",
+            scope: "production",
+            mine: true,
+            tag: "engineering",
+            status: { text: "草稿", tone: "orange" },
+            icon: "⌘",
+            desc: "Autonomous refactoring and architectural oversight for legacy enterprise codebases."
+          },
+          {
+            id: "agent-review",
+            name: "内容审核专家",
+            version: "v1.2",
+            scope: "drafts",
+            mine: true,
+            tag: "research",
+            status: { text: "私有", tone: "gray" },
+            icon: "✺",
+            desc: "High-speed policy compliance engine for multi-modal community platform generated content."
+          }
+        ]
+      };
+
+      const refs = {
+        searchInput: document.getElementById("searchInput"),
+        scopeTabs: document.getElementById("scopeTabs"),
+        tagTabs: document.getElementById("tagTabs"),
+        gridBtn: document.getElementById("gridBtn"),
+        agentsGrid: document.getElementById("agentsGrid")
+      };
+
+      function escapeHtml(text) {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function filteredAgents() {
+        return state.agents.filter((agent) => {
+          if (state.scope === "mine" && !agent.mine) return false;
+          if (state.scope === "production" && agent.scope !== "production") return false;
+          if (state.scope === "drafts" && agent.scope !== "drafts") return false;
+          if (state.tag !== "all" && agent.tag !== state.tag) return false;
+          if (state.query && !`${agent.name} ${agent.desc}`.toLowerCase().includes(state.query.toLowerCase())) return false;
+          return true;
+        });
+      }
+
+      function renderTabs(container, key) {
+        Array.from(container.querySelectorAll("[data-" + key + "]")).forEach((button) => {
+          const active = button.dataset[key] === state[key];
+          button.classList.toggle("active", active);
+        });
+      }
+
+      function timeLabel(agent) {
+        if (agent.id === "agent-analyst") return "2H AGO";
+        if (agent.id === "agent-market") return "1D AGO";
+        if (agent.id === "agent-code") return "3D AGO";
+        return "4H AGO";
+      }
+
+      function renderAgents() {
+        const agents = filteredAgents();
+        refs.agentsGrid.innerHTML = agents
+          .map(
+            (agent) => `
+              <a class="agent-card ${agent.id === state.selectedId ? "active" : ""}" data-agent-id="${agent.id}" href="./agents-detail.html?id=${agent.id}">
+                <div class="agent-head">
+                  <div class="agent-avatar">${agent.icon}</div>
+                  <span class="status-pill ${agent.status.tone}">${agent.status.text}</span>
+                </div>
+                <div>
+                  <h3>${escapeHtml(agent.name)}</h3>
+                  <p>${escapeHtml(agent.desc)}</p>
+                </div>
+                <div class="agent-meta">
+                  <span>${timeLabel(agent)}</span>
+                  <span class="agent-more">•••</span>
+                </div>
+              </a>
+            `
+          )
+          .join("");
+      }
+
+      refs.searchInput.addEventListener("input", (event) => {
+        state.query = event.target.value.trim();
+        renderAgents();
+      });
+
+      refs.scopeTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-scope]");
+        if (!button) return;
+        state.scope = button.dataset.scope;
+        renderTabs(refs.scopeTabs, "scope");
+        renderAgents();
+      });
+
+      refs.tagTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-tag]");
+        if (!button) return;
+        state.tag = button.dataset.tag;
+        renderTabs(refs.tagTabs, "tag");
+        renderAgents();
+      });
+
+      renderTabs(refs.scopeTabs, "scope");
+      renderTabs(refs.tagTabs, "tag");
+      renderAgents();
+    </script>
+  </body>
+</html>

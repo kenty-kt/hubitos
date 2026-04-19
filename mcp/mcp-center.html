@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos AI OS - MCP 注册中心</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --muted: #7b6a66;
+        --brand: #d92d20;
+        --line: rgba(236, 214, 209, 0.92);
+        --card: rgba(255, 255, 255, 0.96);
+        --shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+      }
+
+      .desktop-stage {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-window {
+        width: min(1728px, calc(100vw - 32px));
+        height: min(980px, calc(100vh - 32px));
+        min-height: 720px;
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        overflow: hidden;
+        border-radius: 28px;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .mcp-shell {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 72px;
+        padding: 0 24px;
+        border-bottom: 1px solid rgba(237, 214, 209, 0.7);
+        background: rgba(252, 249, 248, 0.88);
+        backdrop-filter: blur(18px);
+      }
+
+      .topbar-left {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex: 1;
+      }
+
+      .search-shell {
+        position: relative;
+        width: 320px;
+        flex: 0 0 auto;
+      }
+
+      .search-shell input {
+        width: 100%;
+        height: 40px;
+        padding: 0 18px 0 44px;
+        border: 1px solid rgba(238, 220, 217, 0.95);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #352523;
+        outline: none;
+        font-size: 14px;
+      }
+
+      .search-shell .icon {
+        position: absolute;
+        left: 16px;
+        top: 10px;
+        color: #a18d89;
+        font-size: 18px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .icon-btn,
+      .avatar-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: transparent;
+        color: #604945;
+        cursor: pointer;
+      }
+
+      .avatar-btn {
+        background: linear-gradient(180deg, #c09b73 0%, #473521 100%);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .mcp-main {
+        min-width: 0;
+        min-height: 0;
+        overflow: auto;
+        padding: 20px 24px 24px;
+        scrollbar-width: thin;
+        scrollbar-color: #e5bdb7 transparent;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 18px;
+      }
+
+      .mcp-main::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .mcp-main::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .mcp-main::-webkit-scrollbar-thumb {
+        background: #e5bdb7;
+        border-radius: 999px;
+      }
+
+      .category-tabs,
+      .tag-filters,
+      .actions-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .category-tabs {
+        gap: 22px;
+        min-width: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .category-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .category-tab {
+        position: relative;
+        flex: 0 0 auto;
+        min-height: 56px;
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        color: #9c8885;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .category-tab.active {
+        color: var(--brand);
+      }
+
+      .category-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand);
+      }
+
+      .category-badge {
+        margin-left: 8px;
+        min-width: 28px;
+        height: 28px;
+        padding: 0 8px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(217, 45, 32, 0.08);
+        color: #8c5a54;
+        font-size: 13px;
+      }
+
+      .filters-panel {
+        display: grid;
+        gap: 18px;
+      }
+
+      .tag-filters {
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .tag-filter-btn {
+        min-height: 42px;
+        padding: 0 22px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: #f3efee;
+        color: #685a57;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        transition:
+          background 0.18s ease,
+          color 0.18s ease,
+          border-color 0.18s ease;
+      }
+
+      .tag-filter-btn.active {
+        border-color: #f0c9c0;
+        background: #fff1ed;
+        color: #e13b2d;
+      }
+
+      .mcp-grid {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        align-content: start;
+      }
+
+      .mcp-card {
+        min-height: 316px;
+        border-radius: 32px;
+        border: 1px solid rgba(244, 232, 229, 0.96);
+        background: var(--card);
+        box-shadow: 0 18px 38px rgba(171, 54, 35, 0.05);
+        padding: 18px 18px 16px;
+        display: grid;
+        grid-template-rows: auto auto 1fr auto auto;
+        gap: 14px;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .card-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #fff1ef 0%, #ffe5e1 100%);
+        color: var(--brand);
+        font-size: 30px;
+        font-weight: 700;
+      }
+
+      .status-pill,
+      .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 0 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: #f5efee;
+        color: #7a605c;
+      }
+
+      .status-pill.enabled {
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+        color: #fff;
+      }
+
+      .card-title h3 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.25;
+      }
+
+      .card-copy {
+        color: #735652;
+        font-size: 14px;
+        line-height: 1.65;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .actions-row {
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(241, 226, 223, 0.96);
+      }
+
+      .primary-btn,
+      .ghost-btn {
+        min-height: 46px;
+        padding: 0 22px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .primary-btn {
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+        box-shadow: 0 12px 20px rgba(217, 45, 32, 0.18);
+      }
+
+      .ghost-btn {
+        color: #6a5652;
+        background: #f1e9e8;
+      }
+
+      .toast {
+        position: fixed;
+        right: 28px;
+        bottom: 28px;
+        min-width: 240px;
+        max-width: 360px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(28, 20, 19, 0.92);
+        color: #fff6f4;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        transition: 0.2s ease;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 1520px) {
+        .mcp-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 1220px) {
+        body {
+          padding: 0;
+        }
+
+        .app-window {
+          width: 100vw;
+          height: 100vh;
+          min-height: 100vh;
+          border-radius: 0;
+        }
+
+        .topbar {
+          flex-direction: column;
+          align-items: stretch;
+          padding: 14px 16px;
+        }
+
+        .mcp-main {
+          padding: 16px;
+        }
+
+        .topbar-left {
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+        }
+
+        .topbar-right {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .search-shell {
+          width: 100%;
+        }
+
+        .mcp-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="mcp-shell">
+          <header class="topbar">
+            <div class="topbar-left">
+              <div class="category-tabs" id="categoryTabs">
+                <button class="category-tab" data-category="mine" type="button">我的工具</button>
+                <button class="category-tab active" data-category="all" type="button">全部工具 <span class="category-badge">42</span></button>
+                <button class="category-tab" data-category="browser" type="button">浏览器自动化</button>
+                <button class="category-tab" data-category="search" type="button">搜索引擎接口</button>
+                <button class="category-tab" data-category="dev" type="button">开发者套件</button>
+                <button class="category-tab" data-category="finance" type="button">金融与数据分析</button>
+                <button class="category-tab" data-category="social" type="button">社交媒体同步</button>
+                <button class="category-tab" data-category="security" type="button">企业级安全</button>
+              </div>
+              <div class="search-shell">
+                <span class="icon">⌕</span>
+                <input id="searchInput" type="text" placeholder="搜索服务、插件或开发者工具..." />
+              </div>
+            </div>
+            <div class="topbar-right">
+              <button class="icon-btn" type="button">◌</button>
+              <button class="avatar-btn" type="button">K</button>
+            </div>
+          </header>
+
+          <main class="mcp-main">
+            <section class="filters-panel">
+              <div class="tag-filters" id="tagFilters"></div>
+            </section>
+            <section class="mcp-grid" id="mcpGrid"></section>
+          </main>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "mcp",
+        fixed: false,
+        showHistory: true,
+        historyTitle: "历史对话",
+        historyContainerId: "historyList",
+        primaryLabel: "+ 新对话",
+        primaryId: "newConversationBtn",
+        settingsId: "systemSettingsBtn",
+        chatHref: "../chat/chat-workspace.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "./mcp-center.html"
+      });
+
+      const state = {
+        category: "all",
+        tag: "all",
+        query: "",
+        items: [
+          { id: "fetch-tools", category: "browser", icon: "↓", status: "托管服务", title: "Fetch 工具集", desc: "为智能代理提供高效的网页抓取与 Markdown 转换功能，支持动态渲染页面。", tags: ["MIT 认证", "V2.4.1"], installs: "12.4k", success: "99.8%", primary: "使用", secondary: "查看文档" },
+          { id: "google-search", category: "search", icon: "⌕", status: "已启用", title: "Google Search 增强", desc: "实时接入全球搜索数据，具备自动去重与摘要生成功能，适合深度研究流。", tags: ["商业授权", "实时同步"], installs: "45.2k", success: "99.2%", primary: "使用", secondary: "运行日志", enabled: true },
+          { id: "notion-space", category: "dev", icon: "▤", status: "托管服务", title: "Notion Workspace", desc: "全双向数据同步，支持数据库批量操作与块级权限管理。一键导出工作区。", tags: ["企业推荐", "V1.0.8"], installs: "8.1k", success: "98.5%", primary: "使用", secondary: "" },
+          { id: "github-sdk", category: "dev", icon: "⌘", status: "本地节点", title: "GitHub SDK", desc: "核心开发组件。支持代码审查辅助、Issue 自动分类以及 PR 合并建议生成。", tags: ["Apache 2.0", "官方认证"], installs: "156.4k", success: "100%", primary: "使用", secondary: "文档" },
+          { id: "finance-flow", category: "finance", icon: "¤", status: "已启用", title: "Finance Flow", desc: "集成全球汇率、加密货币实时数据及美股行情，支持自动报表生成。", tags: ["高频数据", "低延迟"], installs: "3.2k", success: "99.9%", primary: "使用", secondary: "导出", enabled: true },
+          { id: "secure-guard", category: "security", icon: "◈", status: "本地节点", title: "Secure Guard", desc: "本地敏感数据扫描与脱敏工具，确保智能代理在处理隐私信息时的安全性。", tags: ["隐私优先", "零信任"], installs: "5.8k", success: "100%", primary: "使用", secondary: "" },
+          { id: "telegram-sync", category: "social", icon: "◎", status: "托管服务", title: "Telegram Sync", desc: "同步频道内容、管理群组消息队列，并把对话结果回写到 CRM 或自动化流程。", tags: ["营销自动化", "内容分发"], installs: "11.7k", success: "98.9%", primary: "使用", secondary: "文档" },
+          { id: "browser-runner", category: "browser", icon: "↗", status: "本地节点", title: "Browser Runner", desc: "面向复杂网页任务的自动执行节点，支持登录态复用、截图、DOM 提取与导出。", tags: ["截图", "自动化"], installs: "9.6k", success: "97.8%", primary: "使用", secondary: "查看日志" }
+        ]
+      };
+
+      const refs = {
+        categoryTabs: document.getElementById("categoryTabs"),
+        tagFilters: document.getElementById("tagFilters"),
+        searchInput: document.getElementById("searchInput"),
+        mcpGrid: document.getElementById("mcpGrid"),
+        toast: document.getElementById("toast")
+      };
+
+      function escapeHtml(text) {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function showToast(message) {
+        refs.toast.textContent = message;
+        refs.toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => refs.toast.classList.remove("show"), 2400);
+      }
+
+      function renderTabs() {
+        Array.from(refs.categoryTabs.querySelectorAll("[data-category]")).forEach((button) => {
+          button.classList.toggle("active", button.dataset.category === state.category);
+        });
+      }
+
+      function categoryItems() {
+        return state.items.filter((item) => {
+          if (state.category === "all") return true;
+          if (state.category === "mine") return item.enabled || item.status === "本地节点";
+          return item.category === state.category;
+        });
+      }
+
+      function availableTags() {
+        const tags = Array.from(new Set(categoryItems().flatMap((item) => item.tags)));
+        return tags.slice(0, Math.max(1, Math.ceil(tags.length / 2)));
+      }
+
+      function renderTagFilters() {
+        const tags = availableTags();
+        if (state.tag !== "all" && !tags.includes(state.tag)) {
+          state.tag = "all";
+        }
+
+        refs.tagFilters.innerHTML = [
+          `<button class="tag-filter-btn ${state.tag === "all" ? "active" : ""}" data-tag="all" type="button">全部</button>`,
+          ...tags.map(
+            (tag) =>
+              `<button class="tag-filter-btn ${state.tag === tag ? "active" : ""}" data-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`
+          )
+        ].join("");
+      }
+
+      function visibleItems() {
+        return state.items.filter((item) => {
+          if (state.category === "mine" && !(item.enabled || item.status === "本地节点")) return false;
+          if (state.category !== "all" && state.category !== "mine" && item.category !== state.category) return false;
+          if (state.tag !== "all" && !item.tags.includes(state.tag)) return false;
+          if (state.query && !`${item.title} ${item.desc} ${item.tags.join(" ")}`.toLowerCase().includes(state.query.toLowerCase())) return false;
+          return true;
+        });
+      }
+
+      function renderGrid() {
+        refs.mcpGrid.innerHTML = visibleItems()
+          .map(
+            (item) => `
+              <article class="mcp-card">
+                <div class="card-head">
+                  <div class="card-icon">${escapeHtml(item.icon)}</div>
+                  <span class="status-pill ${item.enabled ? "enabled" : ""}">${escapeHtml(item.status)}</span>
+                </div>
+                <div class="card-title">
+                  <h3>${escapeHtml(item.title)}</h3>
+                </div>
+                <div class="card-copy">${escapeHtml(item.desc)}</div>
+                <div class="actions-row">
+                  <button class="primary-btn" data-primary="${escapeHtml(item.id)}" type="button">${escapeHtml(item.primary)}</button>
+                </div>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      refs.categoryTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-category]");
+        if (!button) return;
+        state.category = button.dataset.category;
+        state.tag = "all";
+        renderTabs();
+        renderTagFilters();
+        renderGrid();
+      });
+
+      refs.tagFilters.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-tag]");
+        if (!button) return;
+        state.tag = button.dataset.tag;
+        renderTagFilters();
+        renderGrid();
+      });
+
+      refs.searchInput.addEventListener("input", (event) => {
+        state.query = event.target.value.trim();
+        renderGrid();
+      });
+
+      refs.mcpGrid.addEventListener("click", (event) => {
+        const primary = event.target.closest("[data-primary]");
+        if (primary) {
+          const item = state.items.find((entry) => entry.id === primary.dataset.primary);
+          if (item) showToast(`${item.primary}：${item.title}`);
+        }
+      });
+
+      document.getElementById("newConversationBtn").addEventListener("click", () => showToast("开始新对话"));
+      document.getElementById("systemSettingsBtn").addEventListener("click", () => showToast("系统设置面板已预留"));
+
+      renderTabs();
+      renderTagFilters();
+      renderGrid();
+    </script>
+  </body>
+</html>
