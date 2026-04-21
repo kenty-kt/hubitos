@@ -619,7 +619,7 @@
     document.documentElement.lang = currentLang === "en" ? "en" : "zh-CN";
     processSubtree(document.querySelector("title"));
     processSubtree(document.body);
-    updateSwitcher();
+    updateSettingsPanel();
   }
 
   function injectStyles() {
@@ -629,27 +629,70 @@
     style.textContent = `
       .hubitos-lang-switch {
         position: fixed;
-        top: 18px;
-        right: 20px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         z-index: 9999;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px;
+        display: none;
+        width: min(320px, calc(100vw - 32px));
+        padding: 18px;
         border: 1px solid rgba(234, 215, 212, 0.92);
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 14px 28px rgba(118, 39, 27, 0.12);
+        border-radius: 24px;
+        background: rgba(255, 253, 252, 0.98);
+        box-shadow: 0 20px 48px rgba(118, 39, 27, 0.18);
         backdrop-filter: blur(18px);
       }
 
+      .hubitos-lang-switch.is-open {
+        display: grid;
+        gap: 14px;
+      }
+
+      .hubitos-lang-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        display: none;
+        background: rgba(20, 12, 11, 0.2);
+        backdrop-filter: blur(4px);
+      }
+
+      .hubitos-lang-overlay.is-open {
+        display: block;
+      }
+
+      .hubitos-lang-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .hubitos-lang-title {
+        font: 700 18px/1.2 "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: #2f201e;
+      }
+
+      .hubitos-lang-section-label {
+        font: 600 12px/1.2 "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #8c7671;
+      }
+
+      .hubitos-lang-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
       .hubitos-lang-switch button {
-        min-width: 88px;
-        min-height: 36px;
+        min-width: 0;
+        min-height: 42px;
         padding: 0 14px;
         border: 0;
-        border-radius: 999px;
-        background: transparent;
+        border-radius: 16px;
+        background: #f8efed;
         color: #6d5c58;
         cursor: pointer;
         font: 600 13px/1 "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -667,12 +710,8 @@
 
       @media (max-width: 768px) {
         .hubitos-lang-switch {
-          top: 12px;
-          right: 12px;
-        }
-
-        .hubitos-lang-switch button {
-          min-width: 76px;
+          width: calc(100vw - 24px);
+          padding: 16px;
         }
       }
     `;
@@ -696,31 +735,87 @@
     channels.forEach((channel) => channel.postMessage({ lang }));
   }
 
-  function updateSwitcher() {
-    const switcher = document.getElementById("hubitosLangSwitch");
-    if (!switcher) return;
-    switcher.querySelectorAll("button[data-lang]").forEach((button) => {
+  function updateSettingsPanel() {
+    const panel = document.getElementById("hubitosLangSwitch");
+    if (!panel) return;
+    const title = panel.querySelector("[data-role='settings-title']");
+    const label = panel.querySelector("[data-role='language-label']");
+    if (title) title.textContent = currentLang === "en" ? "Settings" : "设置";
+    if (label) label.textContent = currentLang === "en" ? "Language" : "语言";
+    panel.querySelectorAll("button[data-lang]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.lang === currentLang);
     });
   }
 
-  function ensureSwitcher() {
+  function openSettingsPanel() {
+    const overlay = document.getElementById("hubitosLangOverlay");
+    const panel = document.getElementById("hubitosLangSwitch");
+    if (!overlay || !panel) return;
+    overlay.classList.add("is-open");
+    panel.classList.add("is-open");
+    updateSettingsPanel();
+  }
+
+  function closeSettingsPanel() {
+    const overlay = document.getElementById("hubitosLangOverlay");
+    const panel = document.getElementById("hubitosLangSwitch");
+    if (!overlay || !panel) return;
+    overlay.classList.remove("is-open");
+    panel.classList.remove("is-open");
+  }
+
+  function ensureSettingsPanel() {
     if (document.getElementById("hubitosLangSwitch") || !document.body) return;
-    const switcher = document.createElement("div");
-    switcher.id = "hubitosLangSwitch";
-    switcher.className = "hubitos-lang-switch";
-    switcher.setAttribute(IGNORE_ATTR, "true");
-    switcher.innerHTML = `
-      <button type="button" data-lang="en">English</button>
-      <button type="button" data-lang="zh">中文</button>
+    const overlay = document.createElement("div");
+    overlay.id = "hubitosLangOverlay";
+    overlay.className = "hubitos-lang-overlay";
+    overlay.setAttribute(IGNORE_ATTR, "true");
+    overlay.addEventListener("click", closeSettingsPanel);
+
+    const panel = document.createElement("div");
+    panel.id = "hubitosLangSwitch";
+    panel.className = "hubitos-lang-switch";
+    panel.setAttribute(IGNORE_ATTR, "true");
+    panel.innerHTML = `
+      <div class="hubitos-lang-header">
+        <div class="hubitos-lang-title" data-role="settings-title">Settings</div>
+      </div>
+      <div class="hubitos-lang-section">
+        <div class="hubitos-lang-section-label" data-role="language-label">Language</div>
+        <div class="hubitos-lang-options">
+          <button type="button" data-lang="en">English</button>
+          <button type="button" data-lang="zh">中文</button>
+        </div>
+      </div>
     `;
-    switcher.addEventListener("click", (event) => {
+    panel.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-lang]");
       if (!button) return;
       setLanguage(button.dataset.lang);
+      closeSettingsPanel();
     });
-    document.body.appendChild(switcher);
-    updateSwitcher();
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button = event.target.closest(".hubitos-settings-link");
+        if (!button) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        if (panel.classList.contains("is-open")) {
+          closeSettingsPanel();
+          return;
+        }
+        openSettingsPanel();
+      },
+      true
+    );
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeSettingsPanel();
+    });
+    document.body.appendChild(overlay);
+    document.body.appendChild(panel);
+    updateSettingsPanel();
   }
 
   function setLanguage(lang, options) {
@@ -773,7 +868,7 @@
   function init() {
     injectStyles();
     ensureBroadcast();
-    ensureSwitcher();
+    ensureSettingsPanel();
     patchAlert();
     observeDom();
     applyLanguage();
