@@ -1,8 +1,8 @@
 (function () {
   const defaultHistoryItems = [
-    { title: "市场研究计划", pinned: true },
-    { title: "PRD 撰写讨论", pinned: false },
-    { title: "竞品分析报告", pinned: false }
+    { title: "Market Research Plan", pinned: true },
+    { title: "PRD Writing Discussion", pinned: false },
+    { title: "Competitor Analysis Report", pinned: false }
   ];
 
   function renderHistoryItems(items) {

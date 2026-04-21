@@ -4,111 +4,111 @@ const state = {
   currentModelId: "pro",
   currentOutput: "",
   attachedItems: [
-    { id: "asset-file-1", type: "file", label: "设计宣言.pdf" },
-    { id: "asset-file-2", type: "file", label: "品牌参考图.png" }
+    { id: "asset-file-1", type: "file", label: "Design_Manifesto.pdf" },
+    { id: "asset-file-2", type: "file", label: "Brand_Reference_Board.png" }
   ],
   skills: [
-    { id: "file-search", name: "文件搜索", enabled: true },
-    { id: "image-gen", name: "图片生成", enabled: true },
-    { id: "code-explain", name: "代码解释", enabled: false },
-    { id: "template-pack", name: "模板中心", enabled: true }
+    { id: "file-search", name: "File Search", enabled: true },
+    { id: "image-gen", name: "Image Generation", enabled: true },
+    { id: "code-explain", name: "Code Explanation", enabled: false },
+    { id: "template-pack", name: "Template Library", enabled: true }
   ],
   models: [
-    { id: "pro", name: "Hubitos Pro", meta: "精确 4.2 · 深度推理", icon: "✦", tokenUsed: 14200, tokenTotal: 128000 },
-    { id: "lite", name: "Hubitos Lite", meta: "日常任务 · 极速响应", icon: "⚡", tokenUsed: 4200, tokenTotal: 64000 },
-    { id: "advanced", name: "Hubitos Advanced", meta: "深度代理 · 执行计算", icon: "◎", tokenUsed: 31800, tokenTotal: 256000 }
+    { id: "pro", name: "Hubitos Pro", meta: "Precision 4.2 · Deep reasoning", icon: "✦", tokenUsed: 14200, tokenTotal: 128000 },
+    { id: "lite", name: "Hubitos Lite", meta: "Daily tasks · Ultra-fast response", icon: "⚡", tokenUsed: 4200, tokenTotal: 64000 },
+    { id: "advanced", name: "Hubitos Advanced", meta: "Deep agent · Compute execution", icon: "◎", tokenUsed: 31800, tokenTotal: 256000 }
   ],
   recentSkills: [
-    { id: "rs1", icon: "⚡", name: "PRD 写作助手", prompt: "用 PRD 写作助手整理这份需求，并生成完整章节结构。" },
-    { id: "rs2", icon: "⌕", name: "文件搜索", prompt: "检索我上传的文件并提炼出关键结论。" },
-    { id: "rs3", icon: "🖼", name: "图片生成", prompt: "根据当前品牌方向生成一版红白主题视觉草图。" }
+    { id: "rs1", icon: "⚡", name: "PRD Writing Assistant", prompt: "Use the PRD Writing Assistant to organize this request and produce a complete chapter outline." },
+    { id: "rs2", icon: "⌕", name: "File Search", prompt: "Search the files I uploaded and extract the key conclusions." },
+    { id: "rs3", icon: "🖼", name: "Image Generation", prompt: "Generate a red-and-white visual draft based on the current brand direction." }
   ],
   recentAgents: [
-    { id: "ra1", icon: "✦", name: "市场研究助理", prompt: "调用市场研究助理，输出竞品分析和建议摘要。" },
-    { id: "ra2", icon: "◎", name: "品牌视觉顾问", prompt: "调用品牌视觉顾问，给我桌面端首页的视觉提案。" },
-    { id: "ra3", icon: "⚙", name: "运营日报 Agent", prompt: "调用运营日报 Agent，整理今天的关键数据和执行建议。" }
+    { id: "ra1", icon: "✦", name: "Market Research Assistant", prompt: "Call the market research assistant and output competitor analysis with a recommendation summary." },
+    { id: "ra2", icon: "◎", name: "Brand Visual Advisor", prompt: "Call the brand visual advisor and draft a desktop homepage visual proposal." },
+    { id: "ra3", icon: "⚙", name: "Operations Daily Agent", prompt: "Call the operations daily agent and organize today's key metrics with execution suggestions." }
   ],
   recentPrompts: [
-    "帮我把这份项目说明整理成一份完整 PRD，并产出 Word 和 Markdown。",
-    "根据上传的 PDF 和图片，生成一版桌面客户端首页草图。",
-    "把这些资料整理成可复用工作流，并输出适合团队协作的执行方案。"
+    "Help me organize this project brief into a complete PRD and output both Word and Markdown.",
+    "Generate a desktop client homepage draft based on the uploaded PDF and images.",
+    "Organize these materials into a reusable workflow and output an execution plan suitable for team collaboration."
   ],
   conversations: [
     {
       id: "conv-home",
-      title: "新对话",
-      folder: "未归档",
+      title: "New Chat",
+      folder: "Unfiled",
       pinned: false,
       assets: [],
       messages: []
     },
     {
       id: "conv-market",
-      title: "市场研究计划",
-      folder: "品牌策略",
+      title: "Market Research Plan",
+      folder: "Brand Strategy",
       pinned: true,
       assets: [
-        { id: "docx-1", icon: "▤", name: "PRD 终稿.docx", meta: "文档 | 已归档到品牌策略" },
-        { id: "png-1", icon: "▧", name: "设计布局.png", meta: "图片 | 已生成封面方向" },
-        { id: "xlsx-1", icon: "▦", name: "研究样本.xlsx", meta: "表格 | 已同步到云端" }
+        { id: "docx-1", icon: "▤", name: "PRD_Final.docx", meta: "Document | Archived to Brand Strategy" },
+        { id: "png-1", icon: "▧", name: "Design_Layout.png", meta: "Image | Cover direction generated" },
+        { id: "xlsx-1", icon: "▦", name: "Research_Sample.xlsx", meta: "Table | Synced to cloud" }
       ],
       messages: [
         {
           id: "m1",
           role: "user",
-          text: "Hubitos 请根据这份 PDF 内容继续完善 AI OS 桌面端的视觉风格，并整理成一份适合高执行力品牌的 PRD 设计说明文档。"
+          text: "Hubitos, please continue refining the AI OS desktop visual style based on this PDF and turn it into a PRD design brief suitable for a high-execution brand."
         },
         {
           id: "m2",
           role: "assistant",
-          text: "我已经综合了您宣言中的设计原则。Precision Atelier 美学强调色调分层而非标准边框。我先整理出设计方向、结构模块和对应资产，并同步归档到品牌策略文件夹。",
-          tags: ["自动路由：Hubitos Pro", "输出：默认", "已启用 3 个技能"],
-          status: "已归档到品牌策略",
+          text: "I've integrated the design principles from your manifesto. The Precision Atelier aesthetic emphasizes tonal layering instead of standard borders. I'll first organize the design direction, structural modules, and related assets, then archive them to the Brand Strategy folder.",
+          tags: ["Auto routing: Hubitos Pro", "Output: Default", "3 skills enabled"],
+          status: "Archived to Brand Strategy",
           assets: [
-            { icon: "📄", title: "PRD 终稿.docx", subtitle: "文档 | 已归档" },
-            { icon: "🖼", title: "封面图_V1.png", subtitle: "图片 | 已提交" }
+            { icon: "📄", title: "PRD_Final.docx", subtitle: "Document | Archived" },
+            { icon: "🖼", title: "Cover_Concept_V1.png", subtitle: "Image | Submitted" }
           ],
-          actions: ["继续追问", "转为 Skill", "转为 Agent"]
+          actions: ["Follow up", "Turn into Skill", "Turn into Agent"]
         }
       ]
     },
     {
       id: "conv-prd",
-      title: "PRD 撰写讨论",
-      folder: "产品方案",
+      title: "PRD Writing Discussion",
+      folder: "Product Strategy",
       pinned: false,
       assets: [
-        { id: "prd-md", icon: "▤", name: "Hubitos_PRD.md", meta: "Markdown | 待确认" }
+        { id: "prd-md", icon: "▤", name: "Hubitos_PRD.md", meta: "Markdown | Pending review" }
       ],
       messages: [
-        { id: "p1", role: "user", text: "请把对话整理成完整 PRD，补齐核心功能与商业模式。" },
+        { id: "p1", role: "user", text: "Please turn the conversation into a complete PRD and fill in the core features and business model." },
         {
           id: "p2",
           role: "assistant",
-          text: "我已经将内容拆分为项目概述、功能架构、业务流程、技术建议和分阶段路线图，接下来可以继续导出 Word 或沉淀为 Skill。",
-          tags: ["自动路由：Hubitos Pro", "输出：Word"],
-          status: "文档草稿已就绪",
-          actions: ["继续追问", "转为 Skill"]
+          text: "I've split the content into project overview, feature architecture, business flow, technical suggestions, and a phased roadmap. Next, we can export Word or turn it into a Skill.",
+          tags: ["Auto routing: Hubitos Pro", "Output: Word"],
+          status: "Document draft is ready",
+          actions: ["Follow up", "Turn into Skill"]
         }
       ]
     },
     {
       id: "conv-report",
-      title: "竞品分析报告",
-      folder: "市场分析",
+      title: "Competitor Analysis Report",
+      folder: "Market Analysis",
       pinned: false,
       assets: [
-        { id: "report-xlsx", icon: "▦", name: "竞品分析.xlsx", meta: "Excel | 含功能对比" }
+        { id: "report-xlsx", icon: "▦", name: "Competitor_Analysis.xlsx", meta: "Excel | Includes feature comparison" }
       ],
       messages: [
-        { id: "r1", role: "user", text: "把这几家竞品整理成功能对比表和定价分析。" },
+        { id: "r1", role: "user", text: "Organize these competitors into a feature comparison table and pricing analysis." },
         {
           id: "r2",
           role: "assistant",
-          text: "我已生成可继续扩展的竞品分析表格，并保留了关键引用链接，下一步可以补充视觉风格矩阵或导出最终版 Excel。",
-          tags: ["自动路由：Hubitos Lite", "输出：Excel"],
-          status: "表格已同步",
-          actions: ["继续追问"]
+          text: "I've generated an expandable competitor analysis sheet and kept the key reference links. Next we can add a visual style matrix or export the final Excel.",
+          tags: ["Auto routing: Hubitos Lite", "Output: Excel"],
+          status: "Table synced",
+          actions: ["Follow up"]
         }
       ]
     }
@@ -202,7 +202,7 @@ function renderHomeStart() {
           <span class="recent-item-icon">${item.icon}</span>
           <span class="recent-item-content">
             <span class="recent-item-title">${escapeHtml(item.name)}</span>
-            <span class="recent-item-desc">快速启用最近高频技能，直接套用到当前任务。</span>
+            <span class="recent-item-desc">Quickly enable recently used high-frequency skills and apply them to the current task.</span>
           </span>
         </button>
       `
@@ -216,7 +216,7 @@ function renderHomeStart() {
           <span class="recent-item-icon">${item.icon}</span>
           <span class="recent-item-content">
             <span class="recent-item-title">${escapeHtml(item.name)}</span>
-            <span class="recent-item-desc">以最近用过的 Agent 身份和流程直接开始执行。</span>
+            <span class="recent-item-desc">Start immediately with the persona and workflow of a recently used agent.</span>
           </span>
         </button>
       `
@@ -238,12 +238,12 @@ function renderHomeStart() {
 }
 
 function renderFormatMenu() {
-  refs.formatLabel.textContent = state.currentOutput || "默认";
+  refs.formatLabel.textContent = state.currentOutput || "Default";
   refs.formatMenu.innerHTML = outputFormats
     .map(
       (format) => `
         <button class="format-option ${format === state.currentOutput ? "active" : ""}" data-format="${format}" type="button">
-          <span>${format || "默认"}</span>
+          <span>${format || "Default"}</span>
           <span>${format === state.currentOutput ? "✓" : ""}</span>
         </button>
       `
@@ -279,7 +279,7 @@ function renderModelMenu() {
               <span class="option-subtitle">${escapeHtml(model.meta)}</span>
             </span>
           </span>
-          <span class="${selected ? "option-check" : "option-tag neutral"}">${selected ? "✓" : model.id === "lite" ? "免费版" : "高级版"}</span>
+          <span class="${selected ? "option-check" : "option-tag neutral"}">${selected ? "✓" : model.id === "lite" ? "Free" : "Advanced"}</span>
         </button>
       `;
     })
@@ -380,11 +380,11 @@ function renderPanel() {
   refs.tokenValue.textContent = `${(model.tokenUsed / 1000).toFixed(1)}k / ${(model.tokenTotal / 1000).toFixed(0)}k`;
   refs.tokenProgress.style.width = `${Math.min((model.tokenUsed / model.tokenTotal) * 100, 100)}%`;
   refs.tokenSection.classList.toggle("hidden", model.id === "lite");
-  refs.conversationTitle.textContent = conversation.messages.length ? conversation.title : "新对话";
-  refs.conversationMeta.textContent = `默认文件夹：${conversation.folder} / 输出：${state.currentOutput || "默认"}`;
+  refs.conversationTitle.textContent = conversation.messages.length ? conversation.title : "New Chat";
+  refs.conversationMeta.textContent = `Default folder: ${conversation.folder} / Output: ${state.currentOutput || "Default"}`;
   refs.routeBanner.textContent = state.routingEnabled
-    ? `Auto Routing 已开启：当前任务会根据推理强度、输出格式和附件类型自动切换模型，当前使用 ${model.name}。`
-    : `当前为手动模型模式：已锁定 ${model.name}，系统不会自动切换模型。`;
+    ? `Auto Routing is on: the system will switch models automatically based on reasoning intensity, output format, and attachment type. Current model: ${model.name}.`
+    : `Manual model mode is on: ${model.name} is locked and the system will not switch models automatically.`;
   refs.toggleRoutingBtn.classList.toggle("active", state.routingEnabled);
 
   refs.skillChips.innerHTML = state.skills
@@ -412,7 +412,7 @@ function renderPanel() {
           `
         )
         .join("")
-    : `<div class="empty-state">暂无资产，生成文档、图片或表格后会自动归档到这里。</div>`;
+    : `<div class="empty-state">No assets yet. Generated docs, images, or tables will be archived here automatically.</div>`;
   refs.assetsSection.classList.toggle("hidden", conversation.assets.length === 0);
 }
 
@@ -429,7 +429,7 @@ function render() {
 }
 
 function addAttachment() {
-  const candidates = ["会议纪要.docx", "参考海报.png", "需求清单.xlsx", "竞品资料.pdf", "数据样本.csv"];
+  const candidates = ["Meeting_Notes.docx", "Reference_Poster.png", "Requirements_Checklist.xlsx", "Competitor_Material.pdf", "Data_Sample.csv"];
   const item = {
     id: `file-${Date.now()}`,
     type: "file",
@@ -437,7 +437,7 @@ function addAttachment() {
   };
   state.attachedItems.push(item);
   renderAttachments();
-  showToast(`已上传 ${item.label}，系统会按格式自动识别`);
+  showToast(`Uploaded ${item.label}; the system will auto-detect the format.`);
 }
 
 function removeAttachment(id) {
@@ -450,8 +450,8 @@ function chooseAutoModel(prompt) {
   const attachmentLabels = state.attachedItems.map((item) => item.label.toLowerCase()).join(" ");
 
   if (
-    lower.includes("图") ||
-    lower.includes("海报") ||
+    lower.includes("image") ||
+    lower.includes("poster") ||
     state.currentOutput === "Image" ||
     attachmentLabels.includes(".png") ||
     attachmentLabels.includes(".jpg")
@@ -460,7 +460,7 @@ function chooseAutoModel(prompt) {
   }
 
   if (
-    lower.includes("表") ||
+    lower.includes("table") ||
     state.currentOutput === "Excel" ||
     attachmentLabels.includes(".xlsx") ||
     attachmentLabels.includes(".csv")
@@ -473,43 +473,43 @@ function chooseAutoModel(prompt) {
 
 function buildAssistantPayload(prompt) {
   const conversation = getConversation();
-  const attachments = state.attachedItems.map((item) => item.label).join("、") || "无附件";
+  const attachments = state.attachedItems.map((item) => item.label).join(", ") || "no attachments";
   const enabledSkills = state.skills.filter((skill) => skill.enabled).map((skill) => skill.name);
-  const skillText = enabledSkills.length ? enabledSkills.join("、") : "未启用技能";
-  const outputLabel = state.currentOutput || "智能识别";
+  const skillText = enabledSkills.length ? enabledSkills.join(", ") : "no skills enabled";
+  const outputLabel = state.currentOutput || "Smart detection";
 
-  let text = `我已接收任务，并会基于 ${outputLabel} 继续处理。当前引用资料包括：${attachments}。我会先根据文件格式自动识别处理方式，再调用 ${skillText} 完成产出，并把结果默认归档到 ${conversation.folder}。`;
+  let text = `I've received the task and will continue based on ${outputLabel}. Referenced materials: ${attachments}. I'll first detect the right handling flow from the file formats, then use ${skillText} to complete the output and archive the result to ${conversation.folder} by default.`;
   let assets = [];
-  let status = `已归档到 ${conversation.folder}`;
+  let status = `Archived to ${conversation.folder}`;
 
   if (state.currentOutput === "Word") {
-    assets = [{ icon: "📄", title: "Hubitos_方案说明.docx", subtitle: "Word 文档 | 可再次编辑" }];
-    text += " 文档会按章节结构输出，并保留便于后续修改的模板块。";
+    assets = [{ icon: "📄", title: "Hubitos_Project_Brief.docx", subtitle: "Word document | Editable" }];
+    text += " The document will be structured by chapters and keep reusable template blocks for later edits.";
   } else if (state.currentOutput === "PPT") {
-    assets = [{ icon: "📊", title: "Hubitos_提案结构.pptx", subtitle: "PPT 提纲 | 含封面方向" }];
-    text += " 我还会附上页级提纲，方便继续生成封面和视觉参考。";
+    assets = [{ icon: "📊", title: "Hubitos_Proposal_Outline.pptx", subtitle: "PPT outline | Includes cover direction" }];
+    text += " I'll also attach a page-level outline so it's easy to continue with the cover and visual references.";
   } else if (state.currentOutput === "Excel") {
-    assets = [{ icon: "▦", title: "Hubitos_任务拆解.xlsx", subtitle: "表格 | 含结构字段" }];
-    text += " 数据会优先结构化为表格，便于筛选、统计和二次处理。";
+    assets = [{ icon: "▦", title: "Hubitos_Task_Breakdown.xlsx", subtitle: "Spreadsheet | Structured fields included" }];
+    text += " The data will be structured into a spreadsheet first so it is easy to filter, analyze, and reuse.";
   } else if (state.currentOutput === "PDF") {
-    assets = [{ icon: "📕", title: "Hubitos_汇报版.pdf", subtitle: "PDF | 已渲染导出" }];
-    text += " 我会同时保留可追溯的原始结构，避免纯 PDF 难以修改。";
+    assets = [{ icon: "📕", title: "Hubitos_Report.pdf", subtitle: "PDF | Rendered and exported" }];
+    text += " I'll also keep the source structure traceable so the result does not become a hard-to-edit PDF only.";
   } else if (state.currentOutput === "Image") {
-    assets = [{ icon: "🖼", title: "Hubitos_概念海报.png", subtitle: "图片 | 可继续图生图" }];
-    text += " 图片生成将引用当前对话上下文和品牌偏好，保证红白主题一致。";
-    status = "图片已进入历史版本管理";
+    assets = [{ icon: "🖼", title: "Hubitos_Concept_Poster.png", subtitle: "Image | Ready for iterative edits" }];
+    text += " Image generation will use the current conversation context and brand preferences to keep the red-and-white direction consistent.";
+    status = "Image added to version history";
   } else if (attachments.includes(".xlsx") || attachments.includes(".csv")) {
-    assets = [{ icon: "▦", title: "Hubitos_识别输出.xlsx", subtitle: "由上传表格自动识别生成" }];
-    text += " 由于检测到表格类文件，我优先采用结构化表格方式返回结果。";
+    assets = [{ icon: "▦", title: "Hubitos_Detected_Output.xlsx", subtitle: "Auto-generated from spreadsheet input" }];
+    text += " Since spreadsheet files were detected, I'll return the result in a structured spreadsheet format first.";
   } else if (attachments.includes(".png") || attachments.includes(".jpg")) {
-    assets = [{ icon: "🖼", title: "Hubitos_视觉延展.png", subtitle: "由上传图片自动识别生成" }];
-    text += " 由于检测到图片类文件，我会结合视觉参考做图像方向延展。";
+    assets = [{ icon: "🖼", title: "Hubitos_Visual_Extension.png", subtitle: "Auto-generated from image input" }];
+    text += " Since image files were detected, I'll extend the visual direction based on the uploaded references.";
   } else if (attachments.includes(".pdf")) {
-    assets = [{ icon: "📄", title: "Hubitos_整理纪要.docx", subtitle: "由 PDF 自动识别生成" }];
-    text += " 由于检测到 PDF，我优先提取文本结构并输出可编辑文档。";
+    assets = [{ icon: "📄", title: "Hubitos_Extracted_Notes.docx", subtitle: "Auto-generated from PDF input" }];
+    text += " Since a PDF was detected, I'll extract the text structure first and output an editable document.";
   } else {
-    assets = [{ icon: "📝", title: "Hubitos_输出草稿.md", subtitle: "Markdown | 结构化完成" }];
-    text += " 当前未强制指定输出格式，我默认返回结构化文本，便于继续转 Word、PRD 或知识库。";
+    assets = [{ icon: "📝", title: "Hubitos_Output_Draft.md", subtitle: "Markdown | Structured output complete" }];
+    text += " No output format was forced, so I'll return a structured text draft first for easy conversion into Word, a PRD, or a knowledge base entry.";
   }
 
   conversation.assets = [
@@ -526,17 +526,17 @@ function buildAssistantPayload(prompt) {
     id: `a-${Date.now()}`,
     role: "assistant",
     text,
-    tags: [`自动路由：${getCurrentModel().name}`, `输出：${outputLabel}`, `已启用 ${enabledSkills.length} 个技能`],
+    tags: [`Auto routing: ${getCurrentModel().name}`, `Output: ${outputLabel}`, `${enabledSkills.length} skills enabled`],
     status,
     assets,
-    actions: ["继续追问", "转为 Skill", "转为 Agent"]
+    actions: ["Follow up", "Turn into Skill", "Turn into Agent"]
   };
 }
 
 function submitPrompt(promptText) {
   const prompt = promptText.trim();
   if (!prompt) {
-    showToast("先输入任务再发送");
+    showToast("Enter a task before sending.");
     return;
   }
 
@@ -569,20 +569,20 @@ function submitPrompt(promptText) {
 function handleQuickAction(action) {
   const conversation = getConversation();
 
-  if (action === "继续追问") {
-    refs.promptInput.value = "请继续补充关键页面、交互细节和发布后的商业化闭环。";
+  if (action === "Follow up") {
+    refs.promptInput.value = "Please continue by adding key pages, interaction details, and the commercialization loop after launch.";
     refs.promptInput.focus();
-    showToast("已将追问建议填入输入框");
+    showToast("Inserted the follow-up suggestion into the input box.");
     return;
   }
 
-  if (action === "转为 Skill") {
-    showToast("已加入 Skill 转化队列");
+  if (action === "Turn into Skill") {
+    showToast("Added to the Skill conversion queue.");
     return;
   }
 
-  if (action === "转为 Agent") {
-    showToast("已加入 Agent 转化队列");
+  if (action === "Turn into Agent") {
+    showToast("Added to the Agent conversion queue.");
     return;
   }
 
@@ -591,15 +591,15 @@ function handleQuickAction(action) {
 function switchConversation(id) {
   state.currentConversationId = id;
   render();
-  showToast("已切换会话");
+  showToast("Conversation switched.");
 }
 
 function createConversation() {
   const id = `conv-${Date.now()}`;
   state.conversations.unshift({
     id,
-    title: "新建任务会话",
-    folder: "未归档",
+    title: "New task conversation",
+    folder: "Unfiled",
     pinned: false,
     assets: [],
     messages: []
@@ -607,7 +607,7 @@ function createConversation() {
   state.currentConversationId = id;
   render();
   refs.promptInput.focus();
-  showToast("已新建会话");
+  showToast("Created a new conversation.");
 }
 
 function toggleSkill(id) {
@@ -644,7 +644,7 @@ function initEvents() {
     refs.modelMenu.classList.remove("open");
     renderPanel();
     renderModelMenu();
-    showToast(`已切换到 ${getCurrentModel().name}`);
+    showToast(`Switched to ${getCurrentModel().name}.`);
   });
 
   refs.formatMenu.addEventListener("click", (event) => {
@@ -685,15 +685,15 @@ function initEvents() {
   refs.toggleRoutingBtn.addEventListener("click", () => {
     state.routingEnabled = !state.routingEnabled;
     renderPanel();
-    showToast(state.routingEnabled ? "自动路由已开启" : "已切换为手动模型模式");
+    showToast(state.routingEnabled ? "Auto routing is on." : "Switched to manual model mode.");
   });
 
   refs.newConversationBtn.addEventListener("click", createConversation);
   refs.attachFileBtn.addEventListener("click", addAttachment);
 
-  refs.skillPresetBtn.addEventListener("click", () => showToast("已根据当前会话推荐技能组合"));
-  refs.pinConversationBtn.addEventListener("click", () => showToast("当前会话已固定"));
-  refs.saveTemplateBtn.addEventListener("click", () => showToast("当前会话已保存为模板"));
+  refs.skillPresetBtn.addEventListener("click", () => showToast("Recommended a skill set based on the current conversation."));
+  refs.pinConversationBtn.addEventListener("click", () => showToast("Current conversation pinned."));
+  refs.saveTemplateBtn.addEventListener("click", () => showToast("Current conversation saved as a template."));
 
   refs.skillChips.addEventListener("click", (event) => {
     const button = event.target.closest("[data-skill-id]");

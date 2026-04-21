@@ -20,30 +20,30 @@
                 <div class="avatar soft">H</div>
               </div>
               <div>
-                <div class="conversation-title" id="conversationTitle">市场研究计划</div>
-                <div class="conversation-meta" id="conversationMeta">默认文件夹：品牌策略 / 输出：默认</div>
+                <div class="conversation-title" id="conversationTitle">Market Research Plan</div>
+                <div class="conversation-meta" id="conversationMeta">Default folder: Brand Strategy / Output: Default</div>
               </div>
             </div>
             <div class="topbar-actions">
-              <button class="icon-btn" id="pinConversationBtn" title="固定会话">◌</button>
-              <button class="icon-btn" id="saveTemplateBtn" title="固定为模板">◎</button>
+              <button class="icon-btn" id="pinConversationBtn" title="Pin conversation">◌</button>
+              <button class="icon-btn" id="saveTemplateBtn" title="Save as template">◎</button>
             </div>
           </header>
 
           <div class="chat-content">
             <div class="chat-scroll" id="chatScroll">
               <div class="route-banner" id="routeBanner">
-                Auto Routing 已开启：当前任务会根据推理强度、输出格式和附件类型自动切换模型。
+                Auto Routing is on: tasks automatically switch models based on reasoning intensity, output format, and attachment type.
               </div>
 
               <div class="home-start" id="homeStart">
                 <div class="recent-sections" id="recentSections">
                   <section class="recent-section recent-section-skills">
-                    <div class="recent-title">最近使用的 Skills</div>
+                    <div class="recent-title">Recently Used Skills</div>
                     <div class="recent-list" id="recentSkills"></div>
                   </section>
                   <section class="recent-section recent-section-agents">
-                    <div class="recent-title">最近使用的 Agent</div>
+                    <div class="recent-title">Recently Used Agents</div>
                     <div class="recent-list" id="recentAgents"></div>
                   </section>
                   <section class="recent-section recent-section-prompts expanded" id="promptSection">
@@ -63,13 +63,13 @@
                 <div class="toolbar-group">
                   <div class="format-picker">
                     <button class="tool-chip format-trigger" id="formatToggle" type="button">
-                      输出格式：<span id="formatLabel">默认</span>
+                      Output: <span id="formatLabel">Default</span>
                     </button>
                     <div class="format-menu" id="formatMenu"></div>
                   </div>
                 </div>
                 <div class="toolbar-group toolbar-group-right">
-                  <button class="tool-action" id="attachFileBtn">＋ 上传文件</button>
+                  <button class="tool-action" id="attachFileBtn">+ Upload File</button>
                 </div>
               </div>
 
@@ -79,11 +79,11 @@
                 <textarea
                   id="promptInput"
                   rows="3"
-                  placeholder="让 Hubitos 完善草案、生成文件，或直接发起一个桌面端任务..."
+                  placeholder="Ask Hubitos to refine a draft, generate files, or start a desktop task directly..."
                 ></textarea>
                 <div class="composer-actions">
-                  <button class="ghost-btn" id="toggleRoutingBtn" title="自动路由开关">⟲</button>
-                  <button class="send-btn" id="sendBtn" title="发送">➤</button>
+                  <button class="ghost-btn" id="toggleRoutingBtn" title="Auto routing toggle">⟲</button>
+                  <button class="send-btn" id="sendBtn" title="Send">➤</button>
                 </div>
               </div>
             </div>
@@ -91,24 +91,24 @@
         </section>
 
         <aside class="context-panel">
-          <div class="panel-title">当前模型</div>
+          <div class="panel-title">Current Model</div>
 
           <div class="model-card" id="modelToggle">
             <div class="model-card-left">
               <div class="model-logo" id="currentModelLogo">✦</div>
               <div>
                 <div class="model-name" id="currentModelName">Hubitos Pro</div>
-                <div class="model-meta" id="currentModelMeta">精确 4.2 · 深度推理</div>
+                <div class="model-meta" id="currentModelMeta">Precision 4.2 · Deep reasoning</div>
               </div>
             </div>
-            <button class="model-expand" type="button" aria-label="切换模型">⌄</button>
+            <button class="model-expand" type="button" aria-label="Switch model">⌄</button>
           </div>
 
           <div class="model-dropdown" id="modelMenu"></div>
 
           <div class="token-block" id="tokenSection">
             <div class="token-header">
-              <span>剩余 Token</span>
+              <span>Tokens Left</span>
               <span class="token-value" id="tokenValue">14.2k / 128k</span>
             </div>
             <div class="token-bar">
@@ -118,15 +118,15 @@
 
           <div class="panel-section">
             <div class="mini-header">
-              <span>已启用技能</span>
-              <button class="text-btn" id="skillPresetBtn" type="button">推荐</button>
+              <span>Enabled Skills</span>
+              <button class="text-btn" id="skillPresetBtn" type="button">Recommended</button>
             </div>
             <div class="skill-chips" id="skillChips"></div>
           </div>
 
           <div class="panel-section" id="assetsSection">
             <div class="mini-header">
-              <span>已生成资产</span>
+              <span>Generated Assets</span>
             </div>
             <div class="asset-list" id="panelAssetList"></div>
           </div>
@@ -142,9 +142,9 @@
       window.HubitosSidebar.mount("#sharedSidebar", {
         active: "chat",
         showHistory: true,
-        historyTitle: "历史对话",
+        historyTitle: "History",
         historyContainerId: "historyList",
-        primaryLabel: "+ 新对话",
+        primaryLabel: "+ New Chat",
         primaryId: "newConversationBtn",
         chatHref: "./chat-workspace.html",
         filesHref: "../files/files-center.html",
