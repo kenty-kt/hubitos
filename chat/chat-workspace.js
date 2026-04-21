@@ -1,6 +1,6 @@
 const state = {
   routingEnabled: true,
-  currentConversationId: "conv-market",
+  currentConversationId: "conv-home",
   currentModelId: "pro",
   currentOutput: "",
   attachedItems: [
