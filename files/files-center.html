@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Hubitos AI OS - 文件中心</title>
+    <title>Hubitos AI OS - Files Center</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
@@ -226,20 +226,20 @@
 
     <header class="hubitos-shell-header fixed top-4 z-30 flex items-center justify-between border-b border-[#edd6d1]/70 bg-[#fcf9f8]/86 px-8 py-0 backdrop-blur-xl">
       <div class="market-tabs" id="libraryTabs">
-        <button data-scope="all" class="market-tab active" type="button">全部文件</button>
-        <button data-scope="recent" class="market-tab" type="button">最近使用</button>
-        <button data-scope="generated" class="market-tab" type="button">生成记录</button>
-        <button data-scope="favorites" class="market-tab" type="button">收藏</button>
-        <button data-scope="trash" class="market-tab" type="button">回收站</button>
+        <button data-scope="all" class="market-tab active" type="button">All Files</button>
+        <button data-scope="recent" class="market-tab" type="button">Recent</button>
+        <button data-scope="generated" class="market-tab" type="button">Generated</button>
+        <button data-scope="favorites" class="market-tab" type="button">Favorites</button>
+        <button data-scope="trash" class="market-tab" type="button">Trash</button>
       </div>
       <div class="flex items-center gap-4">
         <div class="toolbar-search">
-          <input id="searchInput" placeholder="搜索 AI 资产..." type="text" />
+          <input id="searchInput" placeholder="Search AI assets..." type="text" />
           <span class="material-symbols-outlined">search</span>
         </div>
         <button id="uploadBtn" class="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(181,12,8,0.1)] transition-all hover:bg-primary/90">
           <span class="material-symbols-outlined text-lg">upload</span>
-          上传文件
+          Upload File
         </button>
         <button class="rounded-full p-2 text-on-surface-variant transition-all hover:bg-tertiary-fixed">
           <span class="material-symbols-outlined">notifications</span>
@@ -270,8 +270,8 @@
 
         <div class="custom-scrollbar flex-1 space-y-6 overflow-y-auto pb-12 pr-2">
           <div class="flex items-center justify-between">
-            <h4 id="sectionTitle" class="text-xs font-black uppercase tracking-[0.1em] text-on-surface-variant/60">最近生成</h4>
-            <button id="clearTrashBtn" class="hidden text-xs font-bold text-primary">清空回收站</button>
+            <h4 id="sectionTitle" class="text-xs font-black uppercase tracking-[0.1em] text-on-surface-variant/60">Recent Outputs</h4>
+            <button id="clearTrashBtn" class="hidden text-xs font-bold text-primary">Empty Trash</button>
           </div>
 
           <div id="filesGrid" class="grid grid-cols-2 gap-4"></div>
@@ -283,31 +283,31 @@
           <div class="flex flex-1 flex-col overflow-hidden rounded-[2.2rem] bg-white shadow-sm">
             <div class="border-b border-surface-container-low p-6">
               <div class="mb-4 flex items-center justify-between">
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">当前选中</span>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Selected</span>
                 <div class="flex gap-1">
                   <button id="closePreviewBtn" class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-low transition-colors hover:bg-primary-fixed">
                     <span class="material-symbols-outlined text-lg">close</span>
                   </button>
                 </div>
               </div>
-              <h3 id="previewTitle" class="mb-2 text-lg font-bold leading-snug text-on-surface">品牌识别提案 v2.docx</h3>
-              <div id="previewTime" class="mb-3 text-xs font-medium text-on-surface-variant">10月24日, 14:22</div>
+              <h3 id="previewTitle" class="mb-2 text-lg font-bold leading-snug text-on-surface">Brand Identity Proposal v2.docx</h3>
+              <div id="previewTime" class="mb-3 text-xs font-medium text-on-surface-variant">Oct 24, 14:22</div>
               <div id="previewBadges" class="flex flex-wrap gap-2">
-                <span class="rounded-full bg-primary-fixed px-3 py-1 text-[10px] font-bold text-primary">已优化</span>
+                <span class="rounded-full bg-primary-fixed px-3 py-1 text-[10px] font-bold text-primary">Optimized</span>
                 <span class="rounded-full bg-tertiary-fixed px-3 py-1 text-[10px] font-bold text-tertiary">GPT-4o MINI</span>
               </div>
             </div>
 
             <div class="custom-scrollbar flex-1 space-y-6 overflow-y-auto p-6">
               <div class="space-y-3">
-                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">文档片段</label>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">Document Snippet</label>
                 <div id="previewSnippet" class="rounded-2xl border border-dashed border-outline-variant/30 bg-surface-container-low/50 p-4 text-[13px] italic leading-relaxed text-on-surface-variant">
-                  “即将开展的活动的视觉方向侧重于‘极简粗犷主义’，采用 Hubitos 深红和纯白的强对比色调。此版本根据创意总监关于间距的反馈进行了调整...”
+                  "The visual direction for the upcoming campaign leans toward minimalist brutalism, using a sharp contrast between Hubitos deep red and pure white. This version has been adjusted based on the creative director's spacing feedback..."
                 </div>
               </div>
 
               <div class="space-y-3">
-                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">调用的 Skills / MCP</label>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">Skills / MCP Used</label>
                 <div id="insightList" class="space-y-2"></div>
               </div>
             </div>
@@ -315,16 +315,16 @@
             <div class="border-t border-surface-container-low bg-surface-container-lowest p-5">
               <button id="aiEditBtn" class="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-bold text-white shadow-[0_16px_24px_rgba(181,12,8,0.15)] transition-transform active:scale-[0.98]">
                 <span class="material-symbols-outlined text-lg">smart_toy</span>
-                使用 AI 编辑
+                Edit with AI
               </button>
               <div class="mt-3 grid grid-cols-2 gap-3">
                 <button id="exportBtn" class="flex items-center justify-center gap-2 rounded-full bg-surface-container-high py-2.5 text-xs font-bold text-on-surface">
                   <span class="material-symbols-outlined text-sm">download</span>
-                  导出
+                  Export
                 </button>
                 <button id="deleteBtn" class="flex items-center justify-center gap-2 rounded-full bg-surface-container-high py-2.5 text-xs font-bold text-on-surface">
                   <span id="deleteIcon" class="material-symbols-outlined text-sm">delete</span>
-                  <span id="deleteLabel">删除</span>
+                  <span id="deleteLabel">Delete</span>
                 </button>
               </div>
             </div>
@@ -341,9 +341,9 @@
         active: "files",
         fixed: true,
         showHistory: true,
-        historyTitle: "历史对话",
+        historyTitle: "History",
         historyContainerId: "historyList",
-        primaryLabel: "+ 新对话",
+        primaryLabel: "+ New Chat",
         primaryId: "newConversationBtn",
         chatHref: "../chat/chat-workspace.html",
         filesHref: "./files-center.html",
@@ -360,142 +360,142 @@
         tag: "all",
         selectedFileId: "file-docx-1",
         folders: [
-          { id: "assets", name: "我的资产", count: 1204, size: "4.2 GB", icon: "folder", tone: "primary", scope: "all" },
-          { id: "drafts", name: "草稿箱", count: 4, size: "12 MB", icon: "drafts", tone: "neutral", scope: "generated" },
-          { id: "favorites", name: "收藏夹", count: 18, size: "302 MB", icon: "star", tone: "neutral", scope: "favorites" }
+          { id: "assets", name: "My Assets", count: 1204, size: "4.2 GB", icon: "folder", tone: "primary", scope: "all" },
+          { id: "drafts", name: "Drafts", count: 4, size: "12 MB", icon: "drafts", tone: "neutral", scope: "generated" },
+          { id: "favorites", name: "Favorites", count: 18, size: "302 MB", icon: "star", tone: "neutral", scope: "favorites" }
         ],
-        tags: ["all", "文档", "图片", "表格", "上传", "智能体", "技能"],
+        tags: ["all", "Documents", "Images", "Tables", "Uploads", "Agents", "Skills"],
         files: [
           {
             id: "file-pdf-1",
-            name: "Q4 市场分析 - 东京.pdf",
+            name: "Q4 Market Analysis - Tokyo.pdf",
             size: "2.4 MB",
-            type: "文档",
+            type: "Documents",
             scope: "generated",
             favorite: false,
             trashed: false,
-            source: "由智能体 X 生成",
+            source: "Generated by Agent X",
             sourceTone: "primary",
             sourceIcon: "auto_awesome",
-            folder: "我的资产",
-            tags: ["文档", "智能体"],
-            createdAt: "10月24日, 14:22",
-            engine: "智能体 X - 创意型",
+            folder: "My Assets",
+            tags: ["Documents", "Agents"],
+            createdAt: "Oct 24, 14:22",
+            engine: "Agent X - Creative",
             previewMode: "image",
             previewImage:
               "https://lh3.googleusercontent.com/aida-public/AB6AXuDalGzNWHoAZGHpx01Um9V-ck0We6af-uvrL7tqQXelXV76Y0EDEHSeBqB7WB5gwvsstKg7qv9r6dOnvFoVjYukfxCAoxyyN0h-ge7H4E1X__RnNpRMPpRlxg0fSxgttuDebtn1Eozn4v8RGrq2LVYPuPaNoB_tfIMvvM4VEveQlN3x0q4Gr8WHE2Reu9U_hHlIaDVfJBUEsCjsrd5riCofPhg8zUFjGieNGB0nby5cPzuvWm4A64KoDPHKxr9JrIvY5U6I-Z8umbY",
             snippet:
-              "“东京市场分析已经沉淀为季度洞察报告，包含趋势判断、对手动作与建议优先级，可继续转成汇报版 PDF 或对话摘要。”",
-            insights: ["Skill · 市场分析总结", "Skill · 报告结构提炼", "MCP · 云端文档导出"]
+              "\"The Tokyo market analysis has been captured as a quarterly insight report, including trend assessment, competitor moves, and recommendation priorities. It can be turned into a presentation PDF or a chat summary next.\"",
+            insights: ["Skill · Market Analysis Summary", "Skill · Report Structure Refinement", "MCP · Cloud Document Export"]
           },
           {
             id: "file-docx-1",
-            name: "品牌识别提案 v2.docx",
+            name: "Brand Identity Proposal v2.docx",
             size: "450 KB",
-            type: "文档",
+            type: "Documents",
             scope: "recent",
             favorite: true,
             trashed: false,
-            source: "来自对话 #102",
+            source: "From Chat #102",
             sourceTone: "tertiary",
             sourceIcon: "chat_bubble",
-            folder: "我的资产",
-            tags: ["文档"],
-            createdAt: "10月24日, 14:22",
+            folder: "My Assets",
+            tags: ["Documents"],
+            createdAt: "Oct 24, 14:22",
             engine: "GPT-4o MINI",
             previewMode: "icon",
             previewIcon: "description",
             previewIconTone: "primary",
             snippet:
-              "“即将开展的活动的视觉方向侧重于极简粗犷主义，采用 Hubitos 深红和纯白的强对比色调。此版本根据创意总监关于间距的反馈进行了调整。”",
-            insights: ["Skill · PRD 写作助手", "Skill · 文档润色", "MCP · Word 导出服务"]
+              "\"The visual direction for the upcoming campaign leans toward minimalist brutalism, using a sharp contrast between Hubitos deep red and pure white. This version has been adjusted based on the creative director's spacing feedback.\"",
+            insights: ["Skill · PRD Writing Assistant", "Skill · Document Polish", "MCP · Word Export Service"]
           },
           {
             id: "file-xlsx-1",
-            name: "法律合规矩阵.xlsx",
+            name: "Legal Compliance Matrix.xlsx",
             size: "1.1 MB",
-            type: "表格",
+            type: "Tables",
             scope: "generated",
             favorite: false,
             trashed: false,
-            source: "通过技能合成",
+            source: "Generated via Skill",
             sourceTone: "primary",
             sourceIcon: "auto_awesome",
-            folder: "草稿箱",
-            tags: ["表格", "技能"],
-            createdAt: "10月23日, 18:40",
+            folder: "Drafts",
+            tags: ["Tables", "Skills"],
+            createdAt: "Oct 23, 18:40",
             engine: "Skill Pipeline",
             previewMode: "image",
             previewImage:
               "https://lh3.googleusercontent.com/aida-public/AB6AXuCUqL1fNULqvTiIL8YxePBYZaOI7C0jZ8JX5zVPAHJzaScI7eUiOiUBijUOHV9GG90pJ5nh3jTiVFWC9WBL3p2_uD_fzD0UXVNBoVu_6-r5hny2eluTAYQhOFGzG58jiJl95Zext8BdH9cfZO4aH2wa0kFwoPvsqkkoBu7PaYX8AJBh79PcrsZ-TOo2MTWZIxJn5T41ol9k_47EjMLGC7bdWMd26mCyXVL5N-eTCWgwq3HhDx7N4V2SzYmL40xgTD5IqZO3P7qO8Lw",
             snippet:
-              "“表格已按风险等级、合规条线、责任部门进行结构化拆分，可继续导出 Excel 或汇总为周报。”",
-            insights: ["Skill · 表格结构整理", "Skill · 风险等级归类", "MCP · Excel 渲染器"]
+              "\"The sheet has been structured by risk level, compliance line, and responsible team. It can be exported to Excel or summarized into a weekly report.\"",
+            insights: ["Skill · Table Structuring", "Skill · Risk Level Classification", "MCP · Excel Renderer"]
           },
           {
             id: "file-csv-1",
-            name: "原始竞争对手数据.csv",
+            name: "Raw Competitor Data.csv",
             size: "14.8 MB",
-            type: "上传",
+            type: "Uploads",
             scope: "all",
             favorite: false,
             trashed: false,
-            source: "外部上传",
+            source: "External Upload",
             sourceTone: "neutral",
             sourceIcon: "upload",
-            folder: "我的资产",
-            tags: ["表格", "上传"],
-            createdAt: "10月22日, 11:10",
-            engine: "手动上传",
+            folder: "My Assets",
+            tags: ["Tables", "Uploads"],
+            createdAt: "Oct 22, 11:10",
+            engine: "Manual Upload",
             previewMode: "icon",
             previewIcon: "attachment",
             previewIconTone: "tertiary",
             snippet:
-              "“该 CSV 已导入云端，可继续用 AI 做清洗、分类、对比分析，并转为图表或报告。”",
-            insights: ["Skill · 数据清洗", "Skill · 竞品对比生成", "MCP · CSV 解析连接器"]
+              "\"This CSV has been imported to the cloud. You can continue with AI-powered cleaning, classification, comparative analysis, and convert it into charts or reports.\"",
+            insights: ["Skill · Data Cleaning", "Skill · Competitor Comparison Generation", "MCP · CSV Parsing Connector"]
           },
           {
             id: "file-md-1",
             name: "Hubitos_AI_OS_PRD.md",
             size: "182 KB",
-            type: "文档",
+            type: "Documents",
             scope: "recent",
             favorite: true,
             trashed: false,
-            source: "来自对话 #128",
+            source: "From Chat #128",
             sourceTone: "tertiary",
             sourceIcon: "chat_bubble",
-            folder: "我的资产",
-            tags: ["文档", "上传"],
-            createdAt: "10月25日, 09:30",
+            folder: "My Assets",
+            tags: ["Documents", "Uploads"],
+            createdAt: "Oct 25, 09:30",
             engine: "Hubitos Pro",
             previewMode: "icon",
             previewIcon: "description",
             previewIconTone: "primary",
             snippet:
-              "“PRD 已完成项目概述、功能架构、路线图与商业模式章节，可继续用 AI 编辑或导出 Word。”",
-            insights: ["Skill · PRD 扩写", "Skill · 演示稿改写", "MCP · 文档存储连接器"]
+              "\"The PRD already includes project overview, feature architecture, roadmap, and business model sections. You can keep editing with AI or export to Word.\"",
+            insights: ["Skill · PRD Expansion", "Skill · Deck Rewrite", "MCP · Document Storage Connector"]
           },
           {
             id: "file-trash-1",
-            name: "旧版市场摘要.pdf",
+            name: "Legacy Market Summary.pdf",
             size: "980 KB",
-            type: "文档",
+            type: "Documents",
             scope: "trash",
             favorite: false,
             trashed: true,
-            source: "回收站文件",
+            source: "Trashed File",
             sourceTone: "neutral",
             sourceIcon: "delete",
-            folder: "回收站",
-            tags: ["文档"],
-            createdAt: "10月18日, 10:08",
-            engine: "旧版资产",
+            folder: "Trash",
+            tags: ["Documents"],
+            createdAt: "Oct 18, 10:08",
+            engine: "Legacy Asset",
             previewMode: "icon",
             previewIcon: "picture_as_pdf",
             previewIconTone: "primary",
-            snippet: "“该文件已进入回收站，可恢复或彻底删除。”",
-            insights: ["Skill · 回收站恢复检查", "MCP · 文件审计日志"]
+            snippet: "\"This file is in the trash and can be restored or permanently deleted.\"",
+            insights: ["Skill · Trash Recovery Check", "MCP · File Audit Log"]
           }
         ]
       };
@@ -565,7 +565,7 @@
                   <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">${folder.icon}</span>
                 </div>
                 <h3 class="text-sm font-bold text-on-surface">${escapeHtml(folder.name)}</h3>
-                <p class="mt-1 text-[11px] font-medium text-on-surface-variant">${folder.count} 项 • ${folder.size}</p>
+                <p class="mt-1 text-[11px] font-medium text-on-surface-variant">${folder.count} items • ${folder.size}</p>
               </button>
             `)
             .join("") +
@@ -574,7 +574,7 @@
               <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-primary">
                 <span class="material-symbols-outlined">add</span>
               </div>
-              <span class="text-[11px] font-bold">新建文件夹</span>
+              <span class="text-[11px] font-bold">New Folder</span>
             </button>
           `;
       }
@@ -590,7 +590,7 @@
         refs.tagFilters.innerHTML = state.tags
           .map((tag) => {
             const active = state.tag === tag;
-            const label = tag === "all" ? "全部" : tag;
+            const label = tag === "all" ? "All" : tag;
             return `<button class="${active ? "border border-[#f0c9c0] bg-[#fff1ed] text-[#e13b2d]" : "border border-transparent bg-[#f3efee] text-[#685a57]"} rounded-full px-[22px] py-2.5 text-[13px] font-bold leading-none shadow-none transition-colors" data-tag="${tag}" type="button">${label}</button>`;
           })
           .join("");
@@ -607,14 +607,14 @@
         const files = getVisibleFiles();
         refs.sectionTitle.textContent =
           state.scope === "trash"
-            ? "回收站"
+            ? "Trash"
             : state.scope === "recent"
-              ? "最近使用"
+              ? "Recent"
               : state.scope === "generated"
-                ? "生成记录"
+                ? "Generated"
                 : state.scope === "favorites"
-                  ? "收藏文件"
-                  : "最近生成";
+                  ? "Favorite Files"
+                  : "Recent Outputs";
         refs.clearTrashBtn.classList.toggle("hidden", state.scope !== "trash");
         refs.filesGrid.className =
           state.view === "grid"
@@ -638,7 +638,7 @@
                         <div class="mt-2 flex flex-wrap items-center gap-2">
                           <span class="text-[11px] text-on-surface-variant">${file.size}</span>
                           <span class="rounded-full bg-surface-container-high px-2 py-1 text-[10px] font-bold text-on-surface-variant">${file.type}</span>
-                          ${file.favorite ? '<span class="rounded-full bg-primary-fixed px-2 py-1 text-[10px] font-bold text-primary">收藏</span>' : ""}
+                          ${file.favorite ? '<span class="rounded-full bg-primary-fixed px-2 py-1 text-[10px] font-bold text-primary">Favorites</span>' : ""}
                         </div>
                       </div>
                       <span class="material-symbols-outlined text-lg text-on-surface-variant">more_vert</span>
@@ -647,7 +647,7 @@
                 </button>
               `)
               .join("")
-          : `<div class="col-span-2 rounded-3xl border border-dashed border-outline-variant/40 bg-white/70 p-10 text-center text-sm font-medium text-on-surface-variant">没有匹配到文件，试试调整标签、搜索词或切换到其他分类。</div>`;
+          : `<div class="col-span-2 rounded-3xl border border-dashed border-outline-variant/40 bg-white/70 p-10 text-center text-sm font-medium text-on-surface-variant">No matching files found. Try adjusting the tag, search term, or switching categories.</div>`;
       }
 
       function renderPreview() {
@@ -672,7 +672,7 @@
             `
           )
           .join("");
-        refs.deleteLabel.textContent = file.trashed ? "恢复" : "删除";
+        refs.deleteLabel.textContent = file.trashed ? "Restore" : "Delete";
         refs.deleteIcon.textContent = file.trashed ? "restore_from_trash" : "delete";
       }
 
@@ -733,7 +733,7 @@
           const index = state.folders.length + 1;
           state.folders.push({
             id: `folder-${Date.now()}`,
-            name: `新文件夹 ${index}`,
+            name: `New Folder ${index}`,
             count: 0,
             size: "0 MB",
             icon: "folder",
@@ -755,24 +755,24 @@
       refs.uploadBtn.addEventListener("click", () => {
         const uploaded = {
           id: `upload-${Date.now()}`,
-          name: `上传文件_${state.files.length + 1}.pdf`,
+          name: `Uploaded_File_${state.files.length + 1}.pdf`,
           size: "860 KB",
-          type: "上传",
+          type: "Uploads",
           scope: "recent",
           favorite: false,
           trashed: false,
-          source: "外部上传",
+          source: "External Upload",
           sourceTone: "neutral",
           sourceIcon: "upload",
-          folder: "我的资产",
-          tags: ["上传", "文档"],
-          createdAt: "今天, 刚刚",
-          engine: "手动上传",
+          folder: "My Assets",
+          tags: ["Uploads", "Documents"],
+          createdAt: "Today, just now",
+          engine: "Manual Upload",
           previewMode: "icon",
           previewIcon: "picture_as_pdf",
           previewIconTone: "primary",
-          snippet: "“新上传文件已进入云端文件夹，可继续用 AI 做总结、改写、翻译或结构化输出。”",
-          insights: ["总结内容", "生成 PRD", "继续用 AI 编辑"]
+          snippet: "\"The newly uploaded file is now in the cloud folder. You can keep using AI for summarizing, rewriting, translating, or structuring the output.\"",
+          insights: ["Summarize content", "Generate PRD", "Continue with AI editing"]
         };
         state.files.unshift(uploaded);
         state.selectedFileId = uploaded.id;
@@ -782,12 +782,12 @@
 
       refs.aiEditBtn.addEventListener("click", () => {
         const file = getSelectedFile();
-        alert(`已将《${file.name}》带入 AI 编辑流程。`);
+        alert(`Moved "${file.name}" into the AI editing flow.`);
       });
 
       refs.exportBtn.addEventListener("click", () => {
         const file = getSelectedFile();
-        alert(`准备导出《${file.name}》。`);
+        alert(`Preparing to export "${file.name}".`);
       });
 
       refs.deleteBtn.addEventListener("click", () => {

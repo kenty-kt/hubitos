@@ -2,7 +2,6 @@ const state = {
   routingEnabled: true,
   currentConversationId: "conv-home",
   currentModelId: "pro",
-  currentOutput: "",
   attachedItems: [
     { id: "asset-file-1", type: "file", label: "Design_Manifesto.pdf" },
     { id: "asset-file-2", type: "file", label: "Brand_Reference_Board.png" }
@@ -62,13 +61,14 @@ const state = {
           id: "m2",
           role: "assistant",
           text: "I've integrated the design principles from your manifesto. The Precision Atelier aesthetic emphasizes tonal layering instead of standard borders. I'll first organize the design direction, structural modules, and related assets, then archive them to the Brand Strategy folder.",
-          tags: ["Auto routing: Hubitos Pro", "Output: Default", "3 skills enabled"],
+          tags: ["Auto routing: Hubitos Pro", "Output: Word", "3 skills enabled"],
           status: "Archived to Brand Strategy",
-          assets: [
-            { icon: "📄", title: "PRD_Final.docx", subtitle: "Document | Archived" },
-            { icon: "🖼", title: "Cover_Concept_V1.png", subtitle: "Image | Submitted" }
-          ],
-          actions: ["Follow up", "Turn into Skill", "Turn into Agent"]
+          selectedOutput: "Word",
+          assetsByOutput: {
+            Word: [{ icon: "📄", title: "PRD_Final.docx", subtitle: "Document | Archived" }],
+            Image: [{ icon: "🖼", title: "Cover_Concept_V1.png", subtitle: "Image | Submitted" }]
+          },
+          actions: ["Can you add the key page structure and interaction details next?"]
         }
       ]
     },
@@ -88,7 +88,12 @@ const state = {
           text: "I've split the content into project overview, feature architecture, business flow, technical suggestions, and a phased roadmap. Next, we can export Word or turn it into a Skill.",
           tags: ["Auto routing: Hubitos Pro", "Output: Word"],
           status: "Document draft is ready",
-          actions: ["Follow up", "Turn into Skill"]
+          selectedOutput: "Word",
+          assetsByOutput: {
+            Word: [{ icon: "📄", title: "Hubitos_PRD.docx", subtitle: "Word document | Ready for export" }],
+            Markdown: [{ icon: "📝", title: "Hubitos_PRD.md", subtitle: "Markdown | Pending review" }]
+          },
+          actions: ["Can you expand this into milestones, risks, and launch metrics?"]
         }
       ]
     },
@@ -108,7 +113,11 @@ const state = {
           text: "I've generated an expandable competitor analysis sheet and kept the key reference links. Next we can add a visual style matrix or export the final Excel.",
           tags: ["Auto routing: Hubitos Lite", "Output: Excel"],
           status: "Table synced",
-          actions: ["Follow up"]
+          selectedOutput: "Excel",
+          assetsByOutput: {
+            Excel: [{ icon: "▦", title: "Competitor_Analysis.xlsx", subtitle: "Excel | Includes feature comparison" }]
+          },
+          actions: ["Can you add a pricing comparison and highlight the biggest gaps?"]
         }
       ]
     }
@@ -127,20 +136,12 @@ const refs = {
   recentPrompts: document.getElementById("recentPrompts"),
   promptSection: document.getElementById("promptSection"),
   chatScroll: document.getElementById("chatScroll"),
-  formatToggle: document.getElementById("formatToggle"),
-  formatLabel: document.getElementById("formatLabel"),
-  formatMenu: document.getElementById("formatMenu"),
+  modelPickerToggle: document.getElementById("modelPickerToggle"),
+  modelPickerLabel: document.getElementById("modelPickerLabel"),
+  modelPickerMenu: document.getElementById("modelPickerMenu"),
   attachedItems: document.getElementById("attachedItems"),
   promptInput: document.getElementById("promptInput"),
   sendBtn: document.getElementById("sendBtn"),
-  modelToggle: document.getElementById("modelToggle"),
-  modelMenu: document.getElementById("modelMenu"),
-  currentModelLogo: document.getElementById("currentModelLogo"),
-  currentModelName: document.getElementById("currentModelName"),
-  currentModelMeta: document.getElementById("currentModelMeta"),
-  tokenSection: document.getElementById("tokenSection"),
-  tokenValue: document.getElementById("tokenValue"),
-  tokenProgress: document.getElementById("tokenProgress"),
   skillChips: document.getElementById("skillChips"),
   assetsSection: document.getElementById("assetsSection"),
   panelAssetList: document.getElementById("panelAssetList"),
@@ -154,7 +155,7 @@ const refs = {
   toast: document.getElementById("toast")
 };
 
-const outputFormats = ["", "Markdown", "Word", "PPT", "Excel", "PDF", "Image"];
+const outputFormats = ["Markdown", "Word", "PPT", "Excel", "PDF", "Image"];
 
 function getConversation() {
   return state.conversations.find((item) => item.id === state.currentConversationId);
@@ -237,20 +238,6 @@ function renderHomeStart() {
     .join("");
 }
 
-function renderFormatMenu() {
-  refs.formatLabel.textContent = state.currentOutput || "Default";
-  refs.formatMenu.innerHTML = outputFormats
-    .map(
-      (format) => `
-        <button class="format-option ${format === state.currentOutput ? "active" : ""}" data-format="${format}" type="button">
-          <span>${format || "Default"}</span>
-          <span>${format === state.currentOutput ? "✓" : ""}</span>
-        </button>
-      `
-    )
-    .join("");
-}
-
 function renderAttachments() {
   refs.attachedItems.innerHTML = state.attachedItems.length
     ? state.attachedItems
@@ -266,20 +253,22 @@ function renderAttachments() {
     : "";
 }
 
-function renderModelMenu() {
-  refs.modelMenu.innerHTML = state.models
+function renderModelPickerMenu() {
+  const currentModel = getCurrentModel();
+  refs.modelPickerLabel.textContent = `${currentModel.icon} ${currentModel.name}`;
+  refs.modelPickerMenu.innerHTML = state.models
     .map((model) => {
       const selected = model.id === state.currentModelId;
       return `
-        <button class="model-option ${selected ? "selected" : ""}" type="button" data-model-id="${model.id}">
-          <span class="option-left">
-            <span class="option-logo ${selected ? "red" : ""}">${model.icon}</span>
-            <span>
-              <span class="option-title">${escapeHtml(model.name)}</span>
-              <span class="option-subtitle">${escapeHtml(model.meta)}</span>
+        <button class="format-option ${selected ? "active" : ""}" type="button" data-model-id="${model.id}">
+          <span class="format-option-main">
+            <span class="format-option-icon">${escapeHtml(model.icon)}</span>
+            <span class="format-option-copy">
+            <span class="format-option-title">${escapeHtml(model.name)}</span>
+            <span class="format-option-subtitle">${escapeHtml(model.meta)}</span>
             </span>
           </span>
-          <span class="${selected ? "option-check" : "option-tag neutral"}">${selected ? "✓" : model.id === "lite" ? "Free" : "Advanced"}</span>
+          <span>${selected ? "✓" : ""}</span>
         </button>
       `;
     })
@@ -322,17 +311,31 @@ function renderMessages() {
           </div>
           <div class="assistant-card">
             <div class="assistant-text">${escapeHtml(message.text)}</div>
-            <div class="message-meta-row">
-              <div class="assistant-tags">
-                ${(message.tags || []).map((tag) => `<span class="assistant-tag">${escapeHtml(tag)}</span>`).join("")}
-              </div>
+            <div class="message-meta-row compact">
+              <label class="inline-output-control">
+                <span class="inline-output-label">Output</span>
+                <select class="inline-output-select" data-message-select="${message.id}">
+                  <option value="">select output</option>
+                  ${(Object.keys(message.assetsByOutput || {}).length
+                    ? Object.keys(message.assetsByOutput)
+                    : outputFormats)
+                    .map(
+                      (format) => `
+                        <option value="${escapeHtml(format)}" ${message.selectedOutput === format ? "selected" : ""}>
+                          ${escapeHtml(format)}
+                        </option>
+                      `
+                    )
+                    .join("")}
+                </select>
+              </label>
               <div class="assistant-status">${escapeHtml(message.status || "")}</div>
             </div>
             ${
-              message.assets && message.assets.length
+              message.selectedOutput && message.assetsByOutput?.[message.selectedOutput]?.length
                 ? `
                   <div class="asset-grid">
-                    ${message.assets
+                    ${message.assetsByOutput[message.selectedOutput]
                       .map(
                         (asset) => `
                           <div class="asset-card">
@@ -374,16 +377,10 @@ function renderMessages() {
 function renderPanel() {
   const conversation = getConversation();
   const model = getCurrentModel();
-  refs.currentModelLogo.textContent = model.icon;
-  refs.currentModelName.textContent = model.name;
-  refs.currentModelMeta.textContent = model.meta;
-  refs.tokenValue.textContent = `${(model.tokenUsed / 1000).toFixed(1)}k / ${(model.tokenTotal / 1000).toFixed(0)}k`;
-  refs.tokenProgress.style.width = `${Math.min((model.tokenUsed / model.tokenTotal) * 100, 100)}%`;
-  refs.tokenSection.classList.toggle("hidden", model.id === "lite");
   refs.conversationTitle.textContent = conversation.messages.length ? conversation.title : "New Chat";
-  refs.conversationMeta.textContent = `Default folder: ${conversation.folder} / Output: ${state.currentOutput || "Default"}`;
+  refs.conversationMeta.textContent = `Default folder: ${conversation.folder} / Model: ${model.name}`;
   refs.routeBanner.textContent = state.routingEnabled
-    ? `Auto Routing is on: the system will switch models automatically based on reasoning intensity, output format, and attachment type. Current model: ${model.name}.`
+    ? `Auto Routing is on: the system will switch models automatically based on reasoning intensity and attachment type. Current model: ${model.name}.`
     : `Manual model mode is on: ${model.name} is locked and the system will not switch models automatically.`;
   refs.toggleRoutingBtn.classList.toggle("active", state.routingEnabled);
 
@@ -419,9 +416,8 @@ function renderPanel() {
 function render() {
   renderHistory();
   renderHomeStart();
-  renderFormatMenu();
+  renderModelPickerMenu();
   renderAttachments();
-  renderModelMenu();
   renderMessages();
   renderPanel();
   refs.homeStart.classList.toggle("hidden", getConversation().messages.length > 0);
@@ -452,7 +448,6 @@ function chooseAutoModel(prompt) {
   if (
     lower.includes("image") ||
     lower.includes("poster") ||
-    state.currentOutput === "Image" ||
     attachmentLabels.includes(".png") ||
     attachmentLabels.includes(".jpg")
   ) {
@@ -461,7 +456,6 @@ function chooseAutoModel(prompt) {
 
   if (
     lower.includes("table") ||
-    state.currentOutput === "Excel" ||
     attachmentLabels.includes(".xlsx") ||
     attachmentLabels.includes(".csv")
   ) {
@@ -476,60 +470,49 @@ function buildAssistantPayload(prompt) {
   const attachments = state.attachedItems.map((item) => item.label).join(", ") || "no attachments";
   const enabledSkills = state.skills.filter((skill) => skill.enabled).map((skill) => skill.name);
   const skillText = enabledSkills.length ? enabledSkills.join(", ") : "no skills enabled";
-  const outputLabel = state.currentOutput || "Smart detection";
-
-  let text = `I've received the task and will continue based on ${outputLabel}. Referenced materials: ${attachments}. I'll first detect the right handling flow from the file formats, then use ${skillText} to complete the output and archive the result to ${conversation.folder} by default.`;
-  let assets = [];
+  let text = `I've received the task. Referenced materials: ${attachments}. I'll first detect the right handling flow from the file formats, then use ${skillText} to prepare the result and archive it to ${conversation.folder} by default. After the draft is ready, you can choose the output format below and the corresponding file will appear under this reply.`;
+  let assetsByOutput = {};
   let status = `Archived to ${conversation.folder}`;
 
-  if (state.currentOutput === "Word") {
-    assets = [{ icon: "📄", title: "Hubitos_Project_Brief.docx", subtitle: "Word document | Editable" }];
-    text += " The document will be structured by chapters and keep reusable template blocks for later edits.";
-  } else if (state.currentOutput === "PPT") {
-    assets = [{ icon: "📊", title: "Hubitos_Proposal_Outline.pptx", subtitle: "PPT outline | Includes cover direction" }];
-    text += " I'll also attach a page-level outline so it's easy to continue with the cover and visual references.";
-  } else if (state.currentOutput === "Excel") {
-    assets = [{ icon: "▦", title: "Hubitos_Task_Breakdown.xlsx", subtitle: "Spreadsheet | Structured fields included" }];
-    text += " The data will be structured into a spreadsheet first so it is easy to filter, analyze, and reuse.";
-  } else if (state.currentOutput === "PDF") {
-    assets = [{ icon: "📕", title: "Hubitos_Report.pdf", subtitle: "PDF | Rendered and exported" }];
-    text += " I'll also keep the source structure traceable so the result does not become a hard-to-edit PDF only.";
-  } else if (state.currentOutput === "Image") {
-    assets = [{ icon: "🖼", title: "Hubitos_Concept_Poster.png", subtitle: "Image | Ready for iterative edits" }];
-    text += " Image generation will use the current conversation context and brand preferences to keep the red-and-white direction consistent.";
-    status = "Image added to version history";
-  } else if (attachments.includes(".xlsx") || attachments.includes(".csv")) {
-    assets = [{ icon: "▦", title: "Hubitos_Detected_Output.xlsx", subtitle: "Auto-generated from spreadsheet input" }];
-    text += " Since spreadsheet files were detected, I'll return the result in a structured spreadsheet format first.";
+  if (attachments.includes(".xlsx") || attachments.includes(".csv")) {
+    assetsByOutput = {
+      Excel: [{ icon: "▦", title: "Hubitos_Detected_Output.xlsx", subtitle: "Auto-generated from spreadsheet input" }],
+      PDF: [{ icon: "📕", title: "Hubitos_Data_Report.pdf", subtitle: "PDF | Snapshot of spreadsheet result" }]
+    };
+    text += " Since spreadsheet files were detected, the spreadsheet version is prepared first.";
   } else if (attachments.includes(".png") || attachments.includes(".jpg")) {
-    assets = [{ icon: "🖼", title: "Hubitos_Visual_Extension.png", subtitle: "Auto-generated from image input" }];
-    text += " Since image files were detected, I'll extend the visual direction based on the uploaded references.";
+    assetsByOutput = {
+      Image: [{ icon: "🖼", title: "Hubitos_Visual_Extension.png", subtitle: "Auto-generated from image input" }],
+      PPT: [{ icon: "📊", title: "Hubitos_Visual_Deck.pptx", subtitle: "PPT | Includes visual references" }]
+    };
+    text += " Since image files were detected, the visual version is prepared first.";
   } else if (attachments.includes(".pdf")) {
-    assets = [{ icon: "📄", title: "Hubitos_Extracted_Notes.docx", subtitle: "Auto-generated from PDF input" }];
-    text += " Since a PDF was detected, I'll extract the text structure first and output an editable document.";
+    assetsByOutput = {
+      Word: [{ icon: "📄", title: "Hubitos_Extracted_Notes.docx", subtitle: "Auto-generated from PDF input" }],
+      Markdown: [{ icon: "📝", title: "Hubitos_Extracted_Notes.md", subtitle: "Markdown | Editable outline" }]
+    };
+    text += " Since a PDF was detected, the editable document version is prepared first.";
   } else {
-    assets = [{ icon: "📝", title: "Hubitos_Output_Draft.md", subtitle: "Markdown | Structured output complete" }];
-    text += " No output format was forced, so I'll return a structured text draft first for easy conversion into Word, a PRD, or a knowledge base entry.";
+    assetsByOutput = {
+      Markdown: [{ icon: "📝", title: "Hubitos_Output_Draft.md", subtitle: "Markdown | Structured output complete" }],
+      Word: [{ icon: "📄", title: "Hubitos_Project_Brief.docx", subtitle: "Word document | Editable" }],
+      PPT: [{ icon: "📊", title: "Hubitos_Proposal_Outline.pptx", subtitle: "PPT outline | Includes cover direction" }],
+      Excel: [{ icon: "▦", title: "Hubitos_Task_Breakdown.xlsx", subtitle: "Spreadsheet | Structured fields included" }],
+      PDF: [{ icon: "📕", title: "Hubitos_Report.pdf", subtitle: "PDF | Rendered and exported" }],
+      Image: [{ icon: "🖼", title: "Hubitos_Concept_Poster.png", subtitle: "Image | Ready for iterative edits" }]
+    };
+    text += " No output format was forced, so multiple delivery formats are already ready for selection.";
   }
-
-  conversation.assets = [
-    ...assets.map((asset, index) => ({
-      id: `${Date.now()}-${index}`,
-      icon: asset.icon,
-      name: asset.title,
-      meta: asset.subtitle
-    })),
-    ...conversation.assets
-  ].slice(0, 6);
 
   return {
     id: `a-${Date.now()}`,
     role: "assistant",
     text,
-    tags: [`Auto routing: ${getCurrentModel().name}`, `Output: ${outputLabel}`, `${enabledSkills.length} skills enabled`],
+    tags: [`Auto routing: ${getCurrentModel().name}`, "Output: Choose below", `${enabledSkills.length} skills enabled`],
     status,
-    assets,
-    actions: ["Follow up", "Turn into Skill", "Turn into Agent"]
+    selectedOutput: "",
+    assetsByOutput,
+    actions: ["Can you continue and turn this into the next actionable draft?"]
   };
 }
 
@@ -567,25 +550,7 @@ function submitPrompt(promptText) {
 }
 
 function handleQuickAction(action) {
-  const conversation = getConversation();
-
-  if (action === "Follow up") {
-    refs.promptInput.value = "Please continue by adding key pages, interaction details, and the commercialization loop after launch.";
-    refs.promptInput.focus();
-    showToast("Inserted the follow-up suggestion into the input box.");
-    return;
-  }
-
-  if (action === "Turn into Skill") {
-    showToast("Added to the Skill conversion queue.");
-    return;
-  }
-
-  if (action === "Turn into Agent") {
-    showToast("Added to the Agent conversion queue.");
-    return;
-  }
-
+  submitPrompt(action);
 }
 
 function switchConversation(id) {
@@ -617,43 +582,48 @@ function toggleSkill(id) {
   renderPanel();
 }
 
-function initEvents() {
-  refs.modelToggle.addEventListener("click", () => {
-    refs.modelMenu.classList.toggle("open");
-    refs.formatMenu.classList.remove("open");
-  });
+function selectMessageOutput(messageId, format) {
+  const conversation = getConversation();
+  const message = conversation.messages.find((item) => item.id === messageId && item.role === "assistant");
+  if (!message || !message.assetsByOutput?.[format]) return;
 
-  refs.formatToggle.addEventListener("click", () => {
-    refs.formatMenu.classList.toggle("open");
-    refs.modelMenu.classList.remove("open");
+  message.selectedOutput = format;
+  message.tags = (message.tags || []).map((tag) => (tag.startsWith("Output:") ? `Output: ${format}` : tag));
+
+  conversation.assets = [
+    ...message.assetsByOutput[format].map((asset, index) => ({
+      id: `${message.id}-${format}-${index}`,
+      icon: asset.icon,
+      name: asset.title,
+      meta: asset.subtitle
+    })),
+    ...conversation.assets.filter((asset) => !message.assetsByOutput[format].some((item) => item.title === asset.name))
+  ].slice(0, 6);
+
+  renderMessages();
+  renderPanel();
+  showToast(`${format} file is now available below the reply.`);
+}
+
+function initEvents() {
+  refs.modelPickerToggle.addEventListener("click", () => {
+    refs.modelPickerMenu.classList.toggle("open");
   });
 
   document.addEventListener("click", (event) => {
-    if (!refs.modelToggle.contains(event.target) && !refs.modelMenu.contains(event.target)) {
-      refs.modelMenu.classList.remove("open");
-    }
-    if (!refs.formatToggle.contains(event.target) && !refs.formatMenu.contains(event.target)) {
-      refs.formatMenu.classList.remove("open");
+    if (!refs.modelPickerToggle.contains(event.target) && !refs.modelPickerMenu.contains(event.target)) {
+      refs.modelPickerMenu.classList.remove("open");
     }
   });
 
-  refs.modelMenu.addEventListener("click", (event) => {
+  refs.modelPickerMenu.addEventListener("click", (event) => {
     const button = event.target.closest("[data-model-id]");
     if (!button) return;
     state.currentModelId = button.dataset.modelId;
-    refs.modelMenu.classList.remove("open");
+    refs.modelPickerMenu.classList.remove("open");
     renderPanel();
-    renderModelMenu();
+    renderModelPickerMenu();
     showToast(`Switched to ${getCurrentModel().name}.`);
-  });
-
-  refs.formatMenu.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-format]");
-    if (!button) return;
-    state.currentOutput = button.dataset.format;
-    refs.formatMenu.classList.remove("open");
-    renderFormatMenu();
-    renderPanel();
   });
 
   refs.attachedItems.addEventListener("click", (event) => {
@@ -680,6 +650,12 @@ function initEvents() {
     const button = event.target.closest("[data-quick-action]");
     if (!button) return;
     handleQuickAction(button.dataset.quickAction);
+  });
+
+  refs.messageList.addEventListener("change", (event) => {
+    const select = event.target.closest("[data-message-select]");
+    if (!select || !select.value) return;
+    selectMessageOutput(select.dataset.messageSelect, select.value);
   });
 
   refs.toggleRoutingBtn.addEventListener("click", () => {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hubitos AI OS - MCP 注册中心</title>
+    <title>Hubitos AI OS - MCP Registry</title>
     <link rel="stylesheet" href="../shared/sidebar.css" />
     <style>
       :root {
@@ -439,18 +439,18 @@
           <header class="topbar">
             <div class="topbar-left">
               <div class="category-tabs" id="categoryTabs">
-                <button class="category-tab" data-category="mine" type="button">我的工具</button>
-                <button class="category-tab active" data-category="all" type="button">全部工具 <span class="category-badge">42</span></button>
-                <button class="category-tab" data-category="browser" type="button">浏览器自动化</button>
-                <button class="category-tab" data-category="search" type="button">搜索引擎接口</button>
-                <button class="category-tab" data-category="dev" type="button">开发者套件</button>
-                <button class="category-tab" data-category="finance" type="button">金融与数据分析</button>
-                <button class="category-tab" data-category="social" type="button">社交媒体同步</button>
-                <button class="category-tab" data-category="security" type="button">企业级安全</button>
+                <button class="category-tab" data-category="mine" type="button">My Tools</button>
+                <button class="category-tab active" data-category="all" type="button">All Tools <span class="category-badge">42</span></button>
+                <button class="category-tab" data-category="browser" type="button">Browser Automation</button>
+                <button class="category-tab" data-category="search" type="button">Search APIs</button>
+                <button class="category-tab" data-category="dev" type="button">Developer Tools</button>
+                <button class="category-tab" data-category="finance" type="button">Finance & Data</button>
+                <button class="category-tab" data-category="social" type="button">Social Sync</button>
+                <button class="category-tab" data-category="security" type="button">Enterprise Security</button>
               </div>
               <div class="search-shell">
                 <span class="icon">⌕</span>
-                <input id="searchInput" type="text" placeholder="搜索服务、插件或开发者工具..." />
+                <input id="searchInput" type="text" placeholder="Search services, plugins, or developer tools..." />
               </div>
             </div>
             <div class="topbar-right">
@@ -478,9 +478,9 @@
         active: "mcp",
         fixed: false,
         showHistory: true,
-        historyTitle: "历史对话",
+        historyTitle: "History",
         historyContainerId: "historyList",
-        primaryLabel: "+ 新对话",
+        primaryLabel: "+ New Chat",
         primaryId: "newConversationBtn",
         settingsId: "systemSettingsBtn",
         chatHref: "../chat/chat-workspace.html",
@@ -495,14 +495,14 @@
         tag: "all",
         query: "",
         items: [
-          { id: "fetch-tools", category: "browser", icon: "↓", status: "托管服务", title: "Fetch 工具集", desc: "为智能代理提供高效的网页抓取与 Markdown 转换功能，支持动态渲染页面。", tags: ["MIT 认证", "V2.4.1"], installs: "12.4k", success: "99.8%", primary: "使用", secondary: "查看文档" },
-          { id: "google-search", category: "search", icon: "⌕", status: "已启用", title: "Google Search 增强", desc: "实时接入全球搜索数据，具备自动去重与摘要生成功能，适合深度研究流。", tags: ["商业授权", "实时同步"], installs: "45.2k", success: "99.2%", primary: "使用", secondary: "运行日志", enabled: true },
-          { id: "notion-space", category: "dev", icon: "▤", status: "托管服务", title: "Notion Workspace", desc: "全双向数据同步，支持数据库批量操作与块级权限管理。一键导出工作区。", tags: ["企业推荐", "V1.0.8"], installs: "8.1k", success: "98.5%", primary: "使用", secondary: "" },
-          { id: "github-sdk", category: "dev", icon: "⌘", status: "本地节点", title: "GitHub SDK", desc: "核心开发组件。支持代码审查辅助、Issue 自动分类以及 PR 合并建议生成。", tags: ["Apache 2.0", "官方认证"], installs: "156.4k", success: "100%", primary: "使用", secondary: "文档" },
-          { id: "finance-flow", category: "finance", icon: "¤", status: "已启用", title: "Finance Flow", desc: "集成全球汇率、加密货币实时数据及美股行情，支持自动报表生成。", tags: ["高频数据", "低延迟"], installs: "3.2k", success: "99.9%", primary: "使用", secondary: "导出", enabled: true },
-          { id: "secure-guard", category: "security", icon: "◈", status: "本地节点", title: "Secure Guard", desc: "本地敏感数据扫描与脱敏工具，确保智能代理在处理隐私信息时的安全性。", tags: ["隐私优先", "零信任"], installs: "5.8k", success: "100%", primary: "使用", secondary: "" },
-          { id: "telegram-sync", category: "social", icon: "◎", status: "托管服务", title: "Telegram Sync", desc: "同步频道内容、管理群组消息队列，并把对话结果回写到 CRM 或自动化流程。", tags: ["营销自动化", "内容分发"], installs: "11.7k", success: "98.9%", primary: "使用", secondary: "文档" },
-          { id: "browser-runner", category: "browser", icon: "↗", status: "本地节点", title: "Browser Runner", desc: "面向复杂网页任务的自动执行节点，支持登录态复用、截图、DOM 提取与导出。", tags: ["截图", "自动化"], installs: "9.6k", success: "97.8%", primary: "使用", secondary: "查看日志" }
+          { id: "fetch-tools", category: "browser", icon: "↓", status: "Managed Service", title: "Fetch Toolkit", desc: "Efficient web scraping and Markdown conversion for intelligent agents, including support for dynamically rendered pages.", tags: ["MIT Certified", "V2.4.1"], installs: "12.4k", success: "99.8%", primary: "Use", secondary: "View Docs" },
+          { id: "google-search", category: "search", icon: "⌕", status: "Enabled", title: "Google Search Boost", desc: "Connects to global search data in real time with automatic deduplication and summary generation for deep research workflows.", tags: ["Commercial License", "Real-time Sync"], installs: "45.2k", success: "99.2%", primary: "Use", secondary: "Run Logs", enabled: true },
+          { id: "notion-space", category: "dev", icon: "▤", status: "Managed Service", title: "Notion Workspace", desc: "Two-way data sync with batch database operations, block-level permissions, and one-click workspace export.", tags: ["Enterprise Recommended", "V1.0.8"], installs: "8.1k", success: "98.5%", primary: "Use", secondary: "" },
+          { id: "github-sdk", category: "dev", icon: "⌘", status: "Local Node", title: "GitHub SDK", desc: "Core developer component with code review assistance, automatic issue classification, and PR merge suggestions.", tags: ["Apache 2.0", "Officially Verified"], installs: "156.4k", success: "100%", primary: "Use", secondary: "Docs" },
+          { id: "finance-flow", category: "finance", icon: "¤", status: "Enabled", title: "Finance Flow", desc: "Integrated global exchange rates, crypto data, and U.S. equities with support for automated report generation.", tags: ["High-frequency Data", "Low Latency"], installs: "3.2k", success: "99.9%", primary: "Use", secondary: "Export", enabled: true },
+          { id: "secure-guard", category: "security", icon: "◈", status: "Local Node", title: "Secure Guard", desc: "Local sensitive-data scanning and masking tools that keep intelligent agents safe when handling private information.", tags: ["Privacy First", "Zero Trust"], installs: "5.8k", success: "100%", primary: "Use", secondary: "" },
+          { id: "telegram-sync", category: "social", icon: "◎", status: "Managed Service", title: "Telegram Sync", desc: "Syncs channel content, manages group message queues, and writes conversation output back to CRM or automation flows.", tags: ["Marketing Automation", "Content Distribution"], installs: "11.7k", success: "98.9%", primary: "Use", secondary: "Docs" },
+          { id: "browser-runner", category: "browser", icon: "↗", status: "Local Node", title: "Browser Runner", desc: "Automation node for complex web tasks with session reuse, screenshots, DOM extraction, and export support.", tags: ["Screenshots", "Automation"], installs: "9.6k", success: "97.8%", primary: "Use", secondary: "View Logs" }
         ]
       };
 
@@ -539,7 +539,7 @@
       function categoryItems() {
         return state.items.filter((item) => {
           if (state.category === "all") return true;
-          if (state.category === "mine") return item.enabled || item.status === "本地节点";
+          if (state.category === "mine") return item.enabled || item.status === "Local Node";
           return item.category === state.category;
         });
       }
@@ -556,7 +556,7 @@
         }
 
         refs.tagFilters.innerHTML = [
-          `<button class="tag-filter-btn ${state.tag === "all" ? "active" : ""}" data-tag="all" type="button">全部</button>`,
+          `<button class="tag-filter-btn ${state.tag === "all" ? "active" : ""}" data-tag="all" type="button">All</button>`,
           ...tags.map(
             (tag) =>
               `<button class="tag-filter-btn ${state.tag === tag ? "active" : ""}" data-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`
@@ -566,7 +566,7 @@
 
       function visibleItems() {
         return state.items.filter((item) => {
-          if (state.category === "mine" && !(item.enabled || item.status === "本地节点")) return false;
+          if (state.category === "mine" && !(item.enabled || item.status === "Local Node")) return false;
           if (state.category !== "all" && state.category !== "mine" && item.category !== state.category) return false;
           if (state.tag !== "all" && !item.tags.includes(state.tag)) return false;
           if (state.query && !`${item.title} ${item.desc} ${item.tags.join(" ")}`.toLowerCase().includes(state.query.toLowerCase())) return false;
@@ -623,12 +623,12 @@
         const primary = event.target.closest("[data-primary]");
         if (primary) {
           const item = state.items.find((entry) => entry.id === primary.dataset.primary);
-          if (item) showToast(`${item.primary}：${item.title}`);
+          if (item) showToast(`${item.primary}: ${item.title}`);
         }
       });
 
-      document.getElementById("newConversationBtn").addEventListener("click", () => showToast("开始新对话"));
-      document.getElementById("systemSettingsBtn").addEventListener("click", () => showToast("系统设置面板已预留"));
+      document.getElementById("newConversationBtn").addEventListener("click", () => showToast("Start a new conversation"));
+      document.getElementById("systemSettingsBtn").addEventListener("click", () => showToast("The settings panel is ready"));
 
       renderTabs();
       renderTagFilters();

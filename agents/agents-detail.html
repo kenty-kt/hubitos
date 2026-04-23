@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hubitos AI OS - 智能体详情</title>
+    <title>Hubitos AI OS - Agent Details</title>
     <link rel="stylesheet" href="../shared/sidebar.css" />
     <style>
       :root {
@@ -245,32 +245,32 @@
             <div class="detail-main">
               <div class="detail-top">
                 <div>
-                  <small id="detailVersion">智能体配置</small>
-                  <h2 id="detailTitle">精准分析师 v2.4</h2>
+                  <small id="detailVersion">Agent Configuration</small>
+                  <h2 id="detailTitle">Precision Analyst v2.4</h2>
                 </div>
                 <div class="detail-actions">
-                  <a class="outline-btn" href="./agents-center.html" style="text-decoration:none;display:inline-flex;align-items:center;">放弃</a>
-                  <button class="primary-btn" id="deployBtn" type="button">部署智能体</button>
+                  <a class="outline-btn" href="./agents-center.html" style="text-decoration:none;display:inline-flex;align-items:center;">Cancel</a>
+                  <button class="primary-btn" id="deployBtn" type="button">Deploy Agent</button>
                 </div>
               </div>
 
               <div class="form-card">
                 <div class="field">
-                  <label>角色描述</label>
-                  <div class="input-like" id="detailRole">专注 Q3 市场波动的高级财务分析师</div>
+                  <label>Role Description</label>
+                  <div class="input-like" id="detailRole">Senior financial analyst focused on Q3 market volatility.</div>
                 </div>
                 <div class="field">
-                  <label>主要目标定义</label>
-                  <div class="input-like" id="detailGoal">将实时 SEC 文件综合成可操作的见解</div>
+                  <label>Primary Goal</label>
+                  <div class="input-like" id="detailGoal">Turn live SEC filings into actionable insights.</div>
                 </div>
               </div>
 
               <div class="canvas-card">
                 <div class="canvas-title">
-                  <span>逻辑流编排</span>
+                  <span>Flow Orchestration</span>
                   <div class="minor">
                     <span class="minor-pill" id="flowBadge">v2.4</span>
-                    <span class="minor-pill">自动保存</span>
+                    <span class="minor-pill">Auto-save</span>
                   </div>
                 </div>
                 <div class="canvas-surface" id="flowCanvas"></div>
@@ -287,21 +287,21 @@
 
             <aside class="detail-side">
               <div class="side-section">
-                <h4>专注模型</h4>
+                <h4>Focused Models</h4>
                 <div class="model-list" id="modelList"></div>
               </div>
               <div class="side-section">
-                <h4>激活技能</h4>
+                <h4>Enabled Skills</h4>
                 <div class="skill-tags" id="skillTags"></div>
               </div>
               <div class="side-section runtime-card">
                 <div>
-                  <h4 style="margin: 0 0 8px; color: #fff;">测试运行控制台</h4>
-                  <div style="font-size: 11px; color: #a99895;">测试运行智能体的台本</div>
+                  <h4 style="margin: 0 0 8px; color: #fff;">Test Run Console</h4>
+                  <div style="font-size: 11px; color: #a99895;">Script for test-running the agent</div>
                 </div>
                 <div class="runtime-log" id="runtimeLog"></div>
                 <div class="runtime-input">
-                  <input id="runtimeInput" type="text" placeholder="输入测试查询..." />
+                  <input id="runtimeInput" type="text" placeholder="Enter a test query..." />
                   <button id="runtimeSend" type="button">➤</button>
                 </div>
               </div>
@@ -318,9 +318,9 @@
         active: "agents",
         fixed: false,
         showHistory: true,
-        historyTitle: "历史对话",
+        historyTitle: "History",
         historyContainerId: "historyList",
-        primaryLabel: "+ 新对话",
+        primaryLabel: "+ New Chat",
         primaryId: "newConversationBtn",
         chatHref: "../chat/chat-workspace.html",
         filesHref: "../files/files-center.html",
@@ -331,63 +331,63 @@
 
       const agents = {
         "agent-analyst": {
-          name: "精准分析师 v2.4",
+          name: "Precision Analyst v2.4",
           version: "v2.4",
-          role: "专注 Q3 市场波动的高级财务分析师",
-          goal: "将实时 SEC 文件综合成可操作的见解",
+          role: "Senior financial analyst focused on Q3 market volatility.",
+          goal: "Turn live SEC filings into actionable insights.",
           models: [
             { code: "C3", name: "Claude 3.5", active: true },
             { code: "G4", name: "GPT-4o", active: false }
           ],
-          skills: ["网页检索", "SQL", "大模型"],
+          skills: ["Web Search", "SQL", "Large Model"],
           flow: [
-            { x: 90, y: 62, title: "触发器", text: "入站 API 请求", sub: "Webhook JSON 负载监听" },
-            { x: 300, y: 42, title: "托管器", text: "核心处理模块", sub: "Claude 3.5 Sonnet / 财务分析脚本" }
+            { x: 90, y: 62, title: "Trigger", text: "Inbound API request", sub: "Webhook JSON payload listener" },
+            { x: 300, y: 42, title: "Orchestrator", text: "Core processing module", sub: "Claude 3.5 Sonnet / financial analysis script" }
           ]
         },
         "agent-market": {
-          name: "市场研究助手",
+          name: "Market Research Assistant",
           version: "v1.8",
-          role: "负责行业扫描、信号聚类与摘要生成的研究助理",
-          goal: "按行业和时间窗口输出竞争态势简报",
+          role: "Research assistant for industry scanning, signal clustering, and summary generation.",
+          goal: "Produce competitive briefs by industry and time window.",
           models: [
             { code: "C3", name: "Claude 3.5", active: false },
             { code: "G4", name: "GPT-4o", active: true }
           ],
-          skills: ["网页检索", "文件搜索", "图表生成"],
+          skills: ["Web Search", "File Search", "Chart Generation"],
           flow: [
-            { x: 100, y: 70, title: "研究任务", text: "接收行业关键词", sub: "按国家 / 行业过滤" },
-            { x: 314, y: 146, title: "摘要器", text: "形成竞争快照", sub: "自动生成研究结论" }
+            { x: 100, y: 70, title: "Research Task", text: "Receive industry keywords", sub: "Filter by country / industry" },
+            { x: 314, y: 146, title: "Summarizer", text: "Build a competitive snapshot", sub: "Generate research conclusions automatically" }
           ]
         },
         "agent-code": {
-          name: "代码架构师",
+          name: "Code Architect",
           version: "v3.1",
-          role: "审查复杂系统结构并提供重构计划的工程智能体",
-          goal: "对遗留系统做架构拆解、风险识别与分步迁移",
+          role: "Engineering agent that reviews complex system structures and proposes refactoring plans.",
+          goal: "Break down legacy architecture, identify risk, and plan staged migration.",
           models: [
             { code: "C3", name: "Claude 3.5", active: true },
             { code: "G4", name: "GPT-4o", active: false }
           ],
-          skills: ["代码解释", "文件搜索", "MCP 调试"],
+          skills: ["Code Explanation", "File Search", "MCP Debugging"],
           flow: [
-            { x: 90, y: 50, title: "仓库接入", text: "分析代码结构", sub: "索引模块依赖关系" },
-            { x: 318, y: 130, title: "改造器", text: "给出迁移路径", sub: "产出重构建议清单" }
+            { x: 90, y: 50, title: "Repository Intake", text: "Analyze code structure", sub: "Index module dependencies" },
+            { x: 318, y: 130, title: "Refactor Planner", text: "Propose migration paths", sub: "Output a refactor recommendation checklist" }
           ]
         },
         "agent-review": {
-          name: "内容审核专家",
+          name: "Content Review Specialist",
           version: "v1.2",
-          role: "审核社区生成内容并标记风险因子的内容守门员",
-          goal: "识别高风险表达并给出可用改写建议",
+          role: "Content gatekeeper that reviews community-generated content and flags risk factors.",
+          goal: "Identify high-risk expressions and provide safe rewrite suggestions.",
           models: [
             { code: "C3", name: "Claude 3.5", active: false },
             { code: "G4", name: "GPT-4o", active: true }
           ],
-          skills: ["敏感词审查", "图像理解", "回执记录"],
+          skills: ["Sensitive Word Review", "Image Understanding", "Receipt Logging"],
           flow: [
-            { x: 86, y: 84, title: "输入队列", text: "收集待审内容", sub: "文本 / 图像 / 链接" },
-            { x: 302, y: 64, title: "审核器", text: "执行规则与模型评审", sub: "输出审核结论" }
+            { x: 86, y: 84, title: "Input Queue", text: "Collect content to review", sub: "Text / image / links" },
+            { x: 302, y: 64, title: "Reviewer", text: "Run rules and model checks", sub: "Output review decisions" }
           ]
         }
       };
@@ -433,10 +433,10 @@
       `;
 
       const logs = [
-        "[14:32:17] 接收测试输入。",
-        "[14:32:17] 日志：调用核心检索节点。",
-        "[14:32:29] 用户：分析 LLM 竞品公司的财报。",
-        "[14:32:46] 节点输出：正在启动市场标签聚类..."
+        "[14:32:17] Received test input.",
+        "[14:32:17] Log: calling the core retrieval node.",
+        "[14:32:29] User: Analyze earnings reports from competing LLM companies.",
+        "[14:32:46] Node output: starting market tag clustering..."
       ];
       const runtimeLog = document.getElementById("runtimeLog");
       runtimeLog.innerHTML = logs.map((log) => `<div>${log}</div>`).join("");
@@ -445,7 +445,7 @@
         const input = document.getElementById("runtimeInput");
         const value = input.value.trim();
         if (!value) return;
-        runtimeLog.innerHTML += `<div>[14:36:22] 用户：${value}</div><div>[14:36:41] 输出：已将测试请求路由到 ${agent.name}。</div>`;
+        runtimeLog.innerHTML += `<div>[14:36:22] User: ${value}</div><div>[14:36:41] Output: routed the test request to ${agent.name}.</div>`;
         runtimeLog.scrollTop = runtimeLog.scrollHeight;
         input.value = "";
       });

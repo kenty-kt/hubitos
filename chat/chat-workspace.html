@@ -21,7 +21,7 @@
               </div>
               <div>
                 <div class="conversation-title" id="conversationTitle">Market Research Plan</div>
-                <div class="conversation-meta" id="conversationMeta">Default folder: Brand Strategy / Output: Default</div>
+                <div class="conversation-meta" id="conversationMeta">Default folder: Brand Strategy / Model: Hubitos Pro</div>
               </div>
             </div>
             <div class="topbar-actions">
@@ -33,7 +33,7 @@
           <div class="chat-content">
             <div class="chat-scroll" id="chatScroll">
               <div class="route-banner" id="routeBanner">
-                Auto Routing is on: tasks automatically switch models based on reasoning intensity, output format, and attachment type.
+                Auto Routing is on: tasks automatically switch models based on reasoning intensity and attachment type.
               </div>
 
               <div class="home-start" id="homeStart">
@@ -62,10 +62,10 @@
               <div class="composer-toolbar">
                 <div class="toolbar-group">
                   <div class="format-picker">
-                    <button class="tool-chip format-trigger" id="formatToggle" type="button">
-                      Output: <span id="formatLabel">Default</span>
+                    <button class="tool-chip format-trigger" id="modelPickerToggle" type="button">
+                      <span id="modelPickerLabel">✦ Hubitos Pro</span>
                     </button>
-                    <div class="format-menu" id="formatMenu"></div>
+                    <div class="format-menu" id="modelPickerMenu"></div>
                   </div>
                 </div>
                 <div class="toolbar-group toolbar-group-right">
@@ -91,31 +91,6 @@
         </section>
 
         <aside class="context-panel">
-          <div class="panel-title">Current Model</div>
-
-          <div class="model-card" id="modelToggle">
-            <div class="model-card-left">
-              <div class="model-logo" id="currentModelLogo">✦</div>
-              <div>
-                <div class="model-name" id="currentModelName">Hubitos Pro</div>
-                <div class="model-meta" id="currentModelMeta">Precision 4.2 · Deep reasoning</div>
-              </div>
-            </div>
-            <button class="model-expand" type="button" aria-label="Switch model">⌄</button>
-          </div>
-
-          <div class="model-dropdown" id="modelMenu"></div>
-
-          <div class="token-block" id="tokenSection">
-            <div class="token-header">
-              <span>Tokens Left</span>
-              <span class="token-value" id="tokenValue">14.2k / 128k</span>
-            </div>
-            <div class="token-bar">
-              <div class="token-progress" id="tokenProgress"></div>
-            </div>
-          </div>
-
           <div class="panel-section">
             <div class="mini-header">
               <span>Enabled Skills</span>

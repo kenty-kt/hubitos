@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hubitos AI OS - 我的智能体</title>
+    <title>Hubitos AI OS - My Agents</title>
     <link rel="stylesheet" href="../shared/sidebar.css" />
     <style>
       :root {
@@ -410,7 +410,7 @@
           <header class="topbar">
             <div class="topbar-left">
               <div class="market-tabs" id="scopeTabs">
-                <button class="market-tab active" data-scope="mine" type="button">我的智能体</button>
+                <button class="market-tab active" data-scope="mine" type="button">My Agents</button>
                 <button class="market-tab" data-scope="all" type="button">All Agents</button>
                 <button class="market-tab" data-scope="production" type="button">Production</button>
                 <button class="market-tab" data-scope="drafts" type="button">Drafts</button>
@@ -421,8 +421,8 @@
                 <span class="icon">⌕</span>
                 <input id="searchInput" type="text" placeholder="Search agents, skills, or models..." />
               </div>
-              <button class="outline-btn" id="importBtn" type="button">⇪ 导入</button>
-              <button class="primary-btn" id="newAgentBtn" type="button">＋ 新建智能体</button>
+              <button class="outline-btn" id="importBtn" type="button">⇪ Import</button>
+              <button class="primary-btn" id="newAgentBtn" type="button">+ New Agent</button>
               <button class="ghost-icon" type="button">◌</button>
               <button class="avatar-btn" type="button">K</button>
             </div>
@@ -431,10 +431,10 @@
           <section class="agents-list-panel">
             <div class="header-actions">
               <div class="segmented" id="tagTabs">
-                <button class="seg-btn active" data-tag="all" type="button">全部</button>
-                <button class="seg-btn" data-tag="finance" type="button">金融</button>
-                <button class="seg-btn" data-tag="research" type="button">研究</button>
-                <button class="seg-btn" data-tag="engineering" type="button">工程</button>
+                <button class="seg-btn active" data-tag="all" type="button">All</button>
+                <button class="seg-btn" data-tag="finance" type="button">Finance</button>
+                <button class="seg-btn" data-tag="research" type="button">Research</button>
+                <button class="seg-btn" data-tag="engineering" type="button">Engineering</button>
               </div>
               <div class="view-switch">
                 <button id="gridBtn" class="view-btn active" type="button">▥</button>
@@ -454,9 +454,9 @@
         active: "agents",
         fixed: false,
         showHistory: true,
-        historyTitle: "历史对话",
+        historyTitle: "History",
         historyContainerId: "historyList",
-        primaryLabel: "+ 新对话",
+        primaryLabel: "+ New Chat",
         primaryId: "newConversationBtn",
         chatHref: "../chat/chat-workspace.html",
         filesHref: "../files/files-center.html",
@@ -473,45 +473,45 @@
         agents: [
           {
             id: "agent-analyst",
-            name: "精准分析师 v2.4",
+            name: "Precision Analyst v2.4",
             version: "v2.4",
             scope: "production",
             mine: true,
             tag: "finance",
-            status: { text: "已发布", tone: "green" },
+            status: { text: "Published", tone: "green" },
             icon: "◫",
             desc: "High-precision financial data modeling and predictive market sentiment analysis engine."
           },
           {
             id: "agent-market",
-            name: "市场研究助手",
+            name: "Market Research Assistant",
             version: "v1.8",
             scope: "drafts",
             mine: true,
             tag: "research",
-            status: { text: "私有", tone: "gray" },
+            status: { text: "Private", tone: "gray" },
             icon: "◎",
             desc: "Real-time competitive intelligence and market-trend synthesis for retail sectors."
           },
           {
             id: "agent-code",
-            name: "代码架构师",
+            name: "Code Architect",
             version: "v3.1",
             scope: "production",
             mine: true,
             tag: "engineering",
-            status: { text: "草稿", tone: "orange" },
+            status: { text: "Draft", tone: "orange" },
             icon: "⌘",
             desc: "Autonomous refactoring and architectural oversight for legacy enterprise codebases."
           },
           {
             id: "agent-review",
-            name: "内容审核专家",
+            name: "Content Review Specialist",
             version: "v1.2",
             scope: "drafts",
             mine: true,
             tag: "research",
-            status: { text: "私有", tone: "gray" },
+            status: { text: "Private", tone: "gray" },
             icon: "✺",
             desc: "High-speed policy compliance engine for multi-modal community platform generated content."
           }
