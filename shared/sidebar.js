@@ -21,6 +21,7 @@
   function renderSidebar(config) {
     const navItems = [
       { key: "chat", label: "对话", icon: "▤", href: config.chatHref || "#" },
+      { key: "projects", label: "项目", icon: "⌘", href: config.projectsHref || "#" },
       { key: "files", label: "文件", icon: "⌂", href: config.filesHref || "#" },
       { key: "agents", label: "智能体", icon: "✦", href: config.agentsHref || "#" },
       { key: "skills", label: "技能", icon: "⚡", href: config.skillsHref || "#" },

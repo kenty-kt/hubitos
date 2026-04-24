@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos AI OS - Project Detail</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="./projects-detail.css" />
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="projects-shell">
+          <header class="topbar">
+            <div class="topbar-left">
+              <button class="ghost-btn" id="backBtn" type="button">← Back to List</button>
+              <div>
+                <div class="eyebrow">Project Detail</div>
+                <div class="page-title">Deploy, verify, and auto-repair</div>
+                <div class="page-copy">
+                  This page is dedicated to local deployment, verification policies, logs, and AI-assisted repair flow for a single repository.
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div class="projects-content">
+            <section class="workspace-column">
+              <div class="panel hero-panel">
+                <div class="hero-grid">
+                  <div class="hero-copy-block">
+                    <div class="panel-kicker">Selected Project</div>
+                    <h2 id="projectTitle">hubitos-client-shell</h2>
+                    <p id="projectSummary" class="hero-copy"></p>
+                    <div class="intro-meta">
+                      <div class="intro-meta-item">
+                        <span>Repository</span>
+                        <strong id="projectRepo"></strong>
+                      </div>
+                      <div class="intro-meta-item">
+                        <span>Workspace path</span>
+                        <strong id="projectWorkspace"></strong>
+                      </div>
+                      <div class="intro-meta-item">
+                        <span>Last deployment</span>
+                        <strong id="projectDeployedAt"></strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="hero-metrics">
+                    <div class="metric-card">
+                      <span>Framework</span>
+                      <strong id="projectFramework">Next.js 15</strong>
+                    </div>
+                    <div class="metric-card">
+                      <span>Local URL</span>
+                      <strong id="projectUrl">Not deployed</strong>
+                    </div>
+                    <div class="metric-card">
+                      <span>Token Mode</span>
+                      <strong id="projectTokenMode">Bound User Account</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="hero-actions">
+                  <button class="primary-btn primary-btn-strong" id="deployBtn" type="button">One-click Deploy</button>
+                  <button class="ghost-btn" id="stopBtn" type="button">Stop Running</button>
+                  <button class="ghost-btn danger-btn" id="deleteLocalBtn" type="button">Delete Local</button>
+                  <button class="ghost-btn" id="openLocalBtn" type="button">Open localhost</button>
+                </div>
+              </div>
+
+              <div class="workspace-grid">
+                <div class="panel execution-panel">
+                  <div class="panel-head compact">
+                    <div>
+                      <div class="panel-kicker">Local Runner</div>
+                      <h3>Deployment Pipeline</h3>
+                    </div>
+                    <div class="status-pill" id="deploymentStatus">Idle</div>
+                  </div>
+                  <div class="pipeline-grid">
+                    <div class="stage-card" id="stageClone">
+                      <div class="stage-top">
+                        <div class="stage-index">1</div>
+                        <div class="stage-state" id="stageCloneState">Waiting</div>
+                      </div>
+                      <strong>Clone / Pull</strong>
+                      <span>Use GitHub remote and branch selection.</span>
+                    </div>
+                    <div class="stage-card" id="stageInstall">
+                      <div class="stage-top">
+                        <div class="stage-index">2</div>
+                        <div class="stage-state" id="stageInstallState">Waiting</div>
+                      </div>
+                      <strong>Install</strong>
+                      <span>Detect package manager and install dependencies.</span>
+                    </div>
+                    <div class="stage-card" id="stageBoot">
+                      <div class="stage-top">
+                        <div class="stage-index">3</div>
+                        <div class="stage-state" id="stageBootState">Waiting</div>
+                      </div>
+                      <strong>Boot</strong>
+                      <span>Launch local service and stream logs back to the client.</span>
+                    </div>
+                    <div class="stage-card" id="stageVerify">
+                      <div class="stage-top">
+                        <div class="stage-index">4</div>
+                        <div class="stage-state" id="stageVerifyState">Waiting</div>
+                      </div>
+                      <strong>Verify</strong>
+                      <span>Run smoke checks and validate the local service before exposing localhost.</span>
+                    </div>
+                    <div class="stage-card" id="stageRepair">
+                      <div class="stage-top">
+                        <div class="stage-index">5</div>
+                        <div class="stage-state" id="stageRepairState">Waiting</div>
+                      </div>
+                      <strong>AI Repair</strong>
+                      <span>Submit logs and failing files to the coding model when verification breaks.</span>
+                    </div>
+                    <div class="stage-card" id="stageRetry">
+                      <div class="stage-top">
+                        <div class="stage-index">6</div>
+                        <div class="stage-state" id="stageRetryState">Waiting</div>
+                      </div>
+                      <strong>Retry</strong>
+                      <span>Restart and verify again after the AI-generated patch is applied.</span>
+                    </div>
+                  </div>
+                  <div class="execution-stack">
+                    <div class="execution-section">
+                      <div class="panel-head compact">
+                        <div>
+                          <div class="panel-kicker">Repair Policy</div>
+                          <h3>Verify + AI Repair</h3>
+                        </div>
+                      </div>
+                      <div class="repair-policy-card inline">
+                        <div class="repair-policy-head">
+                          <strong>Auto-repair on verification failure</strong>
+                          <label class="switch">
+                            <input id="autoRepairToggle" type="checkbox" checked />
+                            <span class="switch-slider"></span>
+                          </label>
+                        </div>
+                        <p class="repair-policy-copy">
+                          When deploy validation fails, the local agent packages startup logs, failing checks, and changed files, then asks the coding model to patch and retry automatically.
+                        </p>
+                        <div class="repair-policy-list">
+                          <div class="repair-policy-item">
+                            <span>Repair model</span>
+                            <strong id="repairModel">GPT-4.1</strong>
+                          </div>
+                          <div class="repair-policy-item">
+                            <span>Context</span>
+                            <strong>Logs + failing files + command output</strong>
+                          </div>
+                          <div class="repair-policy-item">
+                            <span>Retry limit</span>
+                            <strong id="repairRetryLimit">2 attempts</strong>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="execution-section execution-section-logs">
+                      <div class="panel-head compact">
+                        <div>
+                          <div class="panel-kicker">Execution Feed</div>
+                          <h3>Deploy Logs</h3>
+                        </div>
+                        <button class="ghost-btn small" id="clearLogsBtn" type="button">Clear</button>
+                      </div>
+                      <div class="log-legend" id="logLegend"></div>
+                      <div class="log-stream" id="logStream"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <aside class="inspector-column">
+              <div class="panel">
+                <div class="panel-head compact">
+                  <div>
+                    <div class="panel-kicker">LLM Runtime</div>
+                    <h3>Bound Account Routing</h3>
+                  </div>
+                </div>
+                <div class="account-card">
+                  <div class="account-avatar" id="accountAvatar">K</div>
+                  <div>
+                    <strong id="accountName">kittytins@hubitos.ai</strong>
+                    <div class="account-copy" id="accountProvider">OpenAI + Anthropic linked</div>
+                  </div>
+                </div>
+                <div class="settings-list">
+                  <div class="setting-row">
+                    <span>Charge model usage to</span>
+                    <strong id="billingSource">Bound user account</strong>
+                  </div>
+                  <div class="setting-row">
+                    <span>Preferred coding model</span>
+                    <strong id="codingModel">GPT-4.1</strong>
+                  </div>
+                  <div class="setting-row">
+                    <span>Fallback model</span>
+                    <strong id="fallbackModel">Claude Sonnet 4</strong>
+                  </div>
+                  <div class="setting-row">
+                    <span>Secret storage</span>
+                    <strong>Encrypted in local agent</strong>
+                  </div>
+                </div>
+                <div class="notice-card">
+                  API keys never enter the browser layer. This prototype assumes a local agent signs requests and charges tokens against the user's linked provider account.
+                </div>
+                <button class="primary-btn full" id="routeConfigBtn" type="button">Review routing policy</button>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script src="./projects-store.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "projects",
+        showHistory: true,
+        historyTitle: "Recent Repos",
+        historyContainerId: "historyList",
+        primaryLabel: "+ Import Repo",
+        primaryId: "sidebarImportBtn",
+        chatHref: "../chat/chat-workspace.html",
+        projectsHref: "./projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+    </script>
+    <script src="./projects-detail.js"></script>
+  </body>
+</html>

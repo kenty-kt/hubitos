@@ -5,6 +5,7 @@
 目录约定：
 
 - `chat`：对话工作台相关页面
+- `projects`：GitHub 项目频道、本地部署工作台相关页面
 - `files`：文件中心相关页面
 - `agents`：我的 Agent、Agent 商店、Agent 编辑页
 - `skills`：我的 Skills、Skills 商店、Skill 编辑页

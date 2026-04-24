@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos AI OS - Projects Channel</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="./projects-center.css" />
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="projects-shell">
+          <header class="topbar">
+            <div class="topbar-left">
+              <div>
+                <div class="eyebrow">Projects Channel</div>
+                <div class="page-title">Project list and detail flow</div>
+                <div class="page-copy">
+                  Browse GitHub repositories here, then open a dedicated detail page for local deployment, verification, and AI repair.
+                </div>
+              </div>
+            </div>
+            <div class="topbar-actions">
+              <button class="ghost-btn" id="syncBtn" type="button">Sync GitHub</button>
+              <button class="primary-btn" id="importProjectBtn" type="button">+ Import Repository</button>
+            </div>
+          </header>
+
+          <div class="projects-content split">
+            <section class="panel glass">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-kicker">Repository Queue</div>
+                  <h2>Projects</h2>
+                </div>
+                <div class="search-shell">
+                  <span>⌕</span>
+                  <input id="searchInput" type="text" placeholder="Search repo, owner, or framework..." />
+                </div>
+              </div>
+              <div class="segment-row" id="statusTabs"></div>
+              <div class="project-list" id="projectList"></div>
+            </section>
+
+            <aside class="panel hero-panel">
+              <div class="panel-kicker">Selected Project</div>
+              <h2 id="previewTitle">hubitos-client-shell</h2>
+              <p id="previewSummary" class="hero-copy"></p>
+              <div class="preview-grid">
+                <div class="metric-card">
+                  <span>Repository</span>
+                  <strong id="previewRepo"></strong>
+                </div>
+                <div class="metric-card">
+                  <span>Framework</span>
+                  <strong id="previewFramework"></strong>
+                </div>
+                <div class="metric-card">
+                  <span>Status</span>
+                  <strong id="previewStatus"></strong>
+                </div>
+                <div class="metric-card">
+                  <span>Last deployment</span>
+                  <strong id="previewUpdatedAt"></strong>
+                </div>
+                <div class="metric-card">
+                  <span>Local URL</span>
+                  <strong id="previewUrl"></strong>
+                </div>
+                <div class="metric-card">
+                  <span>Auto-fix strategy</span>
+                  <strong id="previewRepair"></strong>
+                </div>
+              </div>
+              <div class="hero-actions">
+                <button class="primary-btn" id="openDetailBtn" type="button">Open Detail</button>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="importModal">
+      <div class="modal-card">
+        <div class="panel-head compact">
+          <div>
+            <div class="panel-kicker">Import GitHub Repository</div>
+            <h3>Add a project to this channel</h3>
+          </div>
+          <button class="ghost-btn small" id="closeModalBtn" type="button">Close</button>
+        </div>
+        <div class="form-grid">
+          <label>
+            <span>Repository</span>
+            <input id="repoInput" type="text" placeholder="kenty-kt/hubitos-app" />
+          </label>
+          <label>
+            <span>Framework</span>
+            <select id="frameworkInput">
+              <option>Next.js</option>
+              <option>Vite</option>
+              <option>Node API</option>
+              <option>Python</option>
+              <option>Docker</option>
+            </select>
+          </label>
+          <label>
+            <span>Branch</span>
+            <input id="branchInput" type="text" placeholder="main" value="main" />
+          </label>
+          <label>
+            <span>Local port</span>
+            <input id="portInput" type="number" placeholder="3000" value="3000" />
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="ghost-btn" id="seedDemoBtn" type="button">Use demo values</button>
+          <button class="primary-btn" id="saveProjectBtn" type="button">Save project</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script src="./projects-store.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "projects",
+        showHistory: true,
+        historyTitle: "Recent Repos",
+        historyContainerId: "historyList",
+        primaryLabel: "+ Import Repo",
+        primaryId: "sidebarImportBtn",
+        chatHref: "../chat/chat-workspace.html",
+        projectsHref: "./projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+    </script>
+    <script src="./projects-center.js"></script>
+  </body>
+</html>
