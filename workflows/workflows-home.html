@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos 自动任务</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="./workflows-home.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="workflow-shell">
+          <section class="workflow-insights">
+            <div class="workflow-insights-grid">
+              <article class="panel workflow-activity-panel">
+                <div class="panel-head split">
+                  <div>
+                    <span class="panel-kicker">最近</span>
+                  </div>
+                  <button class="ghost-pill subtle" id="refreshFeedBtn" type="button">刷新</button>
+                </div>
+                <div class="activity-list" id="activityList"></div>
+              </article>
+              <article class="signal-panel workflow-signal-panel">
+                <div class="panel-head">
+                  <span class="panel-kicker" id="systemTimeLabel"></span>
+                </div>
+                <div class="signal-stack" id="signalStack"></div>
+              </article>
+            </div>
+          </section>
+
+          <div class="content-grid single-column" id="contentGrid">
+            <section class="panel workflow-panel">
+              <div class="panel-head split">
+                <div>
+                  <h3>自动任务</h3>
+                </div>
+              </div>
+              <div class="workflow-tabs" id="workflowTabs">
+                <button class="workflow-tab active" data-scope="mine" type="button">我的</button>
+                <button class="workflow-tab" data-scope="all" type="button">全部</button>
+              </div>
+              <div class="workflow-grid" id="workflowGrid"></div>
+            </section>
+
+            <section class="panel execution-panel hidden" id="executionPanel">
+              <div class="panel-head split">
+                <div>
+                  <span class="panel-kicker" id="sidePanelKicker">执行面板</span>
+                  <h3 id="sidePanelTitle">右侧执行面板</h3>
+                </div>
+                <div class="side-panel-actions">
+                  <button class="subtle-btn hidden" id="continueChatBtn" type="button">去对话里继续</button>
+                  <button class="ghost-pill hidden" id="closePanelBtn" type="button">关闭</button>
+                </div>
+              </div>
+              <div class="form-card hidden" id="formCard">
+                <div class="form-progress">
+                  <div class="progress-track">
+                    <span class="progress-fill" id="progressFill"></span>
+                  </div>
+                  <div class="progress-meta" id="progressMeta">还差 2 项即可运行</div>
+                </div>
+                <div class="form-body" id="drawerBody"></div>
+                <div class="form-footer">
+                  <div class="drawer-helper">需要授权的直接点击完成；需要补充的问题请在对应输入框中填写，全部内容会串联后一次提交给系统。</div>
+                  <div class="drawer-actions">
+                    <button class="ghost-pill" id="skipDrawerBtn" type="button">稍后补充</button>
+                    <button class="primary-pill" id="submitDrawerBtn" type="button">提交并继续</button>
+                  </div>
+                </div>
+              </div>
+              <div class="result-card hidden" id="resultCard">
+                <div class="result-head">
+                  <div>
+                    <div class="result-title" id="resultTitle">Twitter Growth Loop</div>
+                  <div class="result-meta" id="resultMeta">内容已经准备好，可以发布</div>
+                  </div>
+                  <span class="result-status" id="resultStatus">运行中</span>
+                </div>
+                <div class="result-preview" id="resultPreview">
+                  <div class="result-preview-label" id="resultPreviewLabel">已输出内容</div>
+                  <div class="result-preview-title" id="resultPreviewTitle">竞品报告摘要</div>
+                  <ul class="result-preview-list" id="resultPreviewList"></ul>
+                  <div class="result-preview-actions">
+                    <button class="ghost-pill" id="editResultBtn" type="button">修改条件</button>
+                    <button class="primary-pill hidden" id="openReportBtn" type="button">打开 HTML 报告</button>
+                  </div>
+                </div>
+                <div class="result-columns">
+                  <div class="result-block">
+                    <div class="result-block-title">已抓取内容</div>
+                    <ul class="result-list" id="resultCollected"></ul>
+                  </div>
+                  <div class="result-block">
+                    <div class="result-block-title">待发布 / 已发布内容</div>
+                    <ul class="result-list" id="resultGenerated"></ul>
+                  </div>
+                </div>
+                <div class="result-block">
+                  <div class="result-block-title">评论互动与执行日志</div>
+                  <ul class="result-list compact" id="resultLogs"></ul>
+                </div>
+              </div>
+              <div class="chat-card hidden" id="chatCard">
+                <div class="chat-thread" id="chatThread"></div>
+                <div class="chat-composer">
+                  <textarea id="chatReplyInput" rows="3" placeholder="继续输入你要接管或调整的内容..."></textarea>
+                  <div class="chat-actions">
+                    <button class="ghost-pill" id="closeChatPanelBtn" type="button">关闭对话</button>
+                    <button class="primary-pill" id="sendChatReplyBtn" type="button">发送</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "workflows",
+        showHistory: true,
+        historyTitle: "自动任务记录",
+        primaryLabel: "+ 新建对话",
+        primaryId: "newChatBtn",
+        homeHref: "../home/home.html",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
+        workflowsHref: "./workflows-home.html",
+        projectsHref: "../projects/projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+    </script>
+    <script src="./workflows-home.js"></script>
+  </body>
+</html>

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos 文档学习详情</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --muted: #786866;
+        --brand: #d92d20;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "Inter", "PingFang SC", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 16px;
+      }
+      .shell {
+        width: min(1728px, calc(100vw - 32px));
+        min-height: calc(100vh - 32px);
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        border-radius: 28px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+      .content {
+        display: grid;
+        grid-template-rows: 76px 1fr;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        border-bottom: 1px solid rgba(235, 209, 204, 0.42);
+        background: rgba(255, 252, 251, 0.88);
+      }
+      .topbar h1 {
+        margin: 0;
+        font-size: 22px;
+      }
+      .topbar-copy {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .topbar-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .ghost-btn, .primary-btn {
+        min-height: 40px;
+        padding: 0 16px;
+        border-radius: 999px;
+        cursor: pointer;
+        border: 0;
+        font: inherit;
+      }
+      .ghost-btn {
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: rgba(255,255,255,0.9);
+        color: #5a403c;
+      }
+      .primary-btn {
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) 420px;
+        min-height: 0;
+      }
+      .study-main {
+        padding: 20px 20px 24px;
+        overflow: auto;
+      }
+      .study-side {
+        border-left: 1px solid rgba(233, 215, 213, 0.72);
+        background: linear-gradient(180deg, #f8f3f2 0%, #fdfafa 100%);
+        padding: 20px 18px 24px;
+        overflow: auto;
+        display: grid;
+        align-content: start;
+        gap: 14px;
+      }
+      .card {
+        border-radius: 22px;
+        border: 1px solid rgba(235, 209, 204, 0.9);
+        background: rgba(255,255,255,0.96);
+        padding: 16px;
+      }
+      .kicker {
+        font-size: 11px;
+        color: #907a76;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .doc-title {
+        margin: 10px 0 0;
+        font-size: 28px;
+        line-height: 1.15;
+      }
+      .doc-meta {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #fff1ed;
+        color: var(--brand);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .doc-fragment {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 24px;
+        border: 1px dashed rgba(235, 209, 204, 0.9);
+        background: #fffaf9;
+        color: #5f4c49;
+        line-height: 1.8;
+      }
+      .reading-article {
+        margin-top: 16px;
+        display: grid;
+        gap: 14px;
+      }
+      .reading-block {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(235, 209, 204, 0.72);
+        background: #fff;
+        line-height: 1.85;
+        color: #4f403d;
+        user-select: text;
+      }
+      .reading-block h4 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+      .inline-note-anchor {
+        position: relative;
+        display: inline;
+        padding: 0 2px;
+        border-radius: 4px;
+        background: rgba(255, 215, 102, 0.52);
+        box-shadow: inset 0 -1px 0 rgba(217, 45, 32, 0.18);
+        cursor: pointer;
+      }
+      .inline-note-anchor:hover {
+        background: rgba(255, 215, 102, 0.78);
+      }
+      .inline-note-popup {
+        position: absolute;
+        left: 0;
+        top: calc(100% + 10px);
+        z-index: 15;
+        display: none;
+        width: min(320px, 56vw);
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(235, 209, 204, 0.92);
+        background: rgba(36, 27, 26, 0.96);
+        color: #fffaf8;
+        box-shadow: 0 18px 36px rgba(0,0,0,0.18);
+      }
+      .inline-note-anchor:hover .inline-note-popup {
+        display: block;
+      }
+      .inline-note-popup-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: rgba(255,255,255,0.68);
+        font-weight: 800;
+      }
+      .inline-note-popup-body {
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 1.65;
+      }
+      .inline-note-popup-meta {
+        margin-top: 8px;
+        font-size: 11px;
+        color: rgba(255,255,255,0.72);
+      }
+      .selection-toolbar {
+        position: fixed;
+        z-index: 80;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(36, 27, 26, 0.94);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      }
+      .selection-toolbar.is-visible {
+        display: flex;
+      }
+      .selection-toolbar button {
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 0;
+        cursor: pointer;
+        font: inherit;
+      }
+      .selection-toolbar .primary-mini {
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+      }
+      .selection-toolbar .ghost-mini {
+        color: #2f2321;
+        background: #fff7f5;
+      }
+      .outline-list, .notes-list, .tool-list, .chat-list {
+        display: grid;
+        gap: 10px;
+      }
+      .outline-item, .note-item, .tool-item, .chat-item {
+        border-radius: 16px;
+        border: 1px solid rgba(235, 209, 204, 0.82);
+        background: #fff;
+        padding: 12px;
+      }
+      .chat-item.user { background: #fff5f2; }
+      .chat-item.ai { background: #fff; }
+      .ask-box, .note-box {
+        width: 100%;
+        min-height: 96px;
+        border-radius: 16px;
+        border: 1px solid rgba(236,214,209,0.92);
+        background: #fff;
+        padding: 12px;
+        resize: vertical;
+        font: inherit;
+        color: var(--text);
+      }
+      .note-quote {
+        margin-bottom: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: #fff5f2;
+        border: 1px solid rgba(235, 209, 204, 0.78);
+        color: #8a5c53;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .attachment-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .attachment-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #f6efee;
+        color: #6b5753;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .side-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .stack-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .empty {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      @media (max-width: 1280px) {
+        body { padding: 0; }
+        .shell {
+          width: 100vw;
+          min-height: 100vh;
+          border-radius: 0;
+        }
+      }
+      @media (max-width: 1080px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .study-side {
+          border-left: 0;
+          border-top: 1px solid rgba(233, 215, 213, 0.72);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div id="sharedSidebar"></div>
+      <section class="content">
+        <header class="topbar">
+          <div>
+            <h1 id="docTitle">文档学习详情</h1>
+            <div class="topbar-copy">把文档当作课件学习，可随时向 AI 提问、记录笔记，并使用学习辅助工具。</div>
+          </div>
+          <div class="topbar-actions">
+            <a class="ghost-btn" href="./files-center.html" style="text-decoration:none;display:inline-flex;align-items:center;">返回文件中心</a>
+            <button class="primary-btn" id="continueEditBtn" type="button">用 AI 继续编辑</button>
+          </div>
+        </header>
+        <div class="layout">
+          <main class="study-main">
+            <div class="card">
+              <div class="kicker">Courseware</div>
+              <h2 class="doc-title" id="heroTitle">Brand Identity Proposal v2.docx</h2>
+              <div class="doc-meta" id="heroMeta"></div>
+              <div class="doc-fragment" id="heroSnippet"></div>
+              <div class="reading-article" id="readingArticle"></div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+              <div class="kicker">Outline</div>
+              <h3 style="margin:10px 0 0;font-size:18px;">学习提纲</h3>
+              <div class="outline-list" id="outlineList" style="margin-top:14px;"></div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+              <div class="kicker">AI Tutor</div>
+              <h3 style="margin:10px 0 0;font-size:18px;">随时向 AI 提问</h3>
+              <textarea class="ask-box" id="askInput" placeholder="例如：这份文档的核心结论是什么？如果我要用它做汇报，应该先讲哪三点？"></textarea>
+              <div class="stack-actions">
+                <button class="primary-btn" id="askAiBtn" type="button">提问</button>
+                <button class="ghost-btn" id="generateSummaryBtn" type="button">生成学习总结</button>
+              </div>
+              <div class="chat-list" id="chatList" style="margin-top:14px;"></div>
+            </div>
+          </main>
+
+          <aside class="study-side">
+            <div class="card">
+              <div class="kicker">Notes</div>
+              <h3 style="margin:10px 0 0;font-size:18px;">学习笔记</h3>
+              <div id="pendingQuote" class="note-quote" style="display:none;"></div>
+              <textarea class="note-box" id="noteInput" placeholder="记录你的理解、疑问和后续行动项..."></textarea>
+              <div class="stack-actions">
+                <button class="primary-btn" id="saveNoteBtn" type="button">保存笔记</button>
+                <button class="ghost-btn" id="clearQuoteBtn" type="button">清空摘录</button>
+              </div>
+              <div class="side-actions">
+                <button class="ghost-btn" id="attachToPendingBtn" type="button">给当前笔记上传附件</button>
+              </div>
+              <div class="attachment-row" id="pendingAttachments"></div>
+              <div class="notes-list" id="notesList" style="margin-top:14px;"></div>
+            </div>
+
+            <div class="card">
+              <div class="kicker">Study Tools</div>
+              <h3 style="margin:10px 0 0;font-size:18px;">学习辅助工具</h3>
+              <div class="tool-list" id="toolList" style="margin-top:14px;"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </div>
+    <div class="selection-toolbar" id="selectionToolbar">
+      <button class="primary-mini" id="addSelectionNoteBtn" type="button">划字记笔记</button>
+      <button class="ghost-mini" id="askSelectionBtn" type="button">基于划字提问</button>
+    </div>
+    <input id="noteAttachInput" type="file" class="hidden" multiple />
+
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "files",
+        fixed: true,
+        showHistory: true,
+        historyTitle: "最近对话",
+        historyContainerId: "historyList",
+        primaryLabel: "+ 新建对话",
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
+        projectsHref: "../projects/projects-center.html",
+        filesHref: "./files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+
+      const STORAGE_KEY = "hubitos-files-center-store-v2";
+      const NOTES_KEY = "hubitos-file-study-notes-v1";
+      const CHAT_KEY = "hubitos-file-study-chat-v1";
+      const NOTE_ATTACHMENTS_KEY = "hubitos-file-study-note-attachments-v1";
+      const FALLBACK_FILE = {
+        id: "file-prd-lesson-1",
+        name: "Hubitos_MVP1_Desktop_PRD_学习版.md",
+        type: "Documents",
+        folder: "学习课件",
+        engine: "Hubitos Pro",
+        snippet:
+          "这份学习版 PRD 重点描述了 Hubitos MVP1 的产品目标、用户路径、页面结构和关键能力边界。适合从“为什么做、先做什么、上线后怎么衡量”这三个维度来理解。",
+        insights: ["学习模式 · PRD 课件", "AI 问答 · 概念解释", "笔记工具 · 结构笔记", "学习辅助 · 汇报提纲"]
+      };
+
+      function escapeHtml(text) {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function getStore() {
+        try {
+          return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}");
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function getFile() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        const store = getStore();
+        const files = Array.isArray(store.files) ? store.files : [];
+        return files.find((item) => item.id === id) || files[0] || FALLBACK_FILE;
+      }
+
+      function getNotes() {
+        try {
+          return JSON.parse(window.localStorage.getItem(NOTES_KEY) || "{}");
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function saveNotes(notes) {
+        window.localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+      }
+
+      function getAttachments() {
+        try {
+          return JSON.parse(window.localStorage.getItem(NOTE_ATTACHMENTS_KEY) || "{}");
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function saveAttachments(data) {
+        window.localStorage.setItem(NOTE_ATTACHMENTS_KEY, JSON.stringify(data));
+      }
+
+      function normalizeNotes(rawNotes, rawAttachments) {
+        return (rawNotes || []).map((item, index) => {
+          if (typeof item === "string") {
+            return {
+              id: `legacy-${index}`,
+              content: item,
+              quote: "",
+              attachments: (rawAttachments || [])[index] || []
+            };
+          }
+          if (Array.isArray(item)) {
+            return {
+              id: `legacy-array-${index}`,
+              content: item.join(" "),
+              quote: "",
+              attachments: (rawAttachments || [])[index] || []
+            };
+          }
+          return {
+            id: item.id || `note-${index}`,
+            content: item.content || "",
+            quote: item.quote || "",
+            attachments: item.attachments || (rawAttachments || [])[index] || []
+          };
+        });
+      }
+
+      function migrateNotesForCurrentFile() {
+        if (!file) return;
+        const rawNotes = getNotes();
+        const rawAttachments = getAttachments();
+        const currentNotes = rawNotes[file.id] || [];
+        const normalized = normalizeNotes(currentNotes, rawAttachments[file.id] || []);
+        rawNotes[file.id] = normalized;
+        rawAttachments[file.id] = normalized.map((item) => item.attachments || []);
+        saveNotes(rawNotes);
+        saveAttachments(rawAttachments);
+      }
+
+      function getChatHistory() {
+        try {
+          return JSON.parse(window.localStorage.getItem(CHAT_KEY) || "{}");
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function saveChatHistory(data) {
+        window.localStorage.setItem(CHAT_KEY, JSON.stringify(data));
+      }
+
+      const file = getFile();
+      const chatSeed = [];
+      const noteState = {
+        selectedQuote: "",
+        pendingAttachments: []
+      };
+      let readingBlocks = [];
+
+      if (file) {
+        document.getElementById("docTitle").textContent = file.name;
+        document.getElementById("heroTitle").textContent = file.name;
+        document.getElementById("heroMeta").innerHTML = `
+          <span class="pill">${escapeHtml(file.type)}</span>
+          <span class="pill">${escapeHtml(file.folder || "自动保存")}</span>
+          <span class="pill">${escapeHtml(file.engine || "AI Generated")}</span>
+        `;
+        document.getElementById("heroSnippet").textContent = file.snippet || "这份文档已经自动保存到文件中心，可继续作为课件学习。";
+        readingBlocks = file.id === "file-prd-lesson-1"
+          ? [
+              {
+                title: "一、为什么先做 MVP1",
+                body: "MVP1 先聚焦桌面端工作台，是因为当前用户最确定的高频需求仍然是：发起任务、获取 AI 结果、继续修改、沉淀成文件。相比一开始就做完整平台，先把这条生产力闭环做深，更容易验证留存和真实价值。"
+              },
+              {
+                title: "二、最核心的用户价值",
+                body: "这份 PRD 里最核心的价值不在功能数量，而在路径完整度：用户从自然语言发起任务，到获得内容结果，再到文件沉淀、后续复用和进一步学习，形成一个连续的工作链。"
+              },
+              {
+                title: "三、第一阶段必须上线的能力",
+                body: "第一阶段必须优先覆盖对话工作台、文件生成、文件沉淀和基础继续编辑能力。像商店、数字员工、复杂渠道执行等能力，可以在主路径稳定后逐步扩展，否则页面复杂度会先压过真实价值。"
+              }
+            ]
+          : [
+              {
+                title: "一、核心内容",
+                body: file.snippet || "这份文档已经自动保存到文件中心，可继续作为课件学习。"
+              },
+              {
+                title: "二、学习建议",
+                body: "建议先抓住文档目标、主要结论和可以直接执行的动作，再把不理解的概念整理成问题交给 AI 解释。"
+              }
+            ];
+        const outline = file.id === "file-prd-lesson-1"
+          ? [
+              "MVP1 为什么先聚焦桌面端工作台，而不是一开始就做完整平台",
+              "这份 PRD 里最核心的 3 条用户价值是什么",
+              "从对话工作台到文件沉淀，这条用户路径是怎么闭环的",
+              "哪些能力属于第一阶段必须上线，哪些适合放到后续版本"
+            ]
+          : [
+              "这份文档想解决的核心问题是什么",
+              "文档里最值得记住的 3 个结论",
+              "如果要拿去汇报，应该先讲哪一部分",
+              "有哪些内容值得进一步追问 AI"
+            ];
+        document.getElementById("outlineList").innerHTML = outline.map((item) => `<div class="outline-item">${escapeHtml(item)}</div>`).join("");
+        document.getElementById("toolList").innerHTML = (file.insights || ["AI 问答", "笔记记录", "学习总结"])
+          .map((item) => `<div class="tool-item">${escapeHtml(item)}</div>`)
+          .join("");
+
+        const existingChat = getChatHistory()[file.id];
+        if (Array.isArray(existingChat) && existingChat.length) {
+          chatSeed.push(...existingChat);
+        } else {
+          chatSeed.push(
+            { role: "user", text: `这份《${file.name}》最值得先看哪一部分？` },
+            { role: "ai", text: "建议先看背景与目标，再看结构设计，最后看风险和里程碑。这样最容易把整份文档串起来。"},
+            { role: "user", text: "如果我要拿它给老板汇报，应该压缩成哪三个重点？" },
+            { role: "ai", text: "可以压成三点：为什么要做、这次做什么、上线后怎么衡量是否有效。先不要一开始就展开所有细节。" }
+          );
+        }
+      }
+
+      function renderChat() {
+        document.getElementById("chatList").innerHTML = chatSeed.length
+          ? chatSeed.map((item) => `<div class="chat-item ${item.role}">${escapeHtml(item.text)}</div>`).join("")
+          : `<div class="empty">还没有提问记录。你可以直接问 AI：总结、解释、举例、出题、生成复习提纲。</div>`;
+      }
+
+      function highlightText(content, note) {
+        if (!note.quote) return escapeHtml(content);
+        const index = content.indexOf(note.quote);
+        if (index === -1) return escapeHtml(content);
+        const before = content.slice(0, index);
+        const match = content.slice(index, index + note.quote.length);
+        const after = content.slice(index + note.quote.length);
+        const attachmentCount = (note.attachments || []).length;
+        return `${escapeHtml(before)}<span class="inline-note-anchor">${escapeHtml(match)}<span class="inline-note-popup"><div class="inline-note-popup-title">关联笔记</div><div class="inline-note-popup-body">${escapeHtml(note.content || "这条摘录还没有补充说明。")}</div><div class="inline-note-popup-meta">${attachmentCount ? `已上传 ${attachmentCount} 个附件` : "没有附件"}</div></span></span>${escapeHtml(after)}`;
+      }
+
+      function renderReadingArticle() {
+        const allNotes = getNotes();
+        const rawAttachments = getAttachments()[file?.id || "default"] || [];
+        const notes = normalizeNotes(allNotes[file?.id || "default"] || [], rawAttachments).filter((item) => item.quote);
+        document.getElementById("readingArticle").innerHTML = readingBlocks
+          .map((block) => {
+            let bodyHtml = escapeHtml(block.body);
+            for (const note of notes) {
+              if (block.body.includes(note.quote)) {
+                bodyHtml = highlightText(block.body, note);
+                break;
+              }
+            }
+            return `<div class="reading-block"><h4>${escapeHtml(block.title)}</h4><div>${bodyHtml}</div></div>`;
+          })
+          .join("");
+      }
+
+      function renderNotes() {
+        const allNotes = getNotes();
+        const rawNotes = allNotes[file?.id || "default"] || [
+          "先把这份文档的背景、目标和核心结论各写一句。",
+          "遇到看不懂的概念时，先问 AI 解释，再补到自己的笔记里。",
+          "如果后续要汇报，优先整理成 3 个重点结论。"
+        ];
+        const attachments = getAttachments()[file?.id || "default"] || [];
+        const fileNotes = normalizeNotes(rawNotes, attachments);
+        document.getElementById("notesList").innerHTML = fileNotes.length
+          ? fileNotes.map((item) => {
+              const currentAttachments = item.attachments || [];
+              return `
+                <div class="note-item">
+                  ${item.quote ? `<div class="note-quote">${escapeHtml(item.quote)}</div>` : ""}
+                  <div>${escapeHtml(item.content || "")}</div>
+                  ${currentAttachments.length ? `<div class="attachment-row">${currentAttachments.map((attachment) => `<div class="attachment-pill"><span>📎</span><span>${escapeHtml(attachment.name)}</span></div>`).join("")}</div>` : ""}
+                </div>
+              `;
+            }).join("")
+          : `<div class="empty">还没有笔记。建议先记录结论、疑问和后续行动。</div>`;
+        document.getElementById("pendingQuote").style.display = noteState.selectedQuote ? "block" : "none";
+        document.getElementById("pendingQuote").textContent = noteState.selectedQuote ? `摘录：${noteState.selectedQuote}` : "";
+        document.getElementById("pendingAttachments").innerHTML = noteState.pendingAttachments
+          .map((attachment) => `<div class="attachment-pill"><span>📎</span><span>${escapeHtml(attachment.name)}</span></div>`)
+          .join("");
+        renderReadingArticle();
+      }
+
+      document.getElementById("askAiBtn").addEventListener("click", () => {
+        const input = document.getElementById("askInput");
+        const value = input.value.trim();
+        if (!value) return;
+        chatSeed.push({ role: "user", text: value });
+        chatSeed.push({ role: "ai", text: `基于《${file?.name || "当前文档"}》，我建议你先关注文档的核心目标、主要结论和可执行动作。下一步如果你愿意，我可以继续把这个问题拆成更适合学习的回答结构。` });
+        const history = getChatHistory();
+        history[file?.id || "default"] = chatSeed;
+        saveChatHistory(history);
+        input.value = "";
+        renderChat();
+      });
+
+      document.getElementById("generateSummaryBtn").addEventListener("click", () => {
+        chatSeed.push({ role: "ai", text: `学习总结：这份文档目前最适合作为“主题理解 + 结构拆解 + 汇报准备”三种用途的课件。建议先抓住核心结论，再整理成自己的笔记和行动项。` });
+        const history = getChatHistory();
+        history[file?.id || "default"] = chatSeed;
+        saveChatHistory(history);
+        renderChat();
+      });
+
+      document.getElementById("saveNoteBtn").addEventListener("click", () => {
+        const input = document.getElementById("noteInput");
+        const value = input.value.trim();
+        if (!value || !file) return;
+        try {
+          const notes = getNotes();
+          const attachments = getAttachments();
+          const currentNotes = normalizeNotes(notes[file.id] || [], attachments[file.id] || []);
+          const note = {
+            id: `note-${Date.now()}`,
+            content: value,
+            quote: noteState.selectedQuote || "",
+            attachments: noteState.pendingAttachments
+          };
+          notes[file.id] = [note, ...currentNotes];
+          attachments[file.id] = [noteState.pendingAttachments, ...currentNotes.map((item) => item.attachments || [])];
+          saveNotes(notes);
+          saveAttachments(attachments);
+          input.value = "";
+          noteState.selectedQuote = "";
+          noteState.pendingAttachments = [];
+          renderNotes();
+        } catch (error) {
+          console.error("saveNote failed", error);
+          window.localStorage.removeItem(NOTES_KEY);
+          window.localStorage.removeItem(NOTE_ATTACHMENTS_KEY);
+          const notes = {};
+          const attachments = {};
+          const note = {
+            id: `note-${Date.now()}`,
+            content: value,
+            quote: noteState.selectedQuote || "",
+            attachments: noteState.pendingAttachments
+          };
+          notes[file.id] = [note];
+          attachments[file.id] = [noteState.pendingAttachments];
+          saveNotes(notes);
+          saveAttachments(attachments);
+          input.value = "";
+          noteState.selectedQuote = "";
+          noteState.pendingAttachments = [];
+          renderNotes();
+        }
+      });
+
+      document.getElementById("clearQuoteBtn").addEventListener("click", () => {
+        noteState.selectedQuote = "";
+        noteState.pendingAttachments = [];
+        renderNotes();
+      });
+
+      document.getElementById("attachToPendingBtn").addEventListener("click", () => {
+        document.getElementById("noteAttachInput").click();
+      });
+
+      document.getElementById("noteAttachInput").addEventListener("change", (event) => {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+        noteState.pendingAttachments.push(...files.map((currentFile) => ({ name: currentFile.name, size: currentFile.size })));
+        event.target.value = "";
+        renderNotes();
+      });
+
+      document.getElementById("continueEditBtn").addEventListener("click", () => {
+        window.location.href = "../chat/chat-workspace.html";
+      });
+
+      const selectionToolbar = document.getElementById("selectionToolbar");
+      const askInput = document.getElementById("askInput");
+
+      function hideSelectionToolbar() {
+        selectionToolbar.classList.remove("is-visible");
+      }
+
+      function getSelectedText() {
+        const selection = window.getSelection();
+        return selection ? selection.toString().trim() : "";
+      }
+
+      function updateSelectionToolbar() {
+        const selection = window.getSelection();
+        const text = getSelectedText();
+        if (!selection || !text) {
+          hideSelectionToolbar();
+          return;
+        }
+        const range = selection.rangeCount ? selection.getRangeAt(0) : null;
+        if (!range) {
+          hideSelectionToolbar();
+          return;
+        }
+        const container = range.commonAncestorContainer.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer.parentElement;
+        if (!container || !container.closest(".reading-article, .doc-fragment")) {
+          hideSelectionToolbar();
+          return;
+        }
+        const rect = range.getBoundingClientRect();
+        selectionToolbar.style.left = `${Math.max(16, rect.left + window.scrollX)}px`;
+        selectionToolbar.style.top = `${Math.max(16, rect.top + window.scrollY - 52)}px`;
+        selectionToolbar.classList.add("is-visible");
+      }
+
+      document.addEventListener("selectionchange", () => {
+        window.requestAnimationFrame(updateSelectionToolbar);
+      });
+
+      document.getElementById("addSelectionNoteBtn").addEventListener("click", () => {
+        const text = getSelectedText();
+        if (!text) return;
+        noteState.selectedQuote = text;
+        document.getElementById("noteInput").focus();
+        hideSelectionToolbar();
+        renderNotes();
+      });
+
+      document.getElementById("askSelectionBtn").addEventListener("click", () => {
+        const text = getSelectedText();
+        if (!text) return;
+        askInput.value = `请解释这段内容：${text}`;
+        askInput.focus();
+        hideSelectionToolbar();
+      });
+
+      migrateNotesForCurrentFile();
+      renderReadingArticle();
+      renderChat();
+      renderNotes();
+    </script>
+  </body>
+</html>

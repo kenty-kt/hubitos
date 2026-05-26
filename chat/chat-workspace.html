@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hubitos Chat Workspace</title>
+    <title>Hubitos 对话工作台</title>
     <link rel="stylesheet" href="../shared/sidebar.css" />
     <link rel="stylesheet" href="./chat-workspace.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
   </head>
   <body>
     <div class="desktop-stage">
@@ -15,101 +16,119 @@
         <section class="chat-shell">
           <header class="topbar">
             <div class="topbar-left">
-              <div class="user-mini">
-                <div class="avatar dark">K</div>
-                <div class="avatar soft">H</div>
-              </div>
               <div>
-                <div class="conversation-title" id="conversationTitle">Market Research Plan</div>
-                <div class="conversation-meta" id="conversationMeta">Default folder: Brand Strategy / Model: Hubitos Pro</div>
+                <h1 class="conversation-title" id="conversationTitle">New Chat</h1>
+                <div class="conversation-meta" id="conversationMeta">Conversations are saved as skills by default and can be found in Tools &gt; Mine.</div>
               </div>
             </div>
             <div class="topbar-actions">
-              <button class="icon-btn" id="pinConversationBtn" title="Pin conversation">◌</button>
-              <button class="icon-btn" id="saveTemplateBtn" title="Save as template">◎</button>
+              <button class="avatar-btn" id="saveTemplateBtn" title="保存成模板">K</button>
             </div>
           </header>
 
           <div class="chat-content">
             <div class="chat-scroll" id="chatScroll">
-              <div class="route-banner" id="routeBanner">
-                Auto Routing is on: tasks automatically switch models based on reasoning intensity and attachment type.
-              </div>
-
               <div class="home-start" id="homeStart">
                 <div class="recent-sections" id="recentSections">
                   <section class="recent-section recent-section-skills">
-                    <div class="recent-title">Recently Used Skills</div>
+                    <div class="recent-title">最近用过的技能</div>
                     <div class="recent-list" id="recentSkills"></div>
                   </section>
                   <section class="recent-section recent-section-agents">
-                    <div class="recent-title">Recently Used Agents</div>
+                    <div class="recent-title">最近用过的智能体</div>
                     <div class="recent-list" id="recentAgents"></div>
                   </section>
                   <section class="recent-section recent-section-prompts expanded" id="promptSection">
                     <div class="recent-title-row">
-                      <div class="recent-title">Prompt</div>
+                      <div class="recent-title">常用提示词</div>
                     </div>
                     <div class="recent-list recent-prompt-list" id="recentPrompts"></div>
                   </section>
                 </div>
               </div>
 
-              <div id="messageList"></div>
+              <div id="messageList" role="log" aria-live="polite" aria-relevant="additions text"></div>
             </div>
 
-            <div class="composer-wrap">
+            <div class="composer-wrap" aria-label="任务输入区">
               <div class="composer-toolbar">
                 <div class="toolbar-group">
                   <div class="format-picker">
-                    <button class="tool-chip format-trigger" id="modelPickerToggle" type="button">
+                    <button class="tool-chip format-trigger" id="modelPickerToggle" type="button" aria-haspopup="true" aria-expanded="false">
                       <span id="modelPickerLabel">✦ Hubitos Pro</span>
                     </button>
-                    <div class="format-menu" id="modelPickerMenu"></div>
+                    <div class="format-menu" id="modelPickerMenu" role="menu"></div>
                   </div>
                 </div>
                 <div class="toolbar-group toolbar-group-right">
-                  <button class="tool-action" id="attachFileBtn">+ Upload File</button>
+                  <button class="tool-action" id="attachFileBtn" type="button" aria-label="上传文件">+ 上传文件</button>
                 </div>
               </div>
 
-              <div class="attached-items" id="attachedItems"></div>
+              <div class="attached-items" id="attachedItems" aria-live="polite"></div>
+
+              <section class="task-context-card" id="taskContextCard" aria-label="当前任务上下文">
+                <div class="task-context-head">
+                  <div>
+                    <div class="task-context-kicker">This task</div>
+                    <div class="task-context-title" id="taskContextTitle">Using Hubitos Pro · Auto routing on</div>
+                    <div class="task-context-meta" id="taskContextMeta">No files, tools, or workflow context yet.</div>
+                  </div>
+                  <button class="context-toggle-btn" id="toggleContextDetailsBtn" type="button" aria-controls="taskContextDetails" aria-expanded="false">Expand details</button>
+                </div>
+                <div class="task-context-details hidden" id="taskContextDetails"></div>
+                <div class="task-context-expectation" id="taskContextExpectation">Add a request or choose a context before sending.</div>
+              </section>
+
+              <div class="active-tool-bar hidden" id="activeToolBar">
+                <div class="active-tool-main">
+                  <div class="active-tool-icon" id="activeToolIcon">✎</div>
+                  <div>
+                    <div class="active-tool-label">当前工具</div>
+                    <div class="active-tool-title" id="activeToolTitle">PRD 写作助手</div>
+                    <div class="active-tool-meta" id="activeToolMeta">提示词 · 写作 / 产品</div>
+                  </div>
+                </div>
+                <div class="active-tool-actions">
+                  <button class="active-tool-btn" id="applyToolBtn" type="button">带入输入框</button>
+                  <button class="active-tool-btn ghost" id="clearToolBtn" type="button">清除</button>
+                </div>
+              </div>
+
+              <div class="active-tool-bar hidden workflow-bar" id="activeWorkflowBar">
+                <div class="active-tool-main">
+                  <div class="active-tool-icon">⇢</div>
+                  <div>
+                    <div class="active-tool-label">当前自动任务</div>
+                    <div class="active-tool-title" id="activeWorkflowTitle">Twitter 增长循环</div>
+                    <div class="active-tool-meta" id="activeWorkflowMeta">自动任务 · 等你继续</div>
+                  </div>
+                </div>
+                <div class="active-tool-actions">
+                  <button class="active-tool-btn" id="applyWorkflowBtn" type="button">带入输入框</button>
+                  <button class="active-tool-btn ghost" id="clearWorkflowBtn" type="button">清除</button>
+                </div>
+              </div>
 
               <div class="composer">
+                <label class="sr-only" for="promptInput">任务输入框</label>
                 <textarea
                   id="promptInput"
                   rows="3"
-                  placeholder="Ask Hubitos to refine a draft, generate files, or start a desktop task directly..."
+                  placeholder="For example: turn this request into a PRD and outline the homepage structure."
                 ></textarea>
                 <div class="composer-actions">
-                  <button class="ghost-btn" id="toggleRoutingBtn" title="Auto routing toggle">⟲</button>
-                  <button class="send-btn" id="sendBtn" title="Send">➤</button>
+                  <button class="ghost-btn" id="toggleRoutingBtn" type="button" title="切换是否自动分配模型" aria-label="切换自动分配模型">⌂</button>
+                  <button class="send-btn" id="sendBtn" type="button" title="发送" aria-label="发送任务">↑</button>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
-        <aside class="context-panel">
-          <div class="panel-section">
-            <div class="mini-header">
-              <span>Enabled Skills</span>
-              <button class="text-btn" id="skillPresetBtn" type="button">Recommended</button>
-            </div>
-            <div class="skill-chips" id="skillChips"></div>
-          </div>
-
-          <div class="panel-section" id="assetsSection">
-            <div class="mini-header">
-              <span>Generated Assets</span>
-            </div>
-            <div class="asset-list" id="panelAssetList"></div>
-          </div>
-        </aside>
       </main>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <script src="../shared/i18n.js"></script>
     <script src="../shared/sidebar.js"></script>
@@ -117,11 +136,13 @@
       window.HubitosSidebar.mount("#sharedSidebar", {
         active: "chat",
         showHistory: true,
-        historyTitle: "History",
+        historyTitle: "最近对话",
         historyContainerId: "historyList",
-        primaryLabel: "+ New Chat",
+        primaryLabel: "+ 新建对话",
         primaryId: "newConversationBtn",
         chatHref: "./chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
+        workflowsHref: "../workflows/workflows-home.html",
         projectsHref: "../projects/projects-center.html",
         filesHref: "../files/files-center.html",
         agentsHref: "../agents/agents-center.html",

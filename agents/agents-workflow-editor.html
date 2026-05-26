@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>数字员工工作流编排</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --muted: #786866;
+        --brand: #d92d20;
+        --shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      body {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        padding: 0;
+      }
+
+      button, input, select, textarea { font: inherit; }
+
+      .desktop-stage {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-window {
+        width: 100vw;
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+      }
+
+      .editor-shell {
+        display: grid;
+        grid-template-rows: 72px 1fr;
+        min-width: 0;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        border-bottom: 1px solid rgba(235, 209, 204, 0.42);
+        background:
+          radial-gradient(circle at 18% 0%, rgba(217, 45, 32, 0.08), transparent 22%),
+          rgba(255, 252, 251, 0.9);
+      }
+
+      .topbar h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.15;
+      }
+
+      .topbar-copy {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .topbar-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .ghost-btn,
+      .primary-btn {
+        min-height: 40px;
+        padding: 0 16px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .ghost-btn {
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: rgba(255,255,255,0.9);
+        color: #5a403c;
+      }
+
+      .primary-btn {
+        border: 0;
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+        box-shadow: 0 10px 18px rgba(217, 45, 32, 0.18);
+      }
+
+      .ghost-btn.active {
+        border-color: rgba(217, 45, 32, 0.28);
+        background: #fff1ed;
+        color: var(--brand);
+      }
+
+      .editor-content {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr) 360px;
+        min-height: 0;
+      }
+
+      .palette,
+      .config-panel {
+        background: linear-gradient(180deg, #f8f3f2 0%, #fdfafa 100%);
+        border-right: 1px solid rgba(233, 215, 213, 0.72);
+        padding: 18px 16px;
+        overflow-y: auto;
+      }
+
+      .config-panel {
+        border-right: 0;
+        border-left: 1px solid rgba(233, 215, 213, 0.72);
+        display: grid;
+        align-content: start;
+        gap: 12px;
+      }
+
+      .section-title {
+        margin: 0 0 12px;
+        font-size: 12px;
+        color: #86726e;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .palette-list,
+      .step-list,
+      .skill-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .palette-summary {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .summary-card {
+        padding: 12px;
+        border-radius: 18px;
+        border: 1px solid rgba(235, 209, 204, 0.9);
+        background: rgba(255,255,255,0.94);
+      }
+
+      .summary-label {
+        font-size: 11px;
+        color: #907a76;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .summary-value {
+        margin-top: 6px;
+        font-size: 18px;
+        font-weight: 800;
+        color: #2f2321;
+      }
+
+      .summary-copy {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .palette-card,
+      .config-card,
+      .skill-pill {
+        border-radius: 18px;
+        border: 1px solid rgba(235, 209, 204, 0.9);
+        background: rgba(255,255,255,0.94);
+      }
+
+      .palette-card {
+        padding: 12px;
+      }
+
+      .palette-card.active {
+        border-color: rgba(217, 45, 32, 0.4);
+        background: #fff5f2;
+        box-shadow: 0 12px 24px rgba(217, 45, 32, 0.08);
+      }
+
+      .palette-card strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+
+      .palette-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .editor-canvas-wrap {
+        position: relative;
+        padding: 16px 18px 18px;
+        overflow: auto;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 249, 0.94), rgba(255, 255, 255, 0.96));
+      }
+
+      .canvas-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        border-radius: 18px;
+        border: 1px solid rgba(235, 209, 204, 0.9);
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(10px);
+      }
+
+      .canvas-toolbar-copy {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .canvas-toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .editor-canvas {
+        position: relative;
+        min-width: 1320px;
+        min-height: 860px;
+        border-radius: 28px;
+        border: 1px solid rgba(238, 225, 223, 0.95);
+        background:
+          linear-gradient(rgba(236, 214, 209, 0.28) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(236, 214, 209, 0.28) 1px, transparent 1px),
+          linear-gradient(180deg, #fffdfd 0%, #fff7f6 100%);
+        background-size: 28px 28px, 28px 28px, auto;
+        box-shadow: 0 18px 36px rgba(164, 70, 36, 0.05);
+      }
+
+      .editor-link {
+        position: absolute;
+        height: 2px;
+        background: rgba(217, 45, 32, 0.28);
+        transform-origin: left center;
+      }
+
+      .editor-link::after {
+        content: "";
+        position: absolute;
+        right: -4px;
+        top: -4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(217, 45, 32, 0.42);
+      }
+
+      .editor-node {
+        position: absolute;
+        width: 236px;
+        padding: 12px;
+        border-radius: 22px;
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: rgba(255,255,255,0.98);
+        box-shadow: 0 16px 32px rgba(171, 54, 35, 0.08);
+        cursor: pointer;
+      }
+
+      .editor-node.active {
+        border-color: rgba(217, 45, 32, 0.5);
+        box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12), 0 18px 36px rgba(217, 45, 32, 0.14);
+      }
+
+      .editor-node.connect-source {
+        border-color: rgba(217, 45, 32, 0.72);
+        box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12), 0 18px 36px rgba(217, 45, 32, 0.14);
+      }
+
+      .node-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .node-index {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff1ed;
+        color: var(--brand);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .node-status {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: #fff1ed;
+        color: var(--brand);
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .node-title {
+        margin-top: 8px;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .node-copy {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .node-model {
+        margin-top: 8px;
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.88);
+        border: 1px solid rgba(236,214,209,0.84);
+        color: #6f5f5c;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .node-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .skill-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        color: #6c4f4a;
+        font-size: 12px;
+      }
+
+      .config-card {
+        padding: 16px;
+      }
+
+      .config-card.collapsible {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .config-card.collapsible.is-collapsed .config-card-body {
+        display: none;
+      }
+
+      .config-card + .config-card {
+        margin-top: 12px;
+      }
+
+      .config-card h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+
+      .config-kicker {
+        margin-bottom: 8px;
+        font-size: 11px;
+        color: #907a76;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .config-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        cursor: pointer;
+      }
+
+      .config-card-head h3 {
+        margin: 0;
+      }
+
+      .config-toggle {
+        color: #8d7671;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .config-card-body {
+        padding: 0 16px 16px;
+      }
+
+      .config-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .field label {
+        font-size: 12px;
+        color: #8e7671;
+        font-weight: 700;
+      }
+
+      .field select,
+      .field textarea {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid rgba(236,214,209,0.92);
+        background: #fff;
+        color: var(--text);
+        outline: none;
+      }
+
+      .field select {
+        min-height: 42px;
+        padding: 0 12px;
+      }
+
+      .field textarea {
+        min-height: 90px;
+        padding: 12px;
+        resize: vertical;
+      }
+
+      .config-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .runtime-list {
+        display: grid;
+        gap: 8px;
+        max-height: 160px;
+        overflow: auto;
+        font-size: 12px;
+        color: #5f4c49;
+        line-height: 1.55;
+      }
+
+      .runtime-meta {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #fff1ed;
+        color: var(--brand);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .order-btn {
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: #fff;
+        color: #5a403c;
+        cursor: pointer;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%) translateY(24px);
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: rgba(36, 27, 26, 0.92);
+        color: #fff;
+        font-size: 13px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        z-index: 60;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 1200px) {
+        .editor-content {
+          grid-template-columns: 1fr;
+        }
+        .palette,
+        .config-panel {
+          border: 0;
+          border-bottom: 1px solid rgba(233, 215, 213, 0.72);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+        <section class="editor-shell">
+          <header class="topbar">
+            <div>
+              <h1>私域增长数字员工 · 全流程编排</h1>
+              <div class="topbar-copy">先选中节点，再调整模型与输出说明，最后保存或直接运行整条流程。</div>
+            </div>
+            <div class="topbar-actions">
+              <a class="ghost-btn" href="./agents-detail.html?id=agent-private-growth" style="text-decoration:none;display:inline-flex;align-items:center;">返回详情页</a>
+              <button class="ghost-btn" id="runFlowBtn" type="button">运行流程</button>
+              <button class="primary-btn" id="publishFlowBtn" type="button">保存并发布流程</button>
+            </div>
+          </header>
+
+          <div class="editor-content">
+            <aside class="palette">
+              <div class="section-title">流程概览</div>
+              <div class="palette-summary">
+                <div class="summary-card">
+                  <div class="summary-label">当前节点</div>
+                  <div class="summary-value" id="summarySelected">内容产出</div>
+                  <div class="summary-copy" id="summarySelectedCopy">围绕目标商品和目标人群生成短视频脚本、图文文案和发布素材。</div>
+                </div>
+                <div class="summary-card">
+                  <div class="summary-label">节点数量</div>
+                  <div class="summary-value" id="summaryNodeCount">05</div>
+                  <div class="summary-copy">当前这条数字员工流程一共包含 5 个执行节点。</div>
+                </div>
+              </div>
+              <div class="section-title">节点列表</div>
+              <div class="palette-list" id="paletteList"></div>
+            </aside>
+
+            <main class="editor-canvas-wrap">
+              <div class="canvas-toolbar">
+                <div class="canvas-toolbar-copy" id="canvasToolbarCopy">当前查看整条执行路径。需要改配置时，先点击任意节点。</div>
+                <div class="canvas-toolbar-actions">
+                  <button class="ghost-btn" id="toggleConnectBtn" type="button">开启连线模式</button>
+                  <button class="ghost-btn" id="resetLinksBtn" type="button">重置连线</button>
+                </div>
+              </div>
+              <div class="editor-canvas" id="editorCanvas"></div>
+            </main>
+
+            <aside class="config-panel">
+              <div class="section-title">当前节点配置</div>
+              <div class="config-card">
+                <div class="config-kicker">Selected Node</div>
+                <h3 id="configTitle">内容产出</h3>
+                <p class="config-copy" id="configCopy">围绕目标商品和目标人群生成短视频脚本、图文文案和发布素材。</p>
+                <div class="field">
+                  <label>指定模型</label>
+                  <select id="modelSelect">
+                    <option>GPT-4o</option>
+                    <option>Claude 3.5</option>
+                    <option>DeepSeek</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>输出说明</label>
+                  <textarea id="outputNotes"></textarea>
+                </div>
+                <div class="config-actions">
+                  <button class="order-btn" id="moveUpBtn" type="button">上移</button>
+                  <button class="order-btn" id="moveDownBtn" type="button">下移</button>
+                </div>
+              </div>
+
+              <div class="config-card collapsible" data-card="skills">
+                <div class="config-card-head" data-toggle-card="skills">
+                  <div>
+                    <div class="config-kicker">Attached Skills</div>
+                    <h3>已挂技能</h3>
+                  </div>
+                  <div class="config-toggle" id="toggle-skills">收起</div>
+                </div>
+                <div class="config-card-body">
+                  <div class="skill-list" id="skillList"></div>
+                </div>
+              </div>
+
+              <div class="config-card collapsible" data-card="runtime">
+                <div class="config-card-head" data-toggle-card="runtime">
+                  <div>
+                    <div class="config-kicker">Latest Run</div>
+                    <h3>最近一次运行</h3>
+                  </div>
+                  <div class="config-toggle" id="toggle-runtime">收起</div>
+                </div>
+                <div class="config-card-body">
+                  <div class="status-pill" id="runtimeStatusPill">未运行</div>
+                  <div class="runtime-meta" id="runtimeStatusMeta">状态：未运行</div>
+                  <div class="config-copy" id="runtimeSummary" style="margin-top:10px;">还没有执行记录。</div>
+                  <div class="runtime-list" id="runtimeList" style="margin-top:12px;"></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "employees",
+        fixed: false,
+        showHistory: true,
+        historyTitle: "最近对话",
+        historyContainerId: "historyList",
+        primaryLabel: "+ 新建对话",
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
+        projectsHref: "../projects/projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "./agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+
+      const WORKFLOW_API_BASE = "http://127.0.0.1:8769/api";
+
+      const workflowCatalog = [
+        {
+          id: "wf-content",
+          name: "内容产出",
+          status: "运行中",
+          model: "GPT-4o",
+          desc: "围绕目标商品和目标人群生成短视频脚本、图文文案和发布素材。",
+          skills: ["Content Planning", "Creative Writing", "Image Prompting"],
+          notes: "输出 3 组短视频脚本、5 组开场 hook 和主图文案。"
+        },
+        {
+          id: "wf-engage",
+          name: "互动运营",
+          status: "待运行",
+          model: "Claude 3.5",
+          desc: "接住评论区和私信里的高意向用户，自动分层并生成回复。",
+          skills: ["Comment Engagement", "Lead Scoring", "Reply Automation"],
+          notes: "优先识别高意向用户，生成首轮互动回复和私信接续。"
+        },
+        {
+          id: "wf-zalo",
+          name: "Zalo 私域建联与运营",
+          status: "待运行",
+          model: "GPT-4o",
+          desc: "把高意向用户导入 Zalo，完成建联、社群分层和持续触达。",
+          skills: ["Zalo CRM", "Community Operations", "Welcome Sequence"],
+          notes: "按标签入群，触发欢迎语、优惠券和分层运营脚本。"
+        },
+        {
+          id: "wf-product",
+          name: "商品发布",
+          status: "待运行",
+          model: "DeepSeek",
+          desc: "同步商品标题、卖点、主图说明和上架节奏到多平台。",
+          skills: ["Catalog Publishing", "Product Copy", "Price Sync"],
+          notes: "按平台同步商品标题、卖点、SKU 和上架时间。"
+        },
+        {
+          id: "wf-sales",
+          name: "商品销售",
+          status: "待运行",
+          model: "Claude 3.5",
+          desc: "跟进订单线索、促成成交并生成复购提醒。",
+          skills: ["Sales Follow-up", "Conversion Playbook", "After-sales Care"],
+          notes: "跟进订单状态，触发成交话术、复购提醒和售后关怀。"
+        }
+      ];
+
+      const state = {
+        nodes: workflowCatalog.map((item) => ({ ...item })),
+        selectedId: "wf-content",
+        links: [
+          { from: "wf-content", to: "wf-engage" },
+          { from: "wf-engage", to: "wf-zalo" },
+          { from: "wf-zalo", to: "wf-product" },
+          { from: "wf-product", to: "wf-sales" }
+        ],
+        positions: {
+          "wf-content": { x: 60, y: 72 },
+          "wf-engage": { x: 330, y: 66 },
+          "wf-zalo": { x: 600, y: 182 },
+          "wf-product": { x: 870, y: 74 },
+          "wf-sales": { x: 1140, y: 188 }
+        },
+        drag: null,
+        connectMode: false,
+        pendingLinkSource: null,
+        runtime: {
+          lastRunAt: "",
+          status: "未运行",
+          summary: "还没有执行记录。",
+          logs: []
+        },
+        collapsedCards: {
+          skills: false,
+          runtime: false
+        }
+      };
+
+      function showToast(text) {
+        const toast = document.getElementById("toast");
+        toast.textContent = text;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), 1800);
+      }
+
+      function ensureNodePosition(node, index) {
+        if (!state.positions[node.id]) {
+          state.positions[node.id] = { x: 60 + index * 240, y: 72 + (index % 2) * 100 };
+        }
+        return state.positions[node.id];
+      }
+
+      function renderPalette() {
+        document.getElementById("paletteList").innerHTML = workflowCatalog
+          .map(
+            (item) => `
+              <div class="palette-card ${item.id === state.selectedId ? "active" : ""}" data-palette-id="${item.id}">
+                <strong>${item.name}</strong>
+                <p>${item.desc}</p>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      function renderLinkControls() {
+        const toggle = document.getElementById("toggleConnectBtn");
+        toggle.classList.toggle("active", state.connectMode);
+        toggle.textContent = state.connectMode
+          ? state.pendingLinkSource
+            ? "选择目标节点"
+            : "连线模式已开启"
+          : "开启连线模式";
+      }
+
+      function renderCanvas() {
+        const links = state.links
+          .map((link) => {
+            const fromIndex = state.nodes.findIndex((node) => node.id === link.from);
+            const toIndex = state.nodes.findIndex((node) => node.id === link.to);
+            if (fromIndex === -1 || toIndex === -1) return "";
+            const start = ensureNodePosition(state.nodes[fromIndex], fromIndex);
+            const end = ensureNodePosition(state.nodes[toIndex], toIndex);
+            const x1 = start.x + 236;
+            const y1 = start.y + 94;
+            const x2 = end.x;
+            const y2 = end.y + 94;
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            return `<div class="editor-link" style="left:${x1}px; top:${y1}px; width:${length}px; transform: rotate(${angle}deg);"></div>`;
+          })
+          .filter(Boolean)
+          .join("");
+
+        const nodes = state.nodes
+          .map((node, index) => {
+            const position = ensureNodePosition(node, index);
+            return `
+              <article class="editor-node ${node.id === state.selectedId ? "active" : ""} ${node.id === state.pendingLinkSource ? "connect-source" : ""}" data-node-id="${node.id}" style="left:${position.x}px; top:${position.y}px;">
+                <div class="node-head">
+                  <span class="node-index">${String(index + 1).padStart(2, "0")}</span>
+                  <span class="node-status">${node.status}</span>
+                </div>
+                <div class="node-title">${node.name}</div>
+                <div class="node-copy">${node.desc}</div>
+                <div class="node-model">${node.model}</div>
+                <div class="node-skills">
+                  ${node.skills.map((skill) => `<span class="skill-pill">${skill}</span>`).join("")}
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+
+        document.getElementById("editorCanvas").innerHTML = `${links}${nodes}`;
+        renderLinkControls();
+      }
+
+      function renderConfig() {
+        const node = state.nodes.find((item) => item.id === state.selectedId) || state.nodes[0];
+        document.getElementById("configTitle").textContent = node.name;
+        document.getElementById("configCopy").textContent = node.desc;
+        document.getElementById("modelSelect").value = node.model;
+        document.getElementById("outputNotes").value = node.notes;
+        document.getElementById("skillList").innerHTML = node.skills.map((skill) => `<div class="skill-pill">${skill}</div>`).join("");
+        document.getElementById("summarySelected").textContent = node.name;
+        document.getElementById("summarySelectedCopy").textContent = node.desc;
+        document.getElementById("summaryNodeCount").textContent = String(state.nodes.length).padStart(2, "0");
+        document.getElementById("canvasToolbarCopy").textContent = `当前选中「${node.name}」。你可以在右侧修改模型、输出说明，或在画布中继续调整执行顺序。`;
+        document.getElementById("runtimeStatusPill").textContent = state.runtime.status || "未运行";
+        document.getElementById("runtimeSummary").textContent = state.runtime.summary || "还没有执行记录。";
+        document.getElementById("runtimeStatusMeta").textContent = `状态：${state.runtime.status || "未运行"}${state.runtime.lastRunAt ? ` · ${state.runtime.lastRunAt.replace("T", " ")}` : ""}`;
+        document.getElementById("runtimeList").innerHTML = (state.runtime.logs || []).map((log) => `<div>${log}</div>`).join("");
+        document.querySelectorAll("[data-card]").forEach((card) => {
+          const key = card.dataset.card;
+          card.classList.toggle("is-collapsed", Boolean(state.collapsedCards[key]));
+        });
+        document.getElementById("toggle-skills").textContent = state.collapsedCards.skills ? "展开" : "收起";
+        document.getElementById("toggle-runtime").textContent = state.collapsedCards.runtime ? "展开" : "收起";
+      }
+
+      function rerenderAll() {
+        renderCanvas();
+        renderConfig();
+      }
+
+      function serializeWorkflow() {
+        return {
+          agentId: "agent-private-growth",
+          nodes: state.nodes.map((item) => ({ ...item })),
+          links: state.links.map((item) => ({ ...item })),
+          positions: { ...state.positions },
+          selectedId: state.selectedId
+        };
+      }
+
+      async function requestWorkflowApi(path, options = {}) {
+        const response = await fetch(`${WORKFLOW_API_BASE}${path}`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          },
+          ...options
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || "Private growth workflow request failed");
+        }
+        return payload;
+      }
+
+      function applyWorkflowSnapshot(snapshot) {
+        if (!snapshot) return;
+        if (Array.isArray(snapshot.nodes) && snapshot.nodes.length) state.nodes = snapshot.nodes.map((item) => ({ ...item }));
+        if (Array.isArray(snapshot.links) && snapshot.links.length) state.links = snapshot.links.map((item) => ({ ...item }));
+        if (snapshot.positions) state.positions = { ...snapshot.positions };
+        if (snapshot.selectedId) state.selectedId = snapshot.selectedId;
+      }
+
+      async function hydrateWorkflowState() {
+        try {
+          const payload = await requestWorkflowApi("/private-growth/workflow");
+          applyWorkflowSnapshot(payload.workflow);
+          if (payload.runtime) state.runtime = payload.runtime;
+          rerenderAll();
+        } catch (error) {
+          showToast("本地运行服务未启动，当前以原型模式打开。");
+        }
+      }
+
+      async function saveWorkflow() {
+        const payload = await requestWorkflowApi("/private-growth/workflow/save", {
+          method: "POST",
+          body: JSON.stringify({ workflow: serializeWorkflow() })
+        });
+        applyWorkflowSnapshot(payload.workflow);
+        if (payload.runtime) state.runtime = payload.runtime;
+        rerenderAll();
+        return payload;
+      }
+
+      async function runWorkflowFlow() {
+        const payload = await requestWorkflowApi("/private-growth/workflow/run", {
+          method: "POST",
+          body: JSON.stringify({ workflow: serializeWorkflow() })
+        });
+        applyWorkflowSnapshot(payload.workflow);
+        if (payload.runtime) state.runtime = payload.runtime;
+        rerenderAll();
+        return payload;
+      }
+
+      function moveSelected(direction) {
+        const index = state.nodes.findIndex((item) => item.id === state.selectedId);
+        if (index === -1) return;
+        const target = direction === "up" ? index - 1 : index + 1;
+        if (target < 0 || target >= state.nodes.length) return;
+        const [node] = state.nodes.splice(index, 1);
+        state.nodes.splice(target, 0, node);
+        rerenderAll();
+        showToast(`已调整 ${node.name} 的执行顺序。`);
+      }
+
+      function beginDrag(event, nodeId) {
+        const canvasWrap = document.querySelector(".editor-canvas-wrap");
+        const canvas = document.getElementById("editorCanvas");
+        const position = state.positions[nodeId];
+        if (!canvasWrap || !canvas || !position) return;
+
+        const wrapRect = canvasWrap.getBoundingClientRect();
+        state.drag = {
+          nodeId,
+          offsetX: event.clientX - wrapRect.left + canvasWrap.scrollLeft - position.x,
+          offsetY: event.clientY - wrapRect.top + canvasWrap.scrollTop - position.y
+        };
+      }
+
+      function dragNode(event) {
+        if (!state.drag) return;
+        const canvasWrap = document.querySelector(".editor-canvas-wrap");
+        const canvas = document.getElementById("editorCanvas");
+        if (!canvasWrap || !canvas) return;
+
+        const wrapRect = canvasWrap.getBoundingClientRect();
+        const maxX = canvas.clientWidth - 260;
+        const maxY = canvas.clientHeight - 140;
+        const nextX = event.clientX - wrapRect.left + canvasWrap.scrollLeft - state.drag.offsetX;
+        const nextY = event.clientY - wrapRect.top + canvasWrap.scrollTop - state.drag.offsetY;
+
+        state.positions[state.drag.nodeId] = {
+          x: Math.max(24, Math.min(maxX, nextX)),
+          y: Math.max(24, Math.min(maxY, nextY))
+        };
+        renderCanvas();
+      }
+
+      function endDrag() {
+        state.drag = null;
+      }
+
+      function toggleConnectMode() {
+        state.connectMode = !state.connectMode;
+        state.pendingLinkSource = null;
+        renderCanvas();
+        showToast(state.connectMode ? "连线模式已开启，点击两个节点建立连接。" : "已退出连线模式。");
+      }
+
+      function resetLinks() {
+        state.links = [
+          { from: "wf-content", to: "wf-engage" },
+          { from: "wf-engage", to: "wf-zalo" },
+          { from: "wf-zalo", to: "wf-product" },
+          { from: "wf-product", to: "wf-sales" }
+        ];
+        state.pendingLinkSource = null;
+        renderCanvas();
+        showToast("已恢复默认连线。");
+      }
+
+      function handleConnectClick(nodeId) {
+        state.selectedId = nodeId;
+        if (!state.pendingLinkSource) {
+          state.pendingLinkSource = nodeId;
+          renderCanvas();
+          showToast("已选择起点节点，请点击目标节点。");
+          return;
+        }
+
+        if (state.pendingLinkSource === nodeId) {
+          state.pendingLinkSource = null;
+          renderCanvas();
+          showToast("已取消当前连线选择。");
+          return;
+        }
+
+        const exists = state.links.some((link) => link.from === state.pendingLinkSource && link.to === nodeId);
+        if (!exists) {
+          state.links.push({ from: state.pendingLinkSource, to: nodeId });
+          showToast("已创建新的节点连线。");
+        } else {
+          showToast("这两个节点之间已经有连线了。");
+        }
+        state.pendingLinkSource = null;
+        renderCanvas();
+      }
+
+      document.getElementById("editorCanvas").addEventListener("click", (event) => {
+        const node = event.target.closest("[data-node-id]");
+        if (!node) return;
+        if (state.connectMode) {
+          handleConnectClick(node.dataset.nodeId);
+          return;
+        }
+        state.selectedId = node.dataset.nodeId;
+        rerenderAll();
+      });
+
+      document.getElementById("editorCanvas").addEventListener("mousedown", (event) => {
+        const node = event.target.closest("[data-node-id]");
+        if (!node) return;
+        if (state.connectMode) return;
+        state.selectedId = node.dataset.nodeId;
+        beginDrag(event, node.dataset.nodeId);
+        rerenderAll();
+      });
+
+      document.getElementById("modelSelect").addEventListener("change", (event) => {
+        const node = state.nodes.find((item) => item.id === state.selectedId);
+        if (!node) return;
+        node.model = event.target.value;
+        renderCanvas();
+        showToast(`已为 ${node.name} 指定模型：${node.model}`);
+      });
+
+      document.getElementById("outputNotes").addEventListener("input", (event) => {
+        const node = state.nodes.find((item) => item.id === state.selectedId);
+        if (!node) return;
+        node.notes = event.target.value;
+      });
+
+      document.getElementById("moveUpBtn").addEventListener("click", () => moveSelected("up"));
+      document.getElementById("moveDownBtn").addEventListener("click", () => moveSelected("down"));
+      document.getElementById("toggleConnectBtn").addEventListener("click", toggleConnectMode);
+      document.getElementById("resetLinksBtn").addEventListener("click", resetLinks);
+      document.getElementById("paletteList").addEventListener("click", (event) => {
+        const card = event.target.closest("[data-palette-id]");
+        if (!card) return;
+        state.selectedId = card.dataset.paletteId;
+        rerenderAll();
+      });
+      document.querySelector(".config-panel").addEventListener("click", (event) => {
+        const toggle = event.target.closest("[data-toggle-card]");
+        if (!toggle) return;
+        const key = toggle.dataset.toggleCard;
+        state.collapsedCards[key] = !state.collapsedCards[key];
+        renderConfig();
+      });
+      document.getElementById("publishFlowBtn").addEventListener("click", async () => {
+        try {
+          await saveWorkflow();
+          showToast("已保存这条全流程模板，并同步回数字员工。");
+        } catch (error) {
+          showToast("保存失败，请先运行 `python3 scripts/private_growth_workflow_server.py`。");
+        }
+      });
+      document.getElementById("runFlowBtn").addEventListener("click", async () => {
+        try {
+          await saveWorkflow();
+          await runWorkflowFlow();
+          showToast("已正式运行这条私域增长流程。");
+        } catch (error) {
+          showToast("运行失败，请先启动本地流程服务。");
+        }
+      });
+      window.addEventListener("mousemove", dragNode);
+      window.addEventListener("mouseup", endDrag);
+
+      renderPalette();
+      rerenderAll();
+      hydrateWorkflowState();
+    </script>
+  </body>
+</html>

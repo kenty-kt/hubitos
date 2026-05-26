@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos Agent Home</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="./hermes-agent-home.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="hermes-shell">
+          <header class="hermes-topbar">
+            <div>
+              <div class="topbar-kicker">Agent Operating Home</div>
+              <h1>把多个 Agent 当成一个可以直接调度的执行团队。</h1>
+              <p class="topbar-copy">这个首页更接近内置 Agent 的入口感受：先看任务、Agent 编队、执行进度，再决定由谁接管下一步。</p>
+            </div>
+            <div class="topbar-actions">
+              <a class="ghost-pill" href="../home/home.html">返回通用首页</a>
+              <a class="primary-pill" href="../chat/chat-workspace.html">进入对话执行</a>
+            </div>
+          </header>
+
+          <div class="hero-grid">
+            <section class="hero-panel">
+              <div class="hero-badge">Built-in Agent Hub</div>
+              <div class="hero-head">
+                <div>
+                  <h2>给任务分配编队，而不是只发一条 prompt。</h2>
+                  <p class="hero-copy">
+                    在这里你可以先定义目标，再组合研究、写作、设计、执行等 Agent，由系统自动分阶段协作，然后把结果推进到聊天工作台继续细化。
+                  </p>
+                </div>
+                <div class="hero-status">
+                  <div class="hero-status-label">当前推荐编队</div>
+                  <div class="hero-status-value">4 Agents Online</div>
+                  <div class="hero-status-note">Research / Planner / Writer / Visual</div>
+                </div>
+              </div>
+
+              <div class="mission-composer">
+                <textarea id="missionInput" rows="4" placeholder="例如：为 Hubitos 准备一个新的 Agent 首页，先做竞品扫描，再输出信息架构、文案骨架和视觉方向"></textarea>
+                <div class="mission-actions">
+                  <div class="mission-meta">输入任务后可直接进入聊天工作台，保留任务上下文</div>
+                  <button class="launch-btn" id="launchMissionBtn" type="button">启动任务</button>
+                </div>
+              </div>
+
+              <div class="squad-row" id="squadRow"></div>
+            </section>
+
+            <aside class="ops-panel">
+              <div class="panel-head">
+                <span class="panel-kicker">Ops Snapshot</span>
+                <h3>执行概况</h3>
+              </div>
+              <div class="metric-stack" id="metricStack"></div>
+            </aside>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel roster-panel">
+              <div class="panel-head split">
+                <div>
+                  <span class="panel-kicker">Agent Squad</span>
+                  <h3>可调用 Agent 编队</h3>
+                </div>
+                <button class="subtle-btn" id="rebalanceBtn" type="button">重新编排</button>
+              </div>
+              <div class="roster-grid" id="rosterGrid"></div>
+            </section>
+
+            <section class="panel pipeline-panel">
+              <div class="panel-head">
+                <span class="panel-kicker">Pipeline</span>
+                <h3>任务编排流</h3>
+              </div>
+              <div class="pipeline-list" id="pipelineList"></div>
+            </section>
+          </div>
+
+          <div class="content-grid lower">
+            <section class="panel queue-panel">
+              <div class="panel-head split">
+                <div>
+                  <span class="panel-kicker">Live Queue</span>
+                  <h3>实时任务队列</h3>
+                </div>
+                <button class="subtle-btn" id="refreshQueueBtn" type="button">刷新队列</button>
+              </div>
+              <div class="queue-list" id="queueList"></div>
+            </section>
+
+            <section class="panel deliverable-panel">
+              <div class="panel-head">
+                <span class="panel-kicker">Deliverables</span>
+                <h3>最近产出</h3>
+              </div>
+              <div class="deliverable-list" id="deliverableList"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "home",
+        homeHref: "./hermes-agent-home.html",
+        showHistory: true,
+        historyTitle: "Agent 会话",
+        primaryLabel: "+ 新建任务",
+        primaryId: "newMissionBtn",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
+        workflowsHref: "../workflows/workflows-home.html",
+        projectsHref: "../projects/projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+    </script>
+    <script src="./hermes-agent-home.js"></script>
+  </body>
+</html>

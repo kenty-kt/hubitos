@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>X HTML 日报</title>
+    <style>
+      :root {
+        --bg: #0f1116;
+        --panel: #171a22;
+        --panel-soft: #1f2430;
+        --line: rgba(255,255,255,0.08);
+        --text: #f7f8fb;
+        --muted: #a2abc0;
+        --brand: #4ea1ff;
+        --accent: #12c48b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(78,161,255,0.16), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(18,196,139,0.12), transparent 24%),
+          var(--bg);
+        color: var(--text);
+      }
+      .page {
+        width: min(1320px, calc(100vw - 40px));
+        margin: 24px auto 48px;
+        display: grid;
+        gap: 18px;
+      }
+      .hero, .panel {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+        box-shadow: 0 22px 48px rgba(0,0,0,0.28);
+      }
+      .hero { padding: 28px; }
+      .kicker, .label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #7ec0ff;
+      }
+      h1, h2, h3 { margin: 0; letter-spacing: -0.03em; }
+      h1 { font-size: 40px; line-height: 1.04; }
+      p, li { color: var(--muted); line-height: 1.72; }
+      .hero-grid, .stats, .groups, .cards {
+        display: grid;
+        gap: 16px;
+      }
+      .hero-grid {
+        margin-top: 18px;
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+      .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .stat, .subpanel, .tweet-card {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 18px;
+        background: rgba(255,255,255,0.03);
+      }
+      .tweet-link {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+      }
+      .tweet-link:hover .tweet-card {
+        border-color: rgba(78,161,255,0.4);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.2);
+      }
+      .stat-value {
+        margin-top: 10px;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .chips span {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #d9e3f6;
+        font-size: 12px;
+      }
+      .panel {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+      .section-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .tweet-card h3 {
+        font-size: 18px;
+        line-height: 1.4;
+      }
+      .tweet-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        color: #c4cde0;
+        font-size: 12px;
+      }
+      .tweet-source {
+        margin-top: 14px;
+        color: #7ec0ff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .focus {
+        color: #9ce8cb;
+        font-weight: 700;
+      }
+      @media (max-width: 1080px) {
+        .hero-grid, .stats, .cards { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="kicker">x-daily-report Skill</div>
+        <h1 id="reportTitle">X 自定义抓取 HTML 日报</h1>
+        <div class="hero-grid">
+          <div class="subpanel">
+            <div class="label">运行策略</div>
+            <p id="summaryText">正在读取自动任务配置。</p>
+            <div class="chips" id="keywordChips"></div>
+          </div>
+          <div class="subpanel">
+            <div class="label">监控账号</div>
+            <div class="chips" id="accountChips"></div>
+            <div class="label" style="margin-top:16px;">日报重点</div>
+            <p class="focus" id="focusText">未设置</p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">固定时间</div>
+            <div class="stat-value" id="scheduleValue">--</div>
+          </div>
+          <div class="stat">
+            <div class="label">关键词数</div>
+            <div class="stat-value" id="keywordCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">账号数</div>
+            <div class="stat-value" id="accountCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">单项上限</div>
+            <div class="stat-value" id="maxResultsValue">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Top 5</div>
+            <h2>趋势卡片</h2>
+          </div>
+          <div class="label">HTML Daily Report</div>
+        </div>
+        <div class="cards" id="topCards"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Grouped Feeds</div>
+            <h2>按关键词与账号分组</h2>
+          </div>
+        </div>
+        <div class="cards" id="groupCards"></div>
+      </section>
+    </main>
+
+    <script>
+      const ACTIVE_WORKFLOW_KEY = "hubitos-active-workflow";
+
+      function readWorkflowConfig() {
+        try {
+          const raw = window.localStorage.getItem(ACTIVE_WORKFLOW_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function parseList(raw) {
+        return String(raw || "")
+          .split(/\n|,/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function chipHtml(items, prefix = "") {
+        if (!items.length) return "<span>未设置</span>";
+        return items.map((item) => `<span>${prefix}${item}</span>`).join("");
+      }
+
+      function xSearchUrl(query) {
+        return `https://x.com/search?q=${encodeURIComponent(query)}&src=typed_query&f=live`;
+      }
+
+      function xAccountUrl(account) {
+        return `https://x.com/${account.replace(/^@/, "")}`;
+      }
+
+      function cardHtml(title, copy, meta, url, sourceLabel = "查看原文") {
+        return `
+          <a class="tweet-link" href="${url}" target="_blank" rel="noopener noreferrer">
+            <article class="tweet-card">
+              <div class="label">Digest Card</div>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <div class="tweet-meta">${meta.map((item) => `<span>${item}</span>`).join("")}</div>
+              <div class="tweet-source">${sourceLabel}</div>
+            </article>
+          </a>
+        `;
+      }
+
+      const workflow = readWorkflowConfig();
+      const answers = workflow && workflow.answers ? workflow.answers : {};
+      const keywords = parseList(answers.keywords);
+      const accounts = parseList(answers.accounts).map((item) => item.replace(/^@/, ""));
+      const schedule = answers.schedule || "每天 09:00";
+      const maxResults = answers.maxResults || "10";
+      const focus = answers.focus || "热点话题与高传播内容";
+      const reportDate = new Date().toLocaleDateString("zh-CN");
+
+      document.getElementById("reportTitle").textContent = `X 自定义抓取 HTML 日报 · ${reportDate}`;
+      document.getElementById("summaryText").textContent =
+        `系统会按固定时间「${schedule}」运行 x-daily-report Skill，对配置的关键词与账号执行抓取，并输出一份按日期归档的 HTML 日报。`;
+      document.getElementById("keywordChips").innerHTML = chipHtml(keywords);
+      document.getElementById("accountChips").innerHTML = chipHtml(accounts, "@");
+      document.getElementById("focusText").textContent = focus;
+      document.getElementById("scheduleValue").textContent = schedule;
+      document.getElementById("keywordCount").textContent = String(keywords.length);
+      document.getElementById("accountCount").textContent = String(accounts.length);
+      document.getElementById("maxResultsValue").textContent = String(maxResults);
+
+      const topCards = [
+        {
+          title: "Top 1 趋势主题",
+          copy: `聚焦 ${keywords[0] || "首个关键词"} 与高传播动态，优先汇总最适合写进日报头部的内容。`,
+          meta: [`${schedule}`, `Top Card`, `最多 ${maxResults} 条 / 项`],
+          url: xSearchUrl(keywords[0] || "AI agent"),
+          sourceLabel: `打开 X 搜索：${keywords[0] || "AI agent"}`
+        },
+        {
+          title: "Top 2 账号动态",
+          copy: `聚焦 @${accounts[0] || "重点账号"} 的最新动态，适合放进账号观察栏目。`,
+          meta: [`@${accounts[0] || "Account"}`, `Account`, "Daily Digest"],
+          url: xAccountUrl(accounts[0] || "OpenAI"),
+          sourceLabel: `打开账号主页：@${accounts[0] || "OpenAI"}`
+        },
+        {
+          title: "Top 3 爆发话题",
+          copy: `围绕 ${focus} 组织内容，把高信号和高转发主题单独提出。`,
+          meta: ["High Signal", "Trend", "HTML Report"],
+          url: xSearchUrl(focus),
+          sourceLabel: `打开 X 搜索：${focus}`
+        },
+        {
+          title: "Top 4 新项目 / 新产品",
+          copy: "适合放入今日新项目、产品发布或创始人动态栏目。",
+          meta: ["Launch", "Projects", "Daily Scan"],
+          url: xSearchUrl("new AI project OR product launch"),
+          sourceLabel: "打开 X 搜索：new AI project / product launch"
+        },
+        {
+          title: "Top 5 行业摘要",
+          copy: "把抓到的关键词和账号内容压缩成一段可快速阅读的日报摘要。",
+          meta: ["Summary", "Digest", reportDate],
+          url: xSearchUrl(keywords[0] || "AI"),
+          sourceLabel: "打开原始搜索流"
+        }
+      ];
+
+      document.getElementById("topCards").innerHTML = topCards
+        .map((item) => cardHtml(item.title, item.copy, item.meta, item.url, item.sourceLabel))
+        .join("");
+
+      const grouped = [
+        {
+          title: "关键词分组",
+          copy: keywords.length
+            ? `将 ${keywords.join(" / ")} 作为主题线索，分别整理推文内容、互动表现和潜在趋势。`
+            : "等待关键词配置。",
+          meta: ["Keywords", `${keywords.length} 项`, "Grouped Feed"],
+          url: xSearchUrl(keywords[0] || "AI agent"),
+          sourceLabel: keywords.length ? `打开 X 搜索：${keywords[0]}` : "打开 X 搜索"
+        },
+        {
+          title: "账号分组",
+          copy: accounts.length
+            ? `按 @${accounts.join(" / @")} 的更新节奏汇总内容，用于账号动态追踪。`
+            : "等待账号配置。",
+          meta: ["Accounts", `${accounts.length} 项`, "Grouped Feed"],
+          url: xAccountUrl(accounts[0] || "OpenAI"),
+          sourceLabel: accounts.length ? `打开账号主页：@${accounts[0]}` : "打开账号主页"
+        }
+      ];
+
+      document.getElementById("groupCards").innerHTML = grouped
+        .map((item) => cardHtml(item.title, item.copy, item.meta, item.url, item.sourceLabel))
+        .join("");
+    </script>
+  </body>
+</html>

@@ -36,6 +36,15 @@
 
   let toastTimer = null;
 
+  function escapeHtml(text) {
+    return String(text)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
   function selectedProject() {
     return state.projects.find((project) => project.id === state.selectedId) || state.projects[0] || null;
   }
@@ -50,10 +59,10 @@
 
   function statusLabel(status) {
     return {
-      live: "Live",
-      idle: "Idle",
-      building: "Building"
-    }[status] || "Idle";
+      live: "运行中",
+      idle: "空闲",
+      building: "启动中"
+    }[status] || "空闲";
   }
 
   function showToast(message) {
@@ -81,8 +90,8 @@
       .statusFilters()
       .map(
         (tab) => `
-          <button class="segment-btn ${state.status === tab.key ? "active" : ""}" data-status="${tab.key}" type="button">
-            ${tab.label}
+          <button class="market-tab ${state.status === tab.key ? "active" : ""}" data-status="${tab.key}" type="button">
+            ${escapeHtml(tab.label)}
           </button>
         `
       )
@@ -96,14 +105,14 @@
         (project) => `
           <article class="project-card ${project.id === state.selectedId ? "active" : ""}" data-id="${project.id}">
             <div class="project-card-top">
-              <strong>${project.name}</strong>
+              <strong>${escapeHtml(project.name)}</strong>
               <span class="status-pill ${statusClass(project.status)}">${statusLabel(project.status)}</span>
             </div>
-            <div class="repo-line">${project.repo} · ${project.branch}</div>
-            <div class="card-copy">${project.description}</div>
+            <div class="repo-line">${escapeHtml(project.repo)} · ${escapeHtml(project.branch)}</div>
+            <div class="card-copy">${escapeHtml(project.description)}</div>
             <div class="card-meta">
-              <span>${project.framework}</span>
-              <button class="inline-link" type="button" data-open-detail="${project.id}">Open Detail</button>
+              <span>${escapeHtml(project.framework)}</span>
+              <button class="inline-link" type="button" data-open-detail="${project.id}">查看详情</button>
             </div>
           </article>
         `
@@ -113,8 +122,8 @@
     if (!projects.length) {
       refs.projectList.innerHTML = `
         <article class="project-card">
-          <strong>No projects found</strong>
-          <div class="card-copy">Try another keyword or import a new repository into this channel.</div>
+          <strong>没找到项目</strong>
+          <div class="card-copy">换个关键词试试，或者先导入一个新项目。</div>
         </article>
       `;
     }
@@ -130,7 +139,7 @@
     refs.previewStatus.textContent = statusLabel(project.status);
     refs.previewStatus.className = `status-pill ${statusClass(project.status)}`;
     refs.previewUpdatedAt.textContent = project.lastDeployedAt;
-    refs.previewUrl.textContent = project.localUrl || "Not deployed";
+    refs.previewUrl.textContent = project.localUrl || "还没启动";
     refs.previewRepair.textContent = project.repairPolicy;
   }
 
@@ -160,7 +169,7 @@
   function saveImportedProject() {
     const repo = refs.repoInput.value.trim();
     if (!repo.includes("/")) {
-      showToast("Use the format owner/repo.");
+      showToast("请按 owner/repo 的格式填写。");
       return;
     }
 
@@ -177,20 +186,20 @@
       branch,
       framework,
       status: "idle",
-      description: "Imported from GitHub. Waiting for the local agent to detect package manager, install strategy, and boot command.",
+      description: "已从 GitHub 导入，等待系统识别安装方式和启动命令。",
       command,
       workspace: `~/Hubitos/workspaces/${name}`,
       localUrl: "",
       preferredPort: port,
-      lastDeployedAt: "Not deployed yet",
-      tokenMode: "Bound User Account",
-      verifyPolicy: "Health check + smoke test + homepage render",
-      repairPolicy: "Auto-fix enabled for failed verification",
+      lastDeployedAt: "还没启动过",
+      tokenMode: "使用当前账号",
+      verifyPolicy: "健康检查 + 基础可用性检查 + 首页是否能打开",
+      repairPolicy: "检查失败时自动交给 AI 修复",
       repairModel: "GPT-4.1",
       retryLimit: 2,
       forceVerifyFailure: true,
       accountName: "current-user@hubitos.ai",
-      accountProvider: "Provider linked after auth",
+      accountProvider: "授权后会显示已连接的服务商",
       codingModel: "GPT-4.1",
       fallbackModel: "Claude Sonnet 4"
     };
@@ -202,7 +211,7 @@
     refs.branchInput.value = "main";
     refs.portInput.value = "3000";
     rerender();
-    showToast("Repository imported into the channel.");
+    showToast("项目已经导入到列表里了。");
   }
 
   refs.statusTabs.addEventListener("click", (event) => {
@@ -232,12 +241,12 @@
   });
 
   refs.openDetailBtn.addEventListener("click", () => openDetail());
-  refs.importProjectBtn.addEventListener("click", () => setModal(true));
+  if (refs.importProjectBtn) refs.importProjectBtn.addEventListener("click", () => setModal(true));
   if (refs.sidebarImportBtn) refs.sidebarImportBtn.addEventListener("click", () => setModal(true));
   refs.closeModalBtn.addEventListener("click", () => setModal(false));
   refs.seedDemoBtn.addEventListener("click", seedDemoValues);
   refs.saveProjectBtn.addEventListener("click", saveImportedProject);
-  refs.syncBtn.addEventListener("click", () => showToast("GitHub sync is simulated."));
+  if (refs.syncBtn) refs.syncBtn.addEventListener("click", () => showToast("这里先演示同步效果，暂时不会真的拉 GitHub。"));
   refs.importModal.addEventListener("click", (event) => {
     if (event.target === refs.importModal) setModal(false);
   });

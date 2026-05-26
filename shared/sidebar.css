@@ -1,7 +1,8 @@
 :root {
-  --hubitos-sidebar-width: 188px;
-  --hubitos-brand: #d92d20;
-  --hubitos-line: rgba(233, 215, 213, 0.72);
+  --hubitos-sidebar-width: 200px;
+  --hubitos-brand: #101010;
+  --hubitos-brand-soft: #cfe0bf;
+  --hubitos-line: rgba(16, 16, 16, 0.08);
 }
 
 .hubitos-sidebar {
@@ -9,9 +10,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 28px 18px 24px;
-  background: linear-gradient(180deg, rgba(247, 242, 241, 0.96), rgba(255, 252, 251, 0.96));
+  padding: 22px 14px 18px;
+  background: rgba(251, 250, 246, 0.88);
   border-right: 1px solid var(--hubitos-line);
+  backdrop-filter: blur(18px);
 }
 
 .hubitos-sidebar.is-fixed {
@@ -23,59 +25,152 @@
 }
 
 .hubitos-brand-block {
-  margin-bottom: 34px;
+  margin-bottom: 28px;
+}
+
+.hubitos-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hubitos-brand-mark {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #111111;
+  border-radius: 10px;
+  transform: rotate(-8deg);
+}
+
+.hubitos-brand-mark::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-top: 3px solid #111111;
+  border-left: 3px solid #111111;
+  border-radius: 6px 0 0 0;
+  top: -7px;
+  left: 5px;
+  transform: rotate(24deg);
+  background: rgba(251, 250, 246, 0.96);
+}
+
+.hubitos-brand-mark-core {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--hubitos-brand-soft);
+  box-shadow: 8px 5px 0 -5px #111111;
+}
+
+.hubitos-brand-copy {
+  min-width: 0;
 }
 
 .hubitos-brand-name {
-  font-size: 31px;
+  font-size: 17px;
   line-height: 1;
   color: var(--hubitos-brand);
-  letter-spacing: -0.03em;
+  letter-spacing: 0.04em;
+  font-weight: 900;
 }
 
 .hubitos-brand-subtitle {
-  margin-top: 6px;
-  font-size: 13px;
-  color: #766562;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #767676;
+  letter-spacing: 0.01em;
 }
 
 .hubitos-main-nav {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+}
+
+.hubitos-nav-group {
+  display: grid;
+  gap: 4px;
 }
 
 .hubitos-nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 38px;
-  padding: 0 14px;
-  border-radius: 999px;
-  color: #553f3b;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: #6c6c6c;
   text-decoration: none;
   font-size: 14px;
+  transition: background 0.16s ease, color 0.16s ease;
 }
 
 .hubitos-nav-item.is-active {
-  background: #ffffff;
-  color: var(--hubitos-brand);
-  box-shadow: inset 0 0 0 1px rgba(217, 45, 32, 0.08);
+  background: #ece9e2;
+  color: #171717;
+  box-shadow: none;
 }
 
 .hubitos-nav-icon {
   width: 14px;
   text-align: center;
+  font-size: 13px;
+  color: inherit;
+  opacity: 0.88;
+}
+
+.hubitos-subnav {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 2px 24px;
+}
+
+.hubitos-subnav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: #8a8a8a;
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.hubitos-subnav-item:hover {
+  background: #f2efe8;
+  color: #2a2a2a;
+}
+
+.hubitos-subnav-item.is-active {
+  background: #ece9e2;
+  color: #171717;
+  font-weight: 600;
+}
+
+.hubitos-subnav-bullet {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
 }
 
 .hubitos-sidebar-section {
-  margin-top: 38px;
+  margin-top: 28px;
 }
 
 .hubitos-sidebar-title {
-  margin: 0 4px 12px;
-  font-size: 11px;
-  color: #8b7975;
-  letter-spacing: 0.06em;
+  margin: 0 4px 10px;
+  font-size: 12px;
+  color: #8c8c8c;
+  letter-spacing: 0;
 }
 
 .hubitos-sidebar-body {
@@ -93,18 +188,20 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 9px 8px;
-  border-radius: 12px;
+  padding: 10px 10px;
+  border-radius: 10px;
   border: 0;
   background: transparent;
-  color: #6a5855;
+  color: #8a8a8a;
   font-size: 13px;
   cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
 }
 
 .history-item.active,
 .history-item:hover {
-  background: rgba(217, 45, 32, 0.05);
+  background: #efede8;
+  color: #222222;
 }
 
 .history-label {
@@ -115,33 +212,66 @@
 }
 
 .history-delete {
-  opacity: 0.55;
+  opacity: 0.45;
   font-size: 11px;
 }
 
 .hubitos-sidebar-footer {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .hubitos-primary-action {
   border: 0;
   min-height: 36px;
-  border-radius: 999px;
-  color: #fff;
-  background: linear-gradient(180deg, #e53426 0%, #c9190f 100%);
-  box-shadow: 0 12px 24px rgba(217, 45, 32, 0.28);
+  border-radius: 10px;
+  color: #ffffff;
+  background: #111111;
+  box-shadow: none;
   font-size: 14px;
   cursor: pointer;
 }
 
 .hubitos-settings-link {
-  justify-self: start;
   border: 0;
   background: transparent;
-  color: #6f5f5c;
+  color: #767676;
   font-size: 14px;
   cursor: pointer;
+}
+
+.hubitos-sidebar-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hubitos-profile-chip {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hubitos-profile-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, #f6dd85 0%, #e45f3d 100%);
+  color: #111111;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .hubitos-shell-header {

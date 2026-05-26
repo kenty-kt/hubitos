@@ -1,5 +1,13 @@
 (function () {
   const STORAGE_KEY = "hubitos-projects-v1";
+  const isEnglish =
+    window.HubitosI18n && typeof window.HubitosI18n.getLanguage === "function"
+      ? window.HubitosI18n.getLanguage() === "en"
+      : false;
+  const translateDeep =
+    window.HubitosI18n && typeof window.HubitosI18n.translateDeep === "function"
+      ? window.HubitosI18n.translateDeep.bind(window.HubitosI18n)
+      : null;
 
   const seedProjects = [
     {
@@ -11,19 +19,19 @@
       framework: "Next.js 15",
       status: "live",
       description:
-        "Desktop client shell for orchestrating chat, projects, assets, and AI workflows in a single operator workspace.",
+        "一个把对话、项目、文件和 AI 工作流放在一起的桌面工作台。",
       command: "pnpm dev",
       workspace: "~/Hubitos/workspaces/hubitos-client-shell",
       localUrl: "http://localhost:3000",
       lastDeployedAt: "2026-04-23 18:12",
-      tokenMode: "Bound User Account",
-      verifyPolicy: "Health check + /api/ping + homepage render",
-      repairPolicy: "Auto-fix enabled for failed verification",
+      tokenMode: "使用当前账号",
+      verifyPolicy: "健康检查 + /api/ping + 首页是否能正常打开",
+      repairPolicy: "检查失败时自动交给 AI 修复",
       repairModel: "GPT-4.1",
       retryLimit: 2,
       forceVerifyFailure: false,
       accountName: "kittytins@hubitos.ai",
-      accountProvider: "OpenAI + Anthropic linked",
+      accountProvider: "已连接 OpenAI 和 Anthropic",
       codingModel: "GPT-4.1",
       fallbackModel: "Claude Sonnet 4"
     },
@@ -36,19 +44,19 @@
       framework: "Vite + React",
       status: "idle",
       description:
-        "Internal market operations dashboard with live alerts, campaign routing, and analyst execution traces.",
+        "一个给运营团队用的内部看板，可以看提醒、活动分发和执行记录。",
       command: "npm run dev",
       workspace: "~/Hubitos/workspaces/market-ops-dashboard",
       localUrl: "",
-      lastDeployedAt: "Not deployed yet",
-      tokenMode: "Bound User Account",
-      verifyPolicy: "Smoke test dashboard route + asset load",
-      repairPolicy: "Auto-fix enabled for failed verification",
+      lastDeployedAt: "还没启动过",
+      tokenMode: "使用当前账号",
+      verifyPolicy: "基础页面检查 + 静态资源加载检查",
+      repairPolicy: "检查失败时自动交给 AI 修复",
       repairModel: "GPT-4.1 mini",
       retryLimit: 2,
       forceVerifyFailure: true,
       accountName: "ops@hubitos.ai",
-      accountProvider: "OpenAI linked",
+      accountProvider: "已连接 OpenAI",
       codingModel: "GPT-4.1 mini",
       fallbackModel: "Gemini 2.5 Pro"
     },
@@ -61,30 +69,35 @@
       framework: "Node API",
       status: "building",
       description:
-        "Execution service for local runners, secret vault handoff, token routing, and streaming deployment logs.",
+        "负责本地运行、密钥传递、模型调用分流和日志回传的服务。",
       command: "pnpm start:dev",
       workspace: "~/Hubitos/workspaces/agent-runtime-api",
       localUrl: "http://localhost:8787",
-      lastDeployedAt: "Building now",
-      tokenMode: "Bound User Account",
-      verifyPolicy: "Boot logs + /healthz + integration smoke test",
-      repairPolicy: "Auto-fix enabled for failed verification",
+      lastDeployedAt: "正在启动中",
+      tokenMode: "使用当前账号",
+      verifyPolicy: "启动日志 + /healthz + 基础联调检查",
+      repairPolicy: "检查失败时自动交给 AI 修复",
       repairModel: "Claude Sonnet 4",
       retryLimit: 2,
       forceVerifyFailure: false,
       accountName: "builder@hubitos.ai",
-      accountProvider: "Anthropic + OpenAI linked",
+      accountProvider: "已连接 Anthropic 和 OpenAI",
       codingModel: "Claude Sonnet 4",
       fallbackModel: "GPT-4.1"
     }
   ];
 
+  function localize(value) {
+    if (!isEnglish || !translateDeep) return value;
+    return translateDeep(value, "en");
+  }
+
   function loadProjects() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-      return saved.length ? saved : seedProjects.slice();
+      return localize(saved.length ? saved : seedProjects.slice());
     } catch (error) {
-      return seedProjects.slice();
+      return localize(seedProjects.slice());
     }
   }
 
@@ -120,12 +133,12 @@
   }
 
   function statusFilters() {
-    return [
-      { key: "all", label: "All" },
-      { key: "live", label: "Live" },
-      { key: "idle", label: "Idle" },
-      { key: "building", label: "Building" }
-    ];
+    return localize([
+      { key: "all", label: "全部" },
+      { key: "live", label: "运行中" },
+      { key: "idle", label: "空闲" },
+      { key: "building", label: "启动中" }
+    ]);
   }
 
   window.HubitosProjectsStore = {

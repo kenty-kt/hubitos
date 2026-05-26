@@ -2,11 +2,17 @@
   const STORAGE_KEY = "hubitos-language";
   const DEFAULT_LANG = "en";
   const IGNORE_ATTR = "data-hubitos-i18n-ignore";
+  const AI_CACHE_KEY = "hubitos-i18n-ai-cache-v1";
   const textNodeOriginals = new WeakMap();
   const attributeOriginals = new WeakMap();
+  const aiTranslationCache = new Map();
+  const pendingAiTranslations = new Map();
   const channels = [];
   let currentLang = readStoredLanguage();
   let observer = null;
+  let translatorPromise = null;
+  let aiCachePersistTimer = null;
+  let aiRefreshTimer = null;
 
   const PAIRS = [
     ["Hubitos AI OS - 文件中心", "Hubitos AI OS - Files Center"],
@@ -84,12 +90,33 @@
     ["MCP 中心", "MCP Center"],
     ["MCP 工具分类、标签筛选、搜索与卡片式工具管理。", "MCP tool categories, tag filters, search, and card-based tool management."],
     ["建议访问顺序：先看“对话工作台”，再看“文件中心”。如果需要展示平台能力延展，再继续看“智能体中心 / 技能中心 / MCP 中心”。", "Suggested viewing order: start with the Chat Workspace, then Files Center. If you want to show platform expansion, continue to Agents Center / Skills Center / MCP Center."],
+    ["欢迎回来，开始今天的 AI 工作", "Welcome back. Start today's AI work."],
+    ["开始任务", "Start Task"],
+    ["最近对话", "Recent Conversations"],
+    ["正在进行中的任务", "Active Tasks"],
+    ["已产出文件", "Generated Files"],
+    ["已发布30条推特，10次评论互动。", "30 tweets published and 10 comment interactions completed."],
+    ["包含文档、图片和表格，已进入对应项目目录。", "Includes documents, images, and tables, already saved into the related project folders."],
+    ["市场研究助理已归档竞品分析", "The market research assistant archived the competitor analysis."],
+    ["竞品拆解与定位", "Competitor Breakdown and Positioning"],
+    ["输出了竞品功能矩阵和价格对比，并同步到 Market Analysis 文件夹。", "Generated the competitor feature matrix and pricing comparison, then synced them to the Market Analysis folder."],
+    ["12 分钟前", "12 minutes ago"],
+    ["PRD Writing Assistant 生成了新的结构草案", "PRD Writing Assistant generated a new structural draft."],
+    ["PRD 生成自动任务", "PRD Auto Task"],
+    ["根据最近对话补齐了需求背景、功能结构和阶段目标。", "Filled in the requirement background, feature structure, and phase goals from recent conversations."],
+    ["28 分钟前", "28 minutes ago"],
+    ["首页视觉提案已准备好进入工作台继续编辑", "The homepage visual proposal is ready for further editing in the workspace."],
+    ["首页视觉提案", "Homepage Visual Proposal"],
+    ["建议从首页卡片直接进入聊天工作台，继续细化页面布局和模块细节。", "It's recommended to jump from the homepage card into the chat workspace and continue refining layout and module details."],
+    ["刚刚", "Just now"],
 
     ["对话", "Chat"],
     ["文件", "Files"],
     ["项目", "Projects"],
     ["最近仓库", "Recent Repos"],
+    ["自动任务记录", "Workflow History"],
     ["+ 导入仓库", "+ Import Repo"],
+    ["+ 新建任务", "+ New Task"],
     ["Hubitos AI OS - 项目频道", "Hubitos AI OS - Projects Channel"],
     ["Hubitos AI OS - 项目详情", "Hubitos AI OS - Project Detail"],
     ["项目频道", "Projects Channel"],
@@ -100,8 +127,11 @@
     ["← 返回列表", "← Back to List"],
     ["部署、校验与自动修复", "Deploy, verify, and auto-repair"],
     ["该页面专门负责单个仓库的本地部署、校验策略、日志和 AI 辅助修复流程。", "This page is dedicated to local deployment, verification policies, logs, and AI-assisted repair flow for a single repository."],
+    ["一键启动", "One-click Start"],
     ["一键部署", "One-click Deploy"],
     ["停止运行", "Stop Running"],
+    ["删除本地副本", "Delete Local Copy"],
+    ["打开本地页面", "Open Local Page"],
     ["本地删除", "Delete Local"],
     ["一键本地启动 GitHub 项目", "GitHub projects with one-click local launch"],
     ["导入仓库、模拟本地部署、打开 localhost，并将模型调用路由到每个用户绑定的账户。", "Import repositories, simulate local deployment, open localhost, and route model usage through each user's bound account."],
@@ -119,6 +149,8 @@
     ["打开 localhost", "Open localhost"],
     ["复制克隆命令", "Copy Clone Command"],
     ["本地执行器", "Local Runner"],
+    ["本地运行器", "Local Runner"],
+    ["启动流程", "Launch Flow"],
     ["部署流水线", "Deployment Pipeline"],
     ["空闲", "Idle"],
     ["1. 克隆 / 拉取", "1. Clone / Pull"],
@@ -233,6 +265,7 @@
     ["[cleanup] 已删除本地工作区：", "[cleanup] Removed local workspace for "],
     ["[cleanup] 本地 clone、安装缓存和运行状态已清理", "[cleanup] Local clone, install cache, and runtime state cleared"],
     ["智能体", "Agents"],
+    ["自动任务", "Workflows"],
     ["技能", "Skills"],
     ["数字员工", "Digital Workers"],
     ["商业", "Commerce"],
@@ -240,6 +273,14 @@
     ["+ 新对话", "+ New Chat"],
     ["+ 新建项目", "+ New Project"],
     ["设置", "Settings"],
+    ["语言", "Language"],
+    ["你的 AI 工作台", "Your AI Workspace"],
+    ["最近", "Recent"],
+    ["我的", "Mine"],
+    ["全部智能体", "All Agents"],
+    ["我的智能体", "My Agents"],
+    ["已上线", "Live"],
+    ["草稿", "Drafts"],
     ["市场研究计划", "Market Research Plan"],
     ["PRD 撰写讨论", "PRD Writing Discussion"],
     ["竞品分析报告", "Competitor Analysis Report"],
@@ -263,6 +304,9 @@
     ["精确 4.2 · 深度推理", "Precision 4.2 · Deep reasoning"],
     ["日常任务 · 极速响应", "Daily tasks · Ultra-fast response"],
     ["深度代理 · 执行计算", "Deep agent · Compute execution"],
+    ["适合复杂Task · 思考更深入", "Best for complex tasks · Deeper reasoning"],
+    ["适合深度执行 · Context更多", "Best for deep execution · More context"],
+    ["适合日常Task · 响应更快", "Best for everyday tasks · Faster responses"],
     ["快速启用最近高频技能，直接套用到当前任务。", "Quickly enable recently used high-frequency skills and apply them to the current task."],
     ["以最近用过的 Agent 身份和流程直接开始执行。", "Start immediately with the persona and workflow of a recently used agent."],
     ["暂无资产，生成文档、图片或表格后会自动归档到这里。", "No assets yet. Generated docs, images, or tables will be archived here automatically."],
@@ -308,14 +352,18 @@
     ["我已生成可继续扩展的竞品分析表格，并保留了关键引用链接，下一步可以补充视觉风格矩阵或导出最终版 Excel。", "I've generated an expandable competitor analysis sheet and kept the key reference links. Next we can add a visual style matrix or export the final Excel."],
     ["表格已同步", "Table synced"],
     ["文件搜索", "File Search"],
+    ["查找文件", "File Search"],
     ["图片生成", "Image Generation"],
+    ["生成图片", "Image Generation"],
     ["代码解释", "Code Explanation"],
     ["模板中心", "Template Library"],
     ["PRD 写作助手", "PRD Writing Assistant"],
     ["根据当前品牌方向生成一版红白主题视觉草图。", "Generate a red-and-white visual draft based on the current brand direction."],
     ["调用市场研究助理，输出竞品分析和建议摘要。", "Call the market research assistant and output competitor analysis with a recommendation summary."],
     ["市场研究助理", "Market Research Assistant"],
+    ["市场调研整理", "Market Research Wrap-up"],
     ["品牌视觉顾问", "Brand Visual Advisor"],
+    ["运营日报助手", "Operations Daily Assistant"],
     ["运营日报 Agent", "Operations Daily Agent"],
     ["调用品牌视觉顾问，给我桌面端首页的视觉提案。", "Call the brand visual advisor and draft a desktop homepage visual proposal."],
     ["调用运营日报 Agent，整理今天的关键数据和执行建议。", "Call the operations daily agent and organize today's key metrics with execution suggestions."],
@@ -590,7 +638,461 @@
     ["截图", "Screenshots"],
     ["自动化", "Automation"],
     ["开始新对话", "Start a new chat"],
-    ["系统设置面板已预留", "The system settings panel has been reserved"]
+    ["系统设置面板已预留", "The system settings panel has been reserved"],
+    ["首页", "Home"],
+    ["例如：帮我把这个需求整理成 PRD，并给出首页结构草图", "For example: turn this request into a PRD and outline the homepage structure."],
+    ["开始任务", "Start Task"],
+    ["自动任务", "Workflows"],
+    ["刷新", "Refresh"],
+    ["社媒增长自动任务", "Social Media Growth Workflow"],
+    ["推荐入口：自动任务页 · 打开就能用", "Recommended entry: Workflows page · Ready to use"],
+    ["进入自动任务页，直接点击运行 Twitter / Facebook 模板，缺失信息由系统对话补齐。", "Open the workflows page and run Twitter / Facebook templates directly. Missing information will be completed through system dialogue."],
+    ["高频任务", "High-Frequency Task"],
+    ["从对话、附件和历史资料中抽取关键信息，自动生成适合评审和沉淀的 PRD 草案。", "Extract key information from conversations, attachments, and historical materials to generate a review-ready PRD draft."],
+    ["推荐模型：Hubitos Pro · 可导出：Markdown / Word", "Recommended model: Hubitos Pro · Export: Markdown / Word"],
+    ["设计执行", "Design Execution"],
+    ["结合已有品牌素材，输出一版更适合桌面端的首页结构、模块优先级和视觉方向建议。", "Use existing brand materials to produce a desktop-friendly homepage structure, module priority, and visual direction proposal."],
+    ["推荐模型：Hubitos Advanced · 可导出：图片 / PPT", "Recommended model: Hubitos Advanced · Export: Images / PPT"],
+    ["分析任务", "Analysis Task"],
+    ["把竞品资料拆成能力矩阵、价格策略和差异化机会点，适合市场和产品一起评审。", "Break competitor materials into capability matrices, pricing strategies, and differentiation opportunities for market and product review."],
+    ["推荐模型：Hubitos Lite · 可导出：Excel / PDF", "Recommended model: Hubitos Lite · Export: Excel / PDF"],
+    ["对话执行助手", "Conversation Execution Assistant"],
+    ["适合接收你的任务、整理上下文，并继续在对话里一步步推进执行。", "Best for receiving your task, organizing context, and continuing execution step by step in chat."],
+    ["工具编排助手", "Tool Orchestration Assistant"],
+    ["帮你挑选合适的提示词、智能体和自动任务，并一键带入当前任务。", "Helps you choose the right prompts, agents, and workflows, then inject them into the current task in one click."],
+    ["社媒运营助手", "Social Media Operations Assistant"],
+    ["帮你直接运行 Twitter / Facebook 任务，信息不够时会边问边补，再自动开始执行。", "Runs Twitter / Facebook tasks directly, filling missing information through follow-up questions before execution starts automatically."],
+    ["开发协作助手", "Development Collaboration Assistant"],
+    ["帮你查看 GitHub 项目、启动本地环境，并继续跟进开发里的问题。", "Helps you inspect GitHub projects, launch local environments, and keep moving on development issues."],
+    ["开始", "Start"],
+    ["进入", "Enter"],
+    ["已刷新最近动态。", "Recent activity refreshed."],
+    ["Hubitos 自动任务", "Hubitos Workflows"],
+    ["我的", "Mine"],
+    ["执行面板", "Execution Panel"],
+    ["右侧执行面板", "Right-side Execution Panel"],
+    ["去对话里继续", "Continue in Chat"],
+    ["还差 2 项即可运行", "2 items left before running"],
+    ["需要授权的直接点击完成；需要补充的问题请在对应输入框中填写，全部内容会串联后一次提交给系统。", "For authorization, click to complete directly. For missing inputs, fill them in the corresponding fields and the system will submit everything together."],
+    ["稍后补充", "Fill in Later"],
+    ["提交并继续", "Submit and Continue"],
+    ["内容已经准备好，可以发布", "Content is ready and can be published"],
+    ["待发布 / 已发布内容", "Pending / Published Content"],
+    ["评论互动与执行日志", "Comment Interaction & Execution Logs"],
+    ["继续输入你要接管或调整的内容...", "Enter what you want to take over or adjust..."],
+    ["关闭对话", "Close Chat"],
+    ["我的", "Mine"],
+    ["全部", "All"],
+    ["已抓取内容", "Collected Content"],
+    ["运行中", "Running"],
+    ["补充设置", "Fill Settings"],
+    ["立即使用", "Use Now"],
+    ["现在就能运行", "Ready to Run"],
+    ["已配置", "Configured"],
+    ["需要补信息", "More Info Needed"],
+    ["可直接运行", "Ready to Run"],
+    ["配置中", "Configuring"],
+    ["待启动", "Pending Start"],
+    ["未接入", "Not Connected"],
+    ["约 7 分钟", "About 7 min"],
+    ["约 8 分钟", "About 8 min"],
+    ["约 9 分钟", "About 9 min"],
+    ["约 5 分钟", "About 5 min"],
+    ["Twitter 热点抓取并自动发布", "Twitter Trend Capture & Auto Publish"],
+    ["抓取目标主题的热点内容，生成 3 条适合品牌语气的推文，并自动排队发布。", "Capture trending content for the target topic, generate three tweets that match the brand voice, and queue them for publishing automatically."],
+    ["帮我继续跟进这个 Twitter 热点抓取与自动发布工作流，优化内容并给出下一步建议。", "Help me continue this Twitter trend capture and auto-publish workflow, improve the content, and suggest next steps."],
+    ["X 平台授权", "X Platform Authorization"],
+    ["先完成 X 平台授权。授权后，系统才能抓取热点并安排自动发布。", "Complete X platform authorization first. After that, the system can capture trends and schedule auto publishing."],
+    ["前往 X 授权", "Authorize X"],
+    ["抓取主题", "Capture Topic"],
+    ["这次希望围绕什么主题抓取热点内容？", "What topic should this round of trend capture focus on?"],
+    ["例如：AI agent、独立开发、自动化增长", "For example: AI agent, indie hacking, automated growth"],
+    ["抓取范围", "Capture Scope"],
+    ["希望从哪些账号、列表、话题或关键词范围抓取内容？", "Which accounts, lists, topics, or keyword scopes should the content be captured from?"],
+    ["例如：关注 5 个竞品账号、2 个行业 KOL、1 个热点关键词流", "For example: 5 competitor accounts, 2 industry KOLs, 1 trending keyword stream"],
+    ["发布时间窗", "Publishing Window"],
+    ["希望把自动发布安排在什么时间段？", "What time window should auto publishing be scheduled for?"],
+    ["例如：每天 10:00 / 14:00 / 20:00", "For example: every day at 10:00 / 14:00 / 20:00"],
+    ["品牌语气", "Brand Voice"],
+    ["推文最终希望保持什么样的品牌语气？", "What kind of brand voice should the final tweets maintain?"],
+    ["例如：专业、简洁、有观点，不要太营销", "For example: professional, concise, opinionated, not too salesy"],
+    ["Twitter 评论互动与主动评论", "Twitter Comment Engagement & Proactive Replies"],
+    ["围绕目标关键词自动发现相关帖子，生成评论并持续跟进评论区互动。", "Automatically discover posts around the target keywords, generate replies, and keep following the comment thread."],
+    ["请基于这个 Twitter 评论互动自动任务，继续帮我梳理评论策略、互动节奏和风险边界。", "Based on this Twitter comment-engagement workflow, help me refine the comment strategy, engagement cadence, and risk boundaries."],
+    ["先完成 X 平台授权。授权后，这个自动任务才能开始评论与主动互动。", "Complete X platform authorization first. Only then can this workflow start replying and proactively engaging."],
+    ["目标关键词", "Target Keywords"],
+    ["这次想围绕哪个 Twitter 关键词或主题去互动？", "Which Twitter keywords or topics should we engage around this time?"],
+    ["例如：AI agent、自动化增长、创业工具", "For example: AI agent, automated growth, startup tools"],
+    ["评论语气", "Reply Tone"],
+    ["评论语气希望更专业、友好，还是更强观点输出？", "Should the replies sound more professional, more friendly, or more opinionated?"],
+    ["例如：偏专业、友好，不要太营销，适度表达观点。", "For example: professional and friendly, not too salesy, with moderate opinions."],
+    ["Facebook 社群内容抓取并自动发布", "Facebook Community Content Capture & Auto Publish"],
+    ["从目标社群和页面抓取高价值内容，整理成更适合 Facebook 的长帖和配图说明。", "Capture high-value content from target communities and pages, then turn it into Facebook-friendly long posts and image captions."],
+    ["请继续展开这个 Facebook 内容自动任务，补齐发布策略、帖子结构和评论引导方式。", "Continue developing this Facebook content workflow and complete the publishing strategy, post structure, and comment guidance."],
+    ["Facebook 平台授权", "Facebook Platform Authorization"],
+    ["先完成 Facebook 平台授权。授权后，系统才能抓取来源并安排自动发布。", "Complete Facebook platform authorization first. After that, the system can capture sources and schedule auto publishing."],
+    ["前往 Facebook 授权", "Authorize Facebook"],
+    ["抓取来源", "Capture Sources"],
+    ["你希望从哪些 Facebook 页面、社群或话题来源抓内容？", "Which Facebook pages, communities, or topics should the content be captured from?"],
+    ["例如：3 个目标社群、2 个竞品主页、1 个行业话题页", "For example: 3 target communities, 2 competitor pages, 1 industry topic page"],
+    ["发布主题", "Publishing Topic"],
+    ["这次生成内容的核心发布主题是什么？", "What is the core topic for this publishing run?"],
+    ["例如：AI 自动任务如何提升团队执行效率", "For example: how AI workflows improve team execution efficiency"],
+    ["Facebook 社群评论运营", "Facebook Community Comment Operations"],
+    ["自动跟进已发布帖子的评论区，筛出需要重点回复的留言并生成互动建议。", "Automatically follow the comment threads of published posts, pick out the replies that need attention, and generate interaction suggestions."],
+    ["请继续处理这个 Facebook 社群评论运营自动任务，并给我一份后续人工接管建议。", "Continue handling this Facebook community comment workflow and give me a follow-up handoff recommendation."],
+    ["已扫描 26 条最新评论，标记 5 条高价值互动，2 条建议人工接管", "Scanned 26 recent comments, flagged 5 high-value interactions, and marked 2 for manual takeover."],
+    ["识别 26 条近 24 小时内的最新评论", "Identified 26 recent comments from the last 24 hours."],
+    ["高价值评论 5 条，负向风险评论 2 条", "5 high-value comments and 2 negative-risk comments."],
+    ["发现 1 个适合继续追问的潜在客户讨论", "Found 1 potential customer discussion worth following up on."],
+    ["自动回复 3 条标准咨询评论", "Automatically replied to 3 standard inquiry comments."],
+    ["生成 2 条需要人工确认的回复草案", "Generated 2 reply drafts that need human confirmation."],
+    ["输出 1 条社群管理员私信建议", "Produced 1 private-message suggestion for the community admin."],
+    ["10:02 已抓取最新评论并完成情绪分类", "10:02 Captured recent comments and completed sentiment classification."],
+    ["10:04 系统已生成推荐回复", "10:04 The system generated recommended replies."],
+    ["10:06 已将 2 条高风险互动移交人工接管", "10:06 Handed 2 high-risk interactions over for manual takeover."],
+    ["还差 ", ""],
+    [" 项信息", " items missing"],
+    ["已完成热点抓取发布配置，系统正在抓取候选内容并生成推文草案", "Trend capture and publishing settings are complete. The system is collecting candidates and generating tweet drafts."],
+    ["已确认抓取主题：", "Confirmed capture topic: "],
+    ["未填写", "Not provided"],
+    ["已记录抓取范围：", "Recorded capture scope: "],
+    ["开始从授权 X 账号对应的关注流、关键词流和目标账号中抓取候选内容", "Starting to capture candidate content from followed streams, keyword streams, and target accounts linked to the authorized X account."],
+    ["将按时间窗执行发布：", "Publishing will follow this time window: "],
+    ["按品牌语气生成 3 条推文草案：", "Generate 3 tweet drafts in this brand voice: "],
+    ["生成 1 份待审核发布队列和 1 份备选热点角度清单", "Generate 1 publishing queue for review and 1 backup list of trending angles."],
+    ["已完成 X 授权校验", "X authorization check completed."],
+    ["已写入热点抓取与自动发布规则", "Trend capture and auto-publish rules have been written."],
+    ["下一步将输出候选内容、推文草案与发布队列", "Next, the system will output candidate content, tweet drafts, and a publishing queue."],
+    ["已补齐 ", "Completed "],
+    [" 项信息，系统正在用最新上下文运行这个自动任务", " items. The system is now running this workflow with the latest context."],
+    ["已记录自动任务关键信息：", "Recorded key workflow information: "],
+    ["复用 ", "Reuse "],
+    [" 已授权账号与品牌语气配置", " authorized account and brand voice settings."],
+    ["开始抓取相关来源并生成候选内容池", "Start capturing related sources and generating a pool of candidate content."],
+    ["生成 2 条待发布内容草案", "Generate 2 publish-ready content drafts."],
+    ["生成 3 条可用于评论区互动的回复建议", "Generate 3 reply suggestions for comment-thread interaction."],
+    ["输出 1 条推荐的人工作业接管说明", "Output 1 recommended manual takeover note."],
+    ["系统已根据补充信息完成回填", "The system has backfilled the workflow using the provided information."],
+    ["自动任务模板已自动挂载默认执行策略", "The workflow template has automatically loaded the default execution strategy."],
+    ["下一步可进入聊天工作台继续细化结果", "Next, continue refining the result in the chat workspace."],
+    ["已开始执行。", " has started running."],
+    ["当前正在接管「", "You are now taking over \""],
+    ["」的运行链路。你可以直接调整发布内容、评论策略或执行节奏。", "\". You can directly adjust publishing content, comment strategy, or execution cadence."],
+    ["系统已经接入最近一次执行上下文，你可以继续补充策略、内容或节奏要求。", "The system has loaded the latest execution context. You can continue adding strategy, content, or cadence requirements."],
+    ["已授权完成", "Authorized"],
+    ["点击后模拟跳转到平台授权页，完成后会自动标记为已授权。", "Click to simulate the platform authorization flow. Once finished, it will be marked as authorized automatically."],
+    ["请输入", "Please enter"],
+    ["信息已补齐，提交后即可运行", "All information is complete. Submit to run."],
+    ["补参面板", "Parameter Panel"],
+    ["补齐信息", "Complete Information"],
+    ["对话接管", "Chat Takeover"],
+    ["右侧对话", "Right-side Chat"],
+    ["当前执行结果", "Current Execution Result"],
+    ["右侧工作面板", "Right-side Workspace Panel"],
+    ["还缺少“", "Still missing \""],
+    ["”，补齐后我再继续。", "\". Complete it and I’ll continue."],
+    ["已保留这个自动任务，稍后可继续补充。", "This workflow has been saved and can be completed later."],
+    ["已授权", "Authorized"],
+    ["已跳转授权流程，并标记为授权完成。", "Authorization flow has been opened and marked complete."],
+    ["先输入你要接管或调整的内容。", "Enter the content you want to take over or adjust first."],
+    ["来源：用户接管输入", "Source: User Takeover Input"],
+    ["已记录这条调整指令，系统会基于当前自动任务继续执行并同步右侧运行状态。", "This adjustment has been recorded. The system will continue the current workflow and sync the right-side execution state."],
+    ["来源：自动任务执行编排器", "Source: Workflow Execution Orchestrator"],
+    ["已写入当前自动任务对话链路。", "The current workflow conversation chain has been updated."],
+    ["自动任务记录", "Workflow History"],
+    ["+ 新建对话", "+ New Chat"],
+    ["市场", "Marketplace"],
+    ["我的安装", "Installed"],
+    ["开发者中心", "Developer Center"],
+    ["搜索全球 AI 技能...", "Search AI skills worldwide..."],
+    ["执行任务", "Run Task"],
+    ["热门", "Popular"],
+    ["写作", "Writing"],
+    ["编程", "Coding"],
+    ["数据分析", "Data Analysis"],
+    ["视觉设计", "Visual Design"],
+    ["效率工具", "Productivity Tools"],
+    ["排序: 收益潜力", "Sort: Revenue Potential"],
+    ["市场", "Marketplace"],
+    ["全部文件", "All Files"],
+    ["AI 生成", "AI Generated"],
+    ["收藏", "Favorites"],
+    ["回收站", "Trash"],
+    ["搜索文件、图片或 AI 产出...", "Search files, images, or AI outputs..."],
+    ["上传文件", "Upload File"],
+    ["最近产出", "Recent Outputs"],
+    ["清空回收站", "Empty Trash"],
+    ["当前查看", "Currently Viewing"],
+    ["文档片段", "Document Snippet"],
+    ["用到的技能 / MCP", "Skills / MCP Used"],
+    ["用 AI 继续编辑", "Continue Editing with AI"],
+    ["导出", "Export"],
+    ["草稿箱", "Drafts"],
+    ["通过技能生成", "Generated via Skill"],
+    ["技能流程", "Skill Flow"],
+    ["手动上传", "Uploaded Manually"],
+    ["项目中心", "Projects Center"],
+    ["搜索项目名、仓库名或技术栈...", "Search project name, repository, or tech stack..."],
+    ["当前选中", "Currently Selected"],
+    ["状态", "Status"],
+    ["自动修复方式", "Auto-Repair Policy"],
+    ["查看详情", "View Details"],
+    ["填入示例", "Fill Demo Data"],
+    ["运行中", "Running"],
+    ["启动中", "Starting"],
+    ["没找到项目", "No Projects Found"],
+    ["换个关键词试试，或者先导入一个新项目。", "Try a different keyword, or import a new project first."],
+    ["请按 owner/repo 的格式填写。", "Please use the owner/repo format."],
+    ["已从 GitHub 导入，等待系统识别安装方式和启动命令。", "Imported from GitHub. Waiting for the system to identify the install method and launch command."],
+    ["还没启动过", "Not started yet"],
+    ["使用当前账号", "Use Current Account"],
+    ["健康检查 + 基础可用性检查 + 首页是否能打开", "Health check + basic availability check + homepage availability"],
+    ["检查失败时自动交给 AI 修复", "Send to AI automatically when checks fail"],
+    ["授权后会显示已连接的服务商", "Connected providers will appear after authorization"],
+    ["项目已经导入到列表里了。", "The project has been imported into the list."],
+    ["这里先演示同步效果，暂时不会真的拉 GitHub。", "This only demonstrates the sync effect for now and won't actually pull from GitHub."],
+    ["Hubitos 项目详情", "Hubitos Project Detail"],
+    ["项目详情", "Project Detail"],
+    ["启动、检查、自动修复", "Launch, Verify, and Auto-Repair"],
+    ["这个页面用来处理单个项目的本地启动、检查规则、运行日志，以及 AI 自动修复流程。", "This page handles local launch, verification rules, execution logs, and the AI auto-repair flow for a single project."],
+    ["当前项目", "Current Project"],
+    ["本地目录", "Local Directory"],
+    ["上次启动", "Last Launch"],
+    ["还没启动", "Not Started Yet"],
+    ["一键启动", "One-click Start"],
+    ["删除本地副本", "Delete Local Copy"],
+    ["打开本地页面", "Open Local Page"],
+    ["本地运行器", "Local Runner"],
+    ["启动流程", "Launch Flow"],
+    ["Hubitos Home", "Hubitos Home"],
+    ["本地副本已删除", "Local copy deleted"],
+    ["把多个 Agent 当成一个可以直接调度的执行团队。", "Treat multiple agents as an execution team you can dispatch directly."],
+    ["这个首页更接近内置 Agent 的入口感受：先看任务、Agent 编队、执行进度，再决定由谁接管下一步。", "This homepage feels closer to an embedded agent entry: first review tasks, agent squads, and execution progress, then decide who takes over next."],
+    ["返回通用首页", "Back to General Home"],
+    ["进入对话执行", "Enter Chat Execution"],
+    ["给任务分配编队，而不是只发一条 prompt。", "Assign a squad to the task instead of just sending one prompt."],
+    ["在这里你可以先定义目标，再组合研究、写作、设计、执行等 Agent，由系统自动分阶段协作，然后把结果推进到聊天工作台继续细化。", "Here you can define the goal first, then combine agents for research, writing, design, and execution. The system coordinates them by phase and pushes results into the chat workspace for further refinement."],
+    ["当前推荐编队", "Recommended Squad"],
+    ["输入任务后可直接进入聊天工作台，保留任务上下文", "After entering a task, go straight into the chat workspace while keeping the task context."],
+    ["启动任务", "Launch Task"],
+    ["执行概况", "Execution Overview"],
+    ["可调用 Agent 编队", "Callable Agent Squads"],
+    ["重新编排", "Rebalance"],
+    ["任务编排流", "Task Orchestration Flow"],
+    ["实时任务队列", "Live Task Queue"],
+    ["刷新队列", "Refresh Queue"],
+    ["Agent 会话", "Agent Sessions"],
+    ["调用", "Invoke"],
+    ["继续", "Continue"],
+    ["已重新给任务推荐 Agent 编队。", "A new recommended agent squad has been prepared for the task."],
+    ["实时任务队列已刷新。", "The live task queue has been refreshed."],
+    ["当前工具", "Current Tool"],
+    ["工具", "Tool"],
+    ["可直接使用", "Ready to Use"],
+    ["当前自动任务", "Current Workflow"],
+    ["可以继续", "Can Continue"],
+    ["同一个问题已经让多个模型回答了。选一个继续往下聊。", "The same question has already been answered by multiple models. Pick one to continue."],
+    ["已选中", "Selected"],
+    ["可选择", "Available"],
+    ["继续用这个模型", "Continue with This Model"],
+    ["选这个模型", "Choose This Model"],
+    ["换个模型", "Switch Model"],
+    ["请选择模型", "Please Select a Model"],
+    ["新对话", "New Chat"],
+    ["默认会把对话保存为skill ，可在工具-我的 中找到", "Conversations are saved as skills by default and can be found in Tools > Mine."],
+    ["这里还没有内容。后面生成的文档、图片和表格会自动放到这里。", "Nothing is here yet. Generated documents, images, and spreadsheets will appear here automatically."],
+    ["没有上传文件", "No Files Uploaded"],
+    ["暂时没有启用技能", "No Skills Enabled Yet"],
+    ["约 9 秒", "About 9s"],
+    ["适合整理复杂信息，输出结构更完整", "Best for organizing complex information with more complete structure."],
+    ["大纲 + 说明理由 + 下一步建议", "Outline + Rationale + Next-Step Suggestions"],
+    ["会结合文件、当前文件夹和已启用技能一起回答", "Answers with the current files, folder, and enabled skills in context."],
+    ["约 3 秒", "About 3s"],
+    ["适合快速迭代，先给你能马上执行的版本", "Best for fast iteration and giving you something executable right away."],
+    ["简短答案 + 执行清单", "Short Answer + Action Checklist"],
+    ["文案更短，更适合立刻修改", "Shorter copy, better for immediate edits."],
+    ["约 14 秒", "About 14s"],
+    ["适合做规划、比较方案和处理复杂任务", "Best for planning, comparing approaches, and handling complex tasks."],
+    ["更完整的建议 + 执行注意点", "More Complete Suggestions + Execution Notes"],
+    ["会带更多上下文，覆盖更多决策情况", "Carries more context and covers more decision scenarios."],
+    ["请先输入任务，再发送。", "Enter a task before sending."],
+    ["没找到这条回答对应的原始提问。", "Could not find the original prompt for this answer."],
+    ["已经切换到这条对话。", "Switched to this conversation."],
+    ["已新建一条对话。", "A new conversation has been created."],
+    ["已把“", "Added \""],
+    ["”带入输入框。", "\" to the input box."],
+    ["已开启智能分配模型。", "Smart model routing enabled."],
+    ["已切到手动选模型。", "Switched to manual model selection."],
+    ["已根据当前对话推荐一组更合适的技能。", "Recommended a more suitable set of skills for the current conversation."],
+    ["当前对话已置顶。", "The current conversation has been pinned."],
+    ["当前对话已保存成模板。", "The current conversation has been saved as a template."],
+    ["进行中", "In Progress"],
+    ["排队中", "Queued"],
+    ["待确认", "Pending Confirmation"],
+    ["在线 Agent", "Online Agents"],
+    ["并行任务", "Parallel Tasks"],
+    ["本日交付", "Today's Deliveries"],
+    ["任务解析", "Task Parsing"],
+    ["编队组装", "Squad Assembly"],
+    ["并行执行", "Parallel Execution"],
+    ["结果汇总", "Result Consolidation"],
+    ["输入:", "Input:"],
+    ["输出:", "Output:"],
+    ["分钟前", "minutes ago"],
+    ["当前推荐编队", "Recommended Squad"],
+    ["重新编排", "Rebalance"],
+    ["刷新队列", "Refresh Queue"],
+    ["任务", "Task"],
+    ["编队", "Squad"],
+    ["继续推进", "Continue"],
+    ["待确认", "Pending Confirmation"],
+    ["对外文案", "External Copy"],
+    ["阶段", "Phase"],
+    ["交付物", "Deliverables"],
+    ["继续", "Continue"],
+    ["调用", "Invoke"],
+    ["搜索智能体、技能、MCP 或标签...", "Search agents, skills, MCPs, or tags..."],
+    ["内容写作", "Content Writing"],
+    ["调研分析", "Research & Analysis"],
+    ["编程开发", "Coding & Development"],
+    ["设计体验", "Design & UX"],
+    ["自动化运营", "Automation & Operations"],
+    ["客服支持", "Customer Support"],
+    ["把零散需求整理成结构清楚的 PRD，自动补上目标、范围、流程和验收标准。", "Turn scattered requirements into a clear PRD and automatically fill in goals, scope, process, and acceptance criteria."],
+    ["请用 PRD 写作助手把这个需求整理成结构化 PRD，并补上目标、范围、关键流程和验收标准。", "Use the PRD Writing Assistant to turn this requirement into a structured PRD and fill in goals, scope, key flows, and acceptance criteria."],
+    ["市场调研助手", "Market Research Assistant"],
+    ["帮你分析竞品、整理定位差异，并输出对比表和策略建议。", "Analyze competitors, summarize positioning differences, and produce comparison tables and strategy suggestions."],
+    ["请调用市场调研助手，继续这段对话，并输出竞品分析和建议总结。", "Invoke the Market Research Assistant to continue this conversation and produce competitor analysis plus a recommendation summary."],
+    ["代码重构提示词", "Code Refactoring Prompt"],
+    ["让模型帮你重构组件，同时保证原有功能不变，并说明取舍和风险。", "Ask the model to refactor components while keeping existing behavior unchanged, and explain trade-offs and risks."],
+    ["请重构这个组件，保持原有功能不变，并在给代码前先说明取舍和可能的风险。", "Refactor this component, keep existing behavior unchanged, and explain trade-offs plus possible risks before giving the code."],
+    ["Telegram 机器人助手", "Telegram Bot Assistant"],
+    ["帮你管理 Telegram 机器人流程，识别消息类型，并按规则回复。", "Manage Telegram bot workflows, identify message types, and reply according to rules."],
+    ["请调用 Telegram 机器人助手，帮我设计下一步机器人流程、消息分流和回复规则。", "Invoke the Telegram Bot Assistant to design the next bot workflow, message routing, and reply rules."],
+    ["Zalo 客服助手", "Zalo Support Assistant"],
+    ["处理 Zalo 上的客服对话，保持统一语气，并在把握不大时转给人工。", "Handle customer conversations on Zalo, keep a consistent tone, and hand over to humans when confidence is low."],
+    ["请调用 Zalo 客服助手，帮我设计客服回复流程，并在需要时转人工。", "Invoke the Zalo Support Assistant to design the support reply workflow and escalate to humans when needed."],
+    ["社媒自动任务入口", "Social Media Workflow Entry"],
+    ["打开 Twitter 和 Facebook 的一键自动任务页面，缺的信息由系统边问边补齐。", "Open the one-click Twitter and Facebook workflow page, with missing information filled through follow-up questions."],
+    ["请打开社媒自动任务入口，帮我直接运行一个 Twitter 或 Facebook 自动任务，不想手动配置。", "Open the social media workflow entry and run a Twitter or Facebook workflow directly without manual configuration."],
+    ["多模型对比提示词", "Multi-Model Comparison Prompt"],
+    ["让多个模型同时回答同一个问题，再从里面选一个更好的继续往下聊。", "Have multiple models answer the same question at once, then choose the best one to continue."],
+    ["请进入多模型对比模式，让多个模型回答同一个问题，并帮我选一个继续。", "Enter multi-model comparison mode, let several models answer the same question, and help me pick one to continue."],
+    ["SEO 优化专家", "SEO Optimization Expert"],
+    ["自动分析关键词竞争度，并生成更适合搜索流量的内容结构。", "Automatically analyze keyword competition and generate content structures better suited for search traffic."],
+    ["请调用 SEO 优化专家，帮我做关键词分析和内容结构建议。", "Invoke the SEO Optimization Expert to help with keyword analysis and content structure suggestions."],
+    ["代码重构助手", "Code Refactoring Assistant"],
+    ["自动发现代码坏味道，并给出更清楚的重构建议和拆分计划。", "Automatically detect code smells and provide clearer refactoring suggestions plus a decomposition plan."],
+    ["请调用代码重构助手，帮我识别问题并给出重构建议。", "Invoke the Code Refactoring Assistant to identify problems and provide refactoring suggestions."],
+    ["本地化翻译官", "Localization Translator"],
+    ["不只翻译文字，还会按目标市场调整语气和表达方式。", "Not only translates text, but also adapts tone and phrasing for the target market."],
+    ["请调用本地化翻译官，帮我按目标市场调整语气和表达。", "Invoke the Localization Translator to adapt tone and phrasing for the target market."],
+    ["UI 调色板大师", "UI Palette Master"],
+    ["根据品牌调性，生成更协调的界面配色和组件建议。", "Generate more coherent interface colors and component suggestions based on brand tone."],
+    ["请调用 UI 调色板大师，帮我做配色和界面风格建议。", "Invoke the UI Palette Master to help with color and interface style suggestions."],
+    ["线框图草稿助手", "Wireframe Draft Assistant"],
+    ["根据需求说明快速整理页面结构、模块顺序和交互草图建议。", "Quickly organize page structure, module order, and interaction sketch suggestions from the requirement brief."],
+    ["请调用线框图草稿助手，帮我整理页面结构和模块布局草图。", "Invoke the Wireframe Draft Assistant to organize page structure and module layout sketches."],
+    ["体验评审助手", "UX Review Assistant"],
+    ["帮你检查页面信息层级、按钮路径和关键操作是否顺手。", "Check whether the page information hierarchy, button paths, and key interactions feel smooth."],
+    ["请调用体验评审助手，帮我检查当前页面的操作路径和体验问题。", "Invoke the UX Review Assistant to inspect the current page for interaction paths and experience issues."],
+    ["请用 PRD 写作助手帮我整理这个需求，并输出完整的大纲。", "Use the PRD Writing Assistant to organize this requirement and output a complete outline."],
+    ["请帮我搜索刚上传的文件，并提取里面的关键结论。", "Help me search the uploaded files and extract the key conclusions."],
+    ["请根据当前品牌方向，生成一版红白主视觉草图。", "Generate a red-and-white key visual draft based on the current brand direction."],
+    ["请调用运营日报助手，整理今天的关键数据和执行建议。", "Invoke the Operations Daily Assistant to organize today's key metrics and execution recommendations."],
+    ["网页抓取工具箱", "Web Scraping Toolkit"],
+    ["帮智能体抓网页内容、转成 Markdown，也支持动态渲染页面。", "Help agents scrape web content, convert it to Markdown, and handle dynamically rendered pages."],
+    ["请调用网页抓取工具箱，帮我抓取网页并整理成可继续编辑的内容。", "Invoke the Web Scraping Toolkit to scrape a webpage and turn it into editable content."],
+    ["GitHub 开发组件", "GitHub Dev Toolkit"],
+    ["适合做代码审查、问题分类，以及给出 PR 合并建议。", "Useful for code review, issue triage, and PR merge suggestions."],
+    ["请调用 GitHub 开发组件，帮我做代码审查和问题分类。", "Invoke the GitHub Dev Toolkit to help with code review and issue triage."],
+    ["金融数据流", "Financial Data Stream"],
+    ["接入汇率、加密货币和美股数据，也支持自动生成分析报告。", "Connect to FX, crypto, and U.S. stock data, and generate analysis reports automatically."],
+    ["请调用金融数据流，帮我拉取数据并生成分析总结。", "Invoke the Financial Data Stream to fetch data and generate an analytical summary."],
+    ["安全保护器", "Security Protector"],
+    ["在本地扫描和打码敏感信息，保护智能体处理隐私内容时更安全。", "Scan and mask sensitive information locally to keep agents safer when handling private content."],
+    ["请调用安全保护器，帮我检查并处理敏感信息。", "Invoke the Security Protector to inspect and handle sensitive information."],
+    ["工单分流助手", "Ticket Routing Assistant"],
+    ["自动识别用户问题类型，把咨询、投诉和售后请求分给合适的人处理。", "Automatically identify user issue types and route inquiries, complaints, and after-sales requests to the right people."],
+    ["请调用工单分流助手，帮我把用户问题按类型分类并分配处理。", "Invoke the Ticket Routing Assistant to classify user issues by type and route them for handling."],
+    ["客服回复润色", "Support Reply Polisher"],
+    ["把原始回复改得更清楚、更礼貌，也更符合品牌语气。", "Polish raw replies to make them clearer, more polite, and more aligned with brand tone."],
+    ["请调用客服回复润色，帮我把这段客服回复改得更清楚、更礼貌。", "Invoke Support Reply Polisher to make this support reply clearer and more polite."],
+    ["最近对话", "Recent Conversations"],
+    ["最近用过的技能", "Recently Used Skills"],
+    ["最近用过的智能体", "Recently Used Agents"],
+    ["常用提示词", "Prompt Library"],
+    ["一键带入最近常用的技能，直接用到当前任务里。", "Insert recently used skills in one click and apply them directly to the current task."],
+    ["直接复用最近常用的智能体角色和做事方式。", "Directly reuse the roles and workflows of recently used agents."],
+    ["请把这份项目说明整理成完整 PRD，并同时输出 Word 和 Markdown。", "Turn this project brief into a complete PRD and output both Word and Markdown."],
+    ["请根据我上传的 PDF 和图片，生成一版桌面客户端首页草图。", "Based on the uploaded PDF and images, generate a desktop client homepage draft."],
+    ["请把这些资料整理成一个可复用的自动任务，并输出适合团队协作的执行方案。", "Turn these materials into a reusable workflow and produce an execution plan suitable for team collaboration."],
+    ["带入输入框", "Insert into Input"],
+    ["清除", "Clear"],
+    ["请基于这个 Twitter 评论互动工作流，继续帮我梳理评论策略、互动节奏和风险边界。", "Based on this Twitter comment-engagement workflow, continue helping me refine comment strategy, engagement cadence, and risk boundaries."],
+    ["设计说明.pdf", "Design-Brief.pdf"],
+    ["品牌参考图.png", "Brand-Reference.png"],
+    ["新任务对话", "New Task Conversation"],
+    ["当前工具", "Current Tool"],
+    ["工具", "Tool"],
+    ["当前自动任务", "Current Workflow"],
+    ["还差 ", ""],
+    [" 项信息", " items missing"],
+    ["可直接使用", "Ready to Use"],
+    ["Ⅱ + 模型对比", "II + Model Compare"],
+    ["同一个问题已经让多个模型回答了。选一个继续往下聊。", "Several models have already answered the same question. Pick one to continue."],
+    ["已选中", "Selected"],
+    ["可选择", "Available"],
+    ["这里还没有内容。后面生成的文档、图片和表格会自动放到这里。", "Nothing is here yet. Generated documents, images, and spreadsheets will appear here automatically."],
+    ["会议纪要.docx", "Meeting-Notes.docx"],
+    ["参考海报.png", "Reference-Poster.png"],
+    ["需求清单.xlsx", "Requirements-Checklist.xlsx"],
+    ["竞品资料.pdf", "Competitor-Materials.pdf"],
+    ["数据样例.csv", "Data-Sample.csv"],
+    ["系统会自动识别文件类型。", "The system will automatically detect the file type."],
+    ["我会按“高质量整理”的方式来处理这个任务。当前参考资料有：", "I will handle this task with a high-quality structuring approach. Current reference materials: "],
+    ["我会先梳理设计方向、页面层级和判断标准，再把结果整理到“", "I will first organize the design direction, page hierarchy, and evaluation criteria, then sort the results into \""],
+    ["”这条线里。当前启用的技能有：", "\". The currently enabled skills are: "],
+    ["。输出会更偏结构化说明，方便你继续修改，也方便交接给下一个同事。", ". The output will be more structured, making it easier to revise and hand off."],
+    ["我会用更直接、更省时间的方式来处理。结合这些资料：", "I will handle this more directly and efficiently. Based on these materials: "],
+    ["，我会尽量给你一个更短、更好执行的版本。输出会更偏重点清单和下一步动作，让团队能马上接着干。", ", I will try to give you a shorter, easier-to-execute version. The output will focus more on key checklists and next actions so the team can move immediately."],
+    ["我会把它当成一个更复杂的执行任务来处理。我会把 ", "I will treat this as a more complex execution task. I will take the context from "],
+    [" 里的上下文一起考虑进去，先把关键取舍想清楚，再给你更完整的建议。你会看到更细的执行假设、边界情况和后续怎么落地的说明。", " into account, think through the key trade-offs first, and then give you more complete recommendations. You will see more detailed execution assumptions, edge cases, and implementation guidance."],
+    ["请先对比，再选一个模型继续", "Compare first, then choose a model to continue"],
+    ["我收到任务了。当前参考资料有：", "Task received. Current reference materials: "],
+    ["。我会先判断这些文件适合怎么处理，再结合 ", ". I will first decide how these files should be handled, then combine them with "],
+    [" 来准备结果，默认会保存到 ", " to prepare the result, which will be saved by default to "],
+    ["。草稿准备好后，你可以在下面选择输出格式，对应文件也会直接出现在这条回复下面。", ". Once the draft is ready, you can choose an output format below, and the corresponding files will appear under this reply."],
+    ["已保存到 ", "Saved to "],
+    ["根据表格内容自动生成", "Auto-generated from spreadsheet content"],
+    ["PDF｜表格结果快照", "PDF | Spreadsheet snapshot"],
+    [" 因为检测到了表格文件，所以我会优先准备表格版结果。", " Since a spreadsheet file was detected, I will prioritize a spreadsheet-oriented result."],
+    ["根据图片内容自动生成", "Auto-generated from image content"],
+    ["PPT｜含视觉参考", "PPT | Includes visual references"],
+    [" 因为检测到了图片文件，所以我会优先准备视觉版结果。", " Since an image file was detected, I will prioritize a visual result."],
+    ["根据 PDF 自动生成", "Auto-generated from PDF"],
+    ["Markdown｜可继续编辑", "Markdown | Editable"],
+    [" 因为检测到了 PDF，所以我会优先准备可编辑的文档版结果。", " Since a PDF was detected, I will prioritize an editable document result."],
+    ["Markdown｜结构化草稿已完成", "Markdown | Structured draft ready"],
+    ["Word 文档｜可继续编辑", "Word Document | Editable"],
+    ["表格｜已含结构化字段", "Spreadsheet | Structured fields included"],
+    ["PDF｜已生成导出稿", "PDF | Export draft ready"],
+    ["图片｜可继续修改", "Image | Editable"],
+    [" 因为你没有指定输出格式，所以我先把多个常用格式都准备好了，方便你直接选。", " Since you did not specify an output format, I prepared several common formats first so you can choose directly."],
+    ["输出格式：下方可选", "Output: Choose below"],
+    ["继续帮我整理成下一版可直接执行的草稿。", "Continue refining this into the next execution-ready draft."],
+    ["正在对比 ", "Comparing "],
+    [" 对同一个问题的回答。", " on the same question."],
+    ["已经切换到这条对话。", "Switched to this conversation."],
+    ["接下来会继续使用 ", "Next, we will continue with "],
+    ["，下一轮你也可以再重新对比。", ", and you can compare again in the next round."],
+    [" 文件已经出现在这条回复下面了。", " file is now shown under this reply."],
+    ["已进入对比模式：", "Entered compare mode: "],
+    ["已切换到 ", "Switched to "],
+    ["已把“", "Added \""],
+    ["”从当前对话里移除。", "\" from the current conversation."],
+    ["已上传 ", "Uploaded "]
   ];
 
   const zhToEnMap = new Map(PAIRS);
@@ -617,6 +1119,12 @@
     [/输出：/g, "Output: "],
     [/日志：/g, "Log: "],
     [/节点输出：/g, "Node output: "]
+    ,[/已上传 (.+)，系统会自动识别文件类型。/g, "Uploaded $1. The system will automatically detect the file type."]
+    ,[/已进入对比模式：(.+)/g, "Entered compare mode: $1"]
+    ,[/已切换到 (.+)/g, "Switched to $1"]
+    ,[/接下来会继续使用 (.+)，下一轮你也可以再重新对比。/g, "Next, continuing with $1. You can compare again in the next round."]
+    ,[/(.+) 文件已经出现在这条回复下面了。/g, "$1 file is now shown under this reply."]
+    ,[/已把“(.+)”从当前对话里移除。/g, "Removed \"$1\" from the current conversation."]
   ];
 
   const enToZhRules = [
@@ -639,8 +1147,50 @@
     [/Node output: /g, "节点输出："]
   ];
 
+  function loadAiCache() {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(AI_CACHE_KEY) || "{}");
+      Object.entries(saved).forEach(([key, value]) => {
+        if (typeof value === "string" && value) aiTranslationCache.set(key, value);
+      });
+    } catch (error) {
+      // Ignore cache hydration failures.
+    }
+  }
+
+  function scheduleAiCachePersist() {
+    clearTimeout(aiCachePersistTimer);
+    aiCachePersistTimer = setTimeout(() => {
+      try {
+        window.localStorage.setItem(AI_CACHE_KEY, JSON.stringify(Object.fromEntries(aiTranslationCache)));
+      } catch (error) {
+        // Ignore cache persistence failures.
+      }
+    }, 120);
+  }
+
+  function getAiCacheKey(text, targetLang) {
+    return `${targetLang}::${text}`;
+  }
+
+  function getCachedAiTranslation(text, targetLang) {
+    return aiTranslationCache.get(getAiCacheKey(text, targetLang)) || null;
+  }
+
+  function setCachedAiTranslation(text, targetLang, translated) {
+    if (!translated || translated === text) return;
+    aiTranslationCache.set(getAiCacheKey(text, targetLang), translated);
+    scheduleAiCachePersist();
+  }
+
   function readStoredLanguage() {
     try {
+      const url = new URL(window.location.href);
+      const queryLang = url.searchParams.get("lang");
+      if (queryLang === "zh" || queryLang === "en") {
+        window.localStorage.setItem(STORAGE_KEY, queryLang);
+        return queryLang;
+      }
       const stored = window.localStorage.getItem(STORAGE_KEY);
       return stored === "zh" || stored === "en" ? stored : DEFAULT_LANG;
     } catch (error) {
@@ -684,9 +1234,75 @@
   function translateText(original, targetLang) {
     if (!original || typeof original !== "string") return original;
     if (targetLang === "en") {
-      return containsHan(original) ? translateByMap(original, "en") : original;
+      if (!containsHan(original)) return original;
+      const mapped = translateByMap(original, "en");
+      const cached = getCachedAiTranslation(original, "en");
+      return cached || mapped;
     }
     return containsHan(original) ? original : translateByMap(original, "zh");
+  }
+
+  function canUseAiTranslation(targetLang) {
+    return (
+      targetLang === "en" &&
+      currentLang === "en" &&
+      window.isSecureContext &&
+      typeof window.Translator !== "undefined"
+    );
+  }
+
+  async function getAiTranslator(targetLang) {
+    if (!canUseAiTranslation(targetLang)) return null;
+    if (!translatorPromise) {
+      translatorPromise = (async () => {
+        try {
+          const availability = await window.Translator.availability({
+            sourceLanguage: "zh",
+            targetLanguage: "en"
+          });
+          if (availability === "unavailable") return null;
+          return window.Translator.create({
+            sourceLanguage: "zh",
+            targetLanguage: "en"
+          });
+        } catch (error) {
+          return null;
+        }
+      })();
+    }
+    return translatorPromise;
+  }
+
+  function scheduleAiRefresh() {
+    if (aiRefreshTimer || currentLang !== "en") return;
+    aiRefreshTimer = window.setTimeout(() => {
+      aiRefreshTimer = null;
+      applyLanguage();
+    }, 60);
+  }
+
+  function queueAiTranslation(original, targetLang) {
+    if (!original || typeof original !== "string") return;
+    if (!containsHan(original) || !canUseAiTranslation(targetLang)) return;
+    const cacheKey = getAiCacheKey(original, targetLang);
+    if (aiTranslationCache.has(cacheKey) || pendingAiTranslations.has(cacheKey)) return;
+
+    const task = (async () => {
+      const translator = await getAiTranslator(targetLang);
+      if (!translator) return;
+      try {
+        const translated = await translator.translate(original);
+        if (!translated || translated === original) return;
+        setCachedAiTranslation(original, targetLang, translated);
+        scheduleAiRefresh();
+      } catch (error) {
+        // Ignore individual translation failures and keep the map-based fallback.
+      }
+    })().finally(() => {
+      pendingAiTranslations.delete(cacheKey);
+    });
+
+    pendingAiTranslations.set(cacheKey, task);
   }
 
   function storeAttributeOriginal(element, attr, value) {
@@ -701,12 +1317,21 @@
     return record && attr in record ? record[attr] : element.getAttribute(attr);
   }
 
+  function isTranslatableControl(element) {
+    if (!element || !element.tagName) return false;
+    const tag = element.tagName;
+    if (tag === "TEXTAREA") return true;
+    if (tag !== "INPUT") return false;
+    const type = (element.getAttribute("type") || "text").toLowerCase();
+    return ["text", "search", "email", "url", "tel"].includes(type);
+  }
+
   function shouldSkipNode(node) {
     let current = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
     while (current) {
       if (current.hasAttribute && current.hasAttribute(IGNORE_ATTR)) return true;
       const tag = current.tagName;
-      if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA" || tag === "CODE" || tag === "PRE") return true;
+      if (tag === "SCRIPT" || tag === "STYLE" || tag === "CODE" || tag === "PRE") return true;
       current = current.parentElement;
     }
     return false;
@@ -727,6 +1352,7 @@
     const original = textNodeOriginals.get(textNode);
     const translated = translateText(original, currentLang);
     if (translated !== textNode.nodeValue) textNode.nodeValue = translated;
+    queueAiTranslation(original, currentLang);
   }
 
   function processAttributes(element) {
@@ -744,7 +1370,25 @@
       const original = getAttributeOriginal(element, attr);
       const translated = translateText(original, currentLang);
       if (translated !== element.getAttribute(attr)) element.setAttribute(attr, translated);
+      queueAiTranslation(original, currentLang);
     });
+
+    if (isTranslatableControl(element)) {
+      const currentValue = element.value;
+      if (currentValue) {
+        storeAttributeOriginal(element, "value", currentValue);
+        const knownOriginal = getAttributeOriginal(element, "value");
+        const renderedKnownValue = translateText(knownOriginal, currentLang);
+        if (currentValue !== knownOriginal && currentValue !== renderedKnownValue) {
+          const record = attributeOriginals.get(element);
+          record.value = currentValue;
+        }
+        const original = getAttributeOriginal(element, "value");
+        const translated = translateText(original, currentLang);
+        if (translated !== element.value) element.value = translated;
+        queueAiTranslation(original, currentLang);
+      }
+    }
   }
 
   function processSubtree(root) {
@@ -772,6 +1416,11 @@
     processSubtree(document.querySelector("title"));
     processSubtree(document.body);
     updateSettingsPanel();
+    document.dispatchEvent(
+      new CustomEvent("hubitos:languagechange", {
+        detail: { lang: currentLang }
+      })
+    );
   }
 
   function injectStyles() {
@@ -940,12 +1589,15 @@
         </div>
       </div>
     `;
-    panel.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-lang]");
-      if (!button) return;
-      setLanguage(button.dataset.lang);
-      closeSettingsPanel();
-    });
+      panel.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-lang]");
+        if (!button) return;
+        const lang = button.dataset.lang === "zh" ? "zh" : "en";
+        writeStoredLanguage(lang);
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", lang);
+        window.location.href = url.toString();
+      });
     document.addEventListener(
       "click",
       (event) => {
@@ -977,6 +1629,20 @@
     writeStoredLanguage(currentLang);
     applyLanguage();
     if (!options || options.broadcast !== false) broadcastLanguage(currentLang);
+  }
+
+  function translateDeep(value, targetLang) {
+    const lang = targetLang === "zh" || targetLang === "en" ? targetLang : currentLang;
+    if (typeof value === "string") return translateText(value, lang);
+    if (Array.isArray(value)) return value.map((item) => translateDeep(item, lang));
+    if (value && typeof value === "object") {
+      const next = {};
+      Object.keys(value).forEach((key) => {
+        next[key] = translateDeep(value[key], lang);
+      });
+      return next;
+    }
+    return value;
   }
 
   function observeDom() {
@@ -1013,17 +1679,27 @@
     window.__hubitosAlertPatched = true;
     const nativeAlert = window.alert.bind(window);
     window.alert = function (message) {
-      nativeAlert(translateByMap(String(message), currentLang));
+      nativeAlert(translateText(String(message), currentLang));
     };
   }
 
   function init() {
+    loadAiCache();
     injectStyles();
     ensureBroadcast();
     ensureSettingsPanel();
     patchAlert();
     observeDom();
     applyLanguage();
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("lang")) {
+        url.searchParams.delete("lang");
+        window.history.replaceState({}, "", url.toString());
+      }
+    } catch (error) {
+      // Ignore URL normalization failures.
+    }
     window.addEventListener("storage", (event) => {
       if (event.key !== STORAGE_KEY) return;
       const nextLang = event.newValue === "zh" ? "zh" : "en";
@@ -1038,8 +1714,20 @@
       return currentLang;
     },
     setLanguage,
+    refresh() {
+      applyLanguage();
+    },
+    openSettings() {
+      openSettingsPanel();
+    },
+    closeSettings() {
+      closeSettingsPanel();
+    },
     translate(text) {
-      return translateByMap(String(text), currentLang);
+      return translateText(String(text), currentLang);
+    },
+    translateDeep(value, targetLang) {
+      return translateDeep(value, targetLang);
     }
   };
 

@@ -218,6 +218,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
   </head>
   <body class="text-on-surface">
     <div class="files-shell">
@@ -226,20 +227,24 @@
 
     <header class="hubitos-shell-header fixed top-4 z-30 flex items-center justify-between border-b border-[#edd6d1]/70 bg-[#fcf9f8]/86 px-8 py-0 backdrop-blur-xl">
       <div class="market-tabs" id="libraryTabs">
-        <button data-scope="all" class="market-tab active" type="button">All Files</button>
-        <button data-scope="recent" class="market-tab" type="button">Recent</button>
-        <button data-scope="generated" class="market-tab" type="button">Generated</button>
-        <button data-scope="favorites" class="market-tab" type="button">Favorites</button>
-        <button data-scope="trash" class="market-tab" type="button">Trash</button>
+        <button data-scope="all" class="market-tab active" type="button">全部文件</button>
+        <button data-scope="recent" class="market-tab" type="button">最近使用</button>
+        <button data-scope="generated" class="market-tab" type="button">AI 生成</button>
+        <button data-scope="favorites" class="market-tab" type="button">收藏</button>
+        <button data-scope="trash" class="market-tab" type="button">回收站</button>
       </div>
       <div class="flex items-center gap-4">
         <div class="toolbar-search">
-          <input id="searchInput" placeholder="Search AI assets..." type="text" />
+          <input id="searchInput" placeholder="搜索文件、图片或 AI 产出..." type="text" />
           <span class="material-symbols-outlined">search</span>
         </div>
+        <button id="newFolderBtnTop" class="flex items-center gap-2 rounded-full bg-surface-container-high px-5 py-2.5 text-sm font-bold text-on-surface shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all hover:bg-surface-container">
+          <span class="material-symbols-outlined text-lg">create_new_folder</span>
+          新建文件夹
+        </button>
         <button id="uploadBtn" class="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(181,12,8,0.1)] transition-all hover:bg-primary/90">
           <span class="material-symbols-outlined text-lg">upload</span>
-          Upload File
+          上传文件
         </button>
         <button class="rounded-full p-2 text-on-surface-variant transition-all hover:bg-tertiary-fixed">
           <span class="material-symbols-outlined">notifications</span>
@@ -254,7 +259,10 @@
       <section class="flex min-w-0 flex-1 flex-col">
         <header class="mb-5">
           <div class="flex items-end justify-between">
-            <div class="flex flex-wrap items-center gap-2" id="tagFilters"></div>
+            <div>
+              <div class="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-on-surface-variant/50">自动沉淀中心</div>
+              <div class="text-sm text-on-surface-variant">所有在 Hubitos 中生成、上传和继续编辑的文档都会自动保存在这里，并可归档到文件夹继续学习。</div>
+            </div>
             <div class="flex gap-2 rounded-full bg-surface-container-high p-1">
               <button id="gridViewBtn" class="rounded-full bg-white p-2 text-primary shadow-sm">
                 <span class="material-symbols-outlined text-lg">grid_view</span>
@@ -264,14 +272,15 @@
               </button>
             </div>
           </div>
+          <div class="mt-4 flex flex-wrap items-center gap-2" id="tagFilters"></div>
         </header>
 
         <div id="folderCards" class="mb-4 grid grid-cols-4 gap-4"></div>
 
         <div class="custom-scrollbar flex-1 space-y-6 overflow-y-auto pb-12 pr-2">
           <div class="flex items-center justify-between">
-            <h4 id="sectionTitle" class="text-xs font-black uppercase tracking-[0.1em] text-on-surface-variant/60">Recent Outputs</h4>
-            <button id="clearTrashBtn" class="hidden text-xs font-bold text-primary">Empty Trash</button>
+            <h4 id="sectionTitle" class="text-xs font-black uppercase tracking-[0.1em] text-on-surface-variant/60">最近产出</h4>
+            <button id="clearTrashBtn" class="hidden text-xs font-bold text-primary">清空回收站</button>
           </div>
 
           <div id="filesGrid" class="grid grid-cols-2 gap-4"></div>
@@ -283,7 +292,7 @@
           <div class="flex flex-1 flex-col overflow-hidden rounded-[2.2rem] bg-white shadow-sm">
             <div class="border-b border-surface-container-low p-6">
               <div class="mb-4 flex items-center justify-between">
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Selected</span>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">学习入口</span>
                 <div class="flex gap-1">
                   <button id="closePreviewBtn" class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-low transition-colors hover:bg-primary-fixed">
                     <span class="material-symbols-outlined text-lg">close</span>
@@ -300,27 +309,31 @@
 
             <div class="custom-scrollbar flex-1 space-y-6 overflow-y-auto p-6">
               <div class="space-y-3">
-                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">Document Snippet</label>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">文档片段</label>
                 <div id="previewSnippet" class="rounded-2xl border border-dashed border-outline-variant/30 bg-surface-container-low/50 p-4 text-[13px] italic leading-relaxed text-on-surface-variant">
                   "The visual direction for the upcoming campaign leans toward minimalist brutalism, using a sharp contrast between Hubitos deep red and pure white. This version has been adjusted based on the creative director's spacing feedback..."
                 </div>
               </div>
 
               <div class="space-y-3">
-                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">Skills / MCP Used</label>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40">学习工具 / 关联能力</label>
                 <div id="insightList" class="space-y-2"></div>
               </div>
             </div>
 
             <div class="border-t border-surface-container-low bg-surface-container-lowest p-5">
-              <button id="aiEditBtn" class="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-bold text-white shadow-[0_16px_24px_rgba(181,12,8,0.15)] transition-transform active:scale-[0.98]">
+              <button id="openStudyBtn" class="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-bold text-white shadow-[0_16px_24px_rgba(181,12,8,0.15)] transition-transform active:scale-[0.98]">
+                <span class="material-symbols-outlined text-lg">school</span>
+                进入学习详情页
+              </button>
+              <button id="aiEditBtn" class="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-surface-container-high py-3.5 text-sm font-bold text-on-surface transition-transform active:scale-[0.98]">
                 <span class="material-symbols-outlined text-lg">smart_toy</span>
-                Edit with AI
+                用 AI 继续编辑
               </button>
               <div class="mt-3 grid grid-cols-2 gap-3">
                 <button id="exportBtn" class="flex items-center justify-center gap-2 rounded-full bg-surface-container-high py-2.5 text-xs font-bold text-on-surface">
                   <span class="material-symbols-outlined text-sm">download</span>
-                  Export
+                  导出
                 </button>
                 <button id="deleteBtn" class="flex items-center justify-center gap-2 rounded-full bg-surface-container-high py-2.5 text-xs font-bold text-on-surface">
                   <span id="deleteIcon" class="material-symbols-outlined text-sm">delete</span>
@@ -334,6 +347,7 @@
     </main>
     </div>
     </div>
+    <input id="uploadInput" class="hidden" type="file" multiple />
     <script src="../shared/i18n.js"></script>
     <script src="../shared/sidebar.js"></script>
     <script>
@@ -341,11 +355,12 @@
         active: "files",
         fixed: true,
         showHistory: true,
-        historyTitle: "History",
+        historyTitle: "最近对话",
         historyContainerId: "historyList",
-        primaryLabel: "+ New Chat",
+        primaryLabel: "+ 新建对话",
         primaryId: "newConversationBtn",
         chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
         projectsHref: "../projects/projects-center.html",
         filesHref: "./files-center.html",
         agentsHref: "../agents/agents-center.html",
@@ -354,23 +369,50 @@
       });
     </script>
     <script>
-      const state = {
+      const STORAGE_KEY = "hubitos-files-center-store-v2";
+      const DEFAULT_DATA = {
         view: "grid",
         scope: "all",
         search: "",
         tag: "all",
-        selectedFileId: "file-docx-1",
+        selectedFileId: "file-prd-lesson-1",
         folders: [
-          { id: "assets", name: "My Assets", count: 1204, size: "4.2 GB", icon: "folder", tone: "primary", scope: "all" },
-          { id: "drafts", name: "Drafts", count: 4, size: "12 MB", icon: "drafts", tone: "neutral", scope: "generated" },
-          { id: "favorites", name: "Favorites", count: 18, size: "302 MB", icon: "star", tone: "neutral", scope: "favorites" }
+          { id: "auto-save", name: "自动保存", count: 5, size: "4.2 GB", icon: "folder_managed", tone: "primary", scope: "all" },
+          { id: "courseware", name: "学习课件", count: 2, size: "182 MB", icon: "school", tone: "neutral", scope: "recent" },
+          { id: "uploads", name: "手动上传", count: 1, size: "14.8 MB", icon: "upload_file", tone: "neutral", scope: "all" },
+          { id: "favorites", name: "收藏", count: 2, size: "302 MB", icon: "star", tone: "neutral", scope: "favorites" }
         ],
         tags: ["all", "Documents", "Images", "Tables", "Uploads", "Agents", "Skills"],
         files: [
           {
+            id: "file-prd-lesson-1",
+            name: "Hubitos_MVP1_Desktop_PRD_学习版.md",
+            size: "268 KB",
+            sizeBytes: 268 * 1024,
+            type: "Documents",
+            scope: "recent",
+            favorite: true,
+            trashed: false,
+            source: "AI 自动沉淀",
+            sourceTone: "primary",
+            sourceIcon: "auto_awesome",
+            folderId: "courseware",
+            folder: "学习课件",
+            tags: ["Documents", "Agents", "Skills"],
+            createdAt: "Today, 09:18",
+            engine: "Hubitos Pro",
+            previewMode: "icon",
+            previewIcon: "description",
+            previewIconTone: "primary",
+            snippet:
+              "\"这份学习版 PRD 已按『问题背景 - 用户目标 - 页面结构 - 功能闭环 - 风险』重组，适合直接作为产品课件阅读和追问。\"",
+            insights: ["学习模式 · PRD 课件", "AI 问答 · 概念解释", "笔记工具 · 结构笔记", "学习辅助 · 汇报提纲"]
+          },
+          {
             id: "file-pdf-1",
             name: "Q4 Market Analysis - Tokyo.pdf",
             size: "2.4 MB",
+            sizeBytes: Math.round(2.4 * 1024 * 1024),
             type: "Documents",
             scope: "generated",
             favorite: false,
@@ -378,7 +420,8 @@
             source: "Generated by Agent X",
             sourceTone: "primary",
             sourceIcon: "auto_awesome",
-            folder: "My Assets",
+            folderId: "auto-save",
+            folder: "自动保存",
             tags: ["Documents", "Agents"],
             createdAt: "Oct 24, 14:22",
             engine: "Agent X - Creative",
@@ -387,12 +430,13 @@
               "https://lh3.googleusercontent.com/aida-public/AB6AXuDalGzNWHoAZGHpx01Um9V-ck0We6af-uvrL7tqQXelXV76Y0EDEHSeBqB7WB5gwvsstKg7qv9r6dOnvFoVjYukfxCAoxyyN0h-ge7H4E1X__RnNpRMPpRlxg0fSxgttuDebtn1Eozn4v8RGrq2LVYPuPaNoB_tfIMvvM4VEveQlN3x0q4Gr8WHE2Reu9U_hHlIaDVfJBUEsCjsrd5riCofPhg8zUFjGieNGB0nby5cPzuvWm4A64KoDPHKxr9JrIvY5U6I-Z8umbY",
             snippet:
               "\"The Tokyo market analysis has been captured as a quarterly insight report, including trend assessment, competitor moves, and recommendation priorities. It can be turned into a presentation PDF or a chat summary next.\"",
-            insights: ["Skill · Market Analysis Summary", "Skill · Report Structure Refinement", "MCP · Cloud Document Export"]
+            insights: ["学习模式 · 竞品分析", "AI 问答 · 文档理解", "笔记工具 · 重点摘录"]
           },
           {
             id: "file-docx-1",
             name: "Brand Identity Proposal v2.docx",
             size: "450 KB",
+            sizeBytes: 450 * 1024,
             type: "Documents",
             scope: "recent",
             favorite: true,
@@ -400,7 +444,8 @@
             source: "From Chat #102",
             sourceTone: "tertiary",
             sourceIcon: "chat_bubble",
-            folder: "My Assets",
+            folderId: "courseware",
+            folder: "学习课件",
             tags: ["Documents"],
             createdAt: "Oct 24, 14:22",
             engine: "GPT-4o MINI",
@@ -409,56 +454,61 @@
             previewIconTone: "primary",
             snippet:
               "\"The visual direction for the upcoming campaign leans toward minimalist brutalism, using a sharp contrast between Hubitos deep red and pure white. This version has been adjusted based on the creative director's spacing feedback.\"",
-            insights: ["Skill · PRD Writing Assistant", "Skill · Document Polish", "MCP · Word Export Service"]
+            insights: ["学习模式 · 课件阅读", "AI 问答 · 段落追问", "笔记工具 · 学习笔记"]
           },
           {
             id: "file-xlsx-1",
             name: "Legal Compliance Matrix.xlsx",
             size: "1.1 MB",
+            sizeBytes: Math.round(1.1 * 1024 * 1024),
             type: "Tables",
             scope: "generated",
             favorite: false,
             trashed: false,
-            source: "Generated via Skill",
+            source: "通过技能生成",
             sourceTone: "primary",
             sourceIcon: "auto_awesome",
-            folder: "Drafts",
+            folderId: "auto-save",
+            folder: "自动保存",
             tags: ["Tables", "Skills"],
             createdAt: "Oct 23, 18:40",
-            engine: "Skill Pipeline",
+            engine: "技能流程",
             previewMode: "image",
             previewImage:
               "https://lh3.googleusercontent.com/aida-public/AB6AXuCUqL1fNULqvTiIL8YxePBYZaOI7C0jZ8JX5zVPAHJzaScI7eUiOiUBijUOHV9GG90pJ5nh3jTiVFWC9WBL3p2_uD_fzD0UXVNBoVu_6-r5hny2eluTAYQhOFGzG58jiJl95Zext8BdH9cfZO4aH2wa0kFwoPvsqkkoBu7PaYX8AJBh79PcrsZ-TOo2MTWZIxJn5T41ol9k_47EjMLGC7bdWMd26mCyXVL5N-eTCWgwq3HhDx7N4V2SzYmL40xgTD5IqZO3P7qO8Lw",
             snippet:
               "\"The sheet has been structured by risk level, compliance line, and responsible team. It can be exported to Excel or summarized into a weekly report.\"",
-            insights: ["Skill · Table Structuring", "Skill · Risk Level Classification", "MCP · Excel Renderer"]
+            insights: ["学习模式 · 表格课件", "AI 问答 · 数据解释", "笔记工具 · 结论摘录"]
           },
           {
             id: "file-csv-1",
             name: "Raw Competitor Data.csv",
             size: "14.8 MB",
+            sizeBytes: Math.round(14.8 * 1024 * 1024),
             type: "Uploads",
             scope: "all",
             favorite: false,
             trashed: false,
-            source: "External Upload",
+            source: "手动上传",
             sourceTone: "neutral",
             sourceIcon: "upload",
-            folder: "My Assets",
+            folderId: "uploads",
+            folder: "手动上传",
             tags: ["Tables", "Uploads"],
             createdAt: "Oct 22, 11:10",
-            engine: "Manual Upload",
+            engine: "手动上传",
             previewMode: "icon",
             previewIcon: "attachment",
             previewIconTone: "tertiary",
             snippet:
               "\"This CSV has been imported to the cloud. You can continue with AI-powered cleaning, classification, comparative analysis, and convert it into charts or reports.\"",
-            insights: ["Skill · Data Cleaning", "Skill · Competitor Comparison Generation", "MCP · CSV Parsing Connector"]
+            insights: ["学习模式 · 数据复盘", "AI 问答 · 结构提取", "笔记工具 · 重点字段"]
           },
           {
             id: "file-md-1",
             name: "Hubitos_AI_OS_PRD.md",
             size: "182 KB",
+            sizeBytes: 182 * 1024,
             type: "Documents",
             scope: "recent",
             favorite: true,
@@ -466,7 +516,8 @@
             source: "From Chat #128",
             sourceTone: "tertiary",
             sourceIcon: "chat_bubble",
-            folder: "My Assets",
+            folderId: "courseware",
+            folder: "学习课件",
             tags: ["Documents", "Uploads"],
             createdAt: "Oct 25, 09:30",
             engine: "Hubitos Pro",
@@ -475,12 +526,37 @@
             previewIconTone: "primary",
             snippet:
               "\"The PRD already includes project overview, feature architecture, roadmap, and business model sections. You can keep editing with AI or export to Word.\"",
-            insights: ["Skill · PRD Expansion", "Skill · Deck Rewrite", "MCP · Document Storage Connector"]
+            insights: ["学习模式 · 产品学习", "AI 问答 · PRD 理解", "笔记工具 · 结构笔记"]
+          },
+          {
+            id: "file-pptx-1",
+            name: "增长复盘课件 Q3.pptx",
+            size: "8.6 MB",
+            sizeBytes: Math.round(8.6 * 1024 * 1024),
+            type: "Documents",
+            scope: "recent",
+            favorite: false,
+            trashed: false,
+            source: "Generated by Agent X",
+            sourceTone: "primary",
+            sourceIcon: "auto_awesome",
+            folderId: "courseware",
+            folder: "学习课件",
+            tags: ["Documents", "Agents"],
+            createdAt: "Yesterday, 18:42",
+            engine: "Deck Writer",
+            previewMode: "icon",
+            previewIcon: "slideshow",
+            previewIconTone: "tertiary",
+            snippet:
+              "\"这份课件沉淀了 Q3 的增长实验、投放结论和下一季度优先级，适合边看边问 AI 为什么这么判断。\"",
+            insights: ["学习模式 · 复盘课件", "AI 问答 · 结论追问", "笔记工具 · 行动项整理"]
           },
           {
             id: "file-trash-1",
             name: "Legacy Market Summary.pdf",
             size: "980 KB",
+            sizeBytes: 980 * 1024,
             type: "Documents",
             scope: "trash",
             favorite: false,
@@ -488,7 +564,8 @@
             source: "Trashed File",
             sourceTone: "neutral",
             sourceIcon: "delete",
-            folder: "Trash",
+            folderId: "trash",
+            folder: "回收站",
             tags: ["Documents"],
             createdAt: "Oct 18, 10:08",
             engine: "Legacy Asset",
@@ -496,14 +573,18 @@
             previewIcon: "picture_as_pdf",
             previewIconTone: "primary",
             snippet: "\"This file is in the trash and can be restored or permanently deleted.\"",
-            insights: ["Skill · Trash Recovery Check", "MCP · File Audit Log"]
+            insights: ["回收站恢复", "删除审计记录"]
           }
         ]
       };
 
+      const state = loadState();
+
       const refs = {
         searchInput: document.getElementById("searchInput"),
         uploadBtn: document.getElementById("uploadBtn"),
+        uploadInput: document.getElementById("uploadInput"),
+        newFolderBtnTop: document.getElementById("newFolderBtnTop"),
         gridViewBtn: document.getElementById("gridViewBtn"),
         listViewBtn: document.getElementById("listViewBtn"),
         folderCards: document.getElementById("folderCards"),
@@ -517,6 +598,7 @@
         previewBadges: document.getElementById("previewBadges"),
         previewSnippet: document.getElementById("previewSnippet"),
         insightList: document.getElementById("insightList"),
+        openStudyBtn: document.getElementById("openStudyBtn"),
         aiEditBtn: document.getElementById("aiEditBtn"),
         exportBtn: document.getElementById("exportBtn"),
         deleteBtn: document.getElementById("deleteBtn"),
@@ -532,6 +614,64 @@
           .replaceAll(">", "&gt;")
           .replaceAll('"', "&quot;")
           .replaceAll("'", "&#39;");
+      }
+
+      function loadState() {
+        try {
+          const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "null");
+          if (!saved) return structuredClone(DEFAULT_DATA);
+          const merged = {
+            ...structuredClone(DEFAULT_DATA),
+            ...saved,
+            folders: Array.isArray(saved.folders) ? saved.folders : structuredClone(DEFAULT_DATA.folders),
+            files: Array.isArray(saved.files) ? saved.files : structuredClone(DEFAULT_DATA.files)
+          };
+          const existingIds = new Set((merged.files || []).map((item) => item.id));
+          for (const file of DEFAULT_DATA.files) {
+            if (!existingIds.has(file.id)) merged.files.push(file);
+          }
+          const existingFolderIds = new Set((merged.folders || []).map((item) => item.id));
+          for (const folder of DEFAULT_DATA.folders) {
+            if (!existingFolderIds.has(folder.id)) merged.folders.push(folder);
+          }
+          return merged;
+        } catch (error) {
+          return structuredClone(DEFAULT_DATA);
+        }
+      }
+
+      function saveState() {
+        recalcFolders();
+        window.localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            view: state.view,
+            scope: state.scope,
+            search: state.search,
+            tag: state.tag,
+            selectedFileId: state.selectedFileId,
+            folders: state.folders,
+            files: state.files
+          })
+        );
+      }
+
+      function formatSize(bytes) {
+        if (!bytes || bytes < 1024) return `${bytes || 0} B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+
+      function recalcFolders() {
+        state.folders = state.folders.map((folder) => {
+          const files = state.files.filter((file) => !file.trashed && file.folderId === folder.id);
+          const totalBytes = files.reduce((sum, file) => sum + Number(file.sizeBytes || 0), 0);
+          return {
+            ...folder,
+            count: files.length,
+            size: formatSize(totalBytes)
+          };
+        });
       }
 
       function getVisibleFiles() {
@@ -558,6 +698,7 @@
       }
 
       function renderFolders() {
+        recalcFolders();
         refs.folderCards.innerHTML =
           state.folders
             .map((folder) => `
@@ -571,12 +712,12 @@
             `)
             .join("") +
           `
-            <button id="newFolderBtn" class="group flex cursor-pointer flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-outline-variant/40 bg-surface-container-low/40 p-4 text-on-surface-variant transition-all hover:border-primary/40 hover:bg-primary-fixed/20" type="button">
-              <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-primary">
-                <span class="material-symbols-outlined">add</span>
-              </div>
-              <span class="text-[11px] font-bold">New Folder</span>
-            </button>
+              <button id="newFolderBtn" class="group flex cursor-pointer flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-outline-variant/40 bg-surface-container-low/40 p-4 text-on-surface-variant transition-all hover:border-primary/40 hover:bg-primary-fixed/20" type="button">
+                <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-primary">
+                  <span class="material-symbols-outlined">add</span>
+                </div>
+                <span class="text-[11px] font-bold">New Folder</span>
+              </button>
           `;
       }
 
@@ -664,7 +805,7 @@
         refs.previewSnippet.textContent = file.snippet;
         refs.insightList.innerHTML = file.insights
           .map(
-            (item, index) => `
+            (item) => `
               <div class="flex items-center gap-3 rounded-xl border border-outline-variant/20 bg-white p-3">
                 <span class="material-symbols-outlined text-lg text-primary">${item.startsWith("MCP") ? "extension" : "bolt"}</span>
                 <span class="text-xs font-medium text-on-surface">${item}</span>
@@ -731,16 +872,18 @@
         }
         const newFolder = event.target.closest("#newFolderBtn");
         if (newFolder) {
-          const index = state.folders.length + 1;
+          const name = window.prompt("新文件夹名称", `新文件夹 ${state.folders.length + 1}`);
+          if (!name) return;
           state.folders.push({
             id: `folder-${Date.now()}`,
-            name: `New Folder ${index}`,
+            name: name.trim(),
             count: 0,
             size: "0 MB",
             icon: "folder",
             tone: "primary",
             scope: "all"
           });
+          saveState();
           renderFolders();
         }
       });
@@ -749,41 +892,75 @@
         const fileButton = event.target.closest("[data-file-id]");
         if (!fileButton) return;
         state.selectedFileId = fileButton.dataset.fileId;
-        renderFiles();
-        renderPreview();
+        saveState();
+        window.location.href = `./files-study-detail.html?id=${encodeURIComponent(state.selectedFileId)}`;
       });
 
-      refs.uploadBtn.addEventListener("click", () => {
-        const uploaded = {
-          id: `upload-${Date.now()}`,
-          name: `Uploaded_File_${state.files.length + 1}.pdf`,
-          size: "860 KB",
-          type: "Uploads",
+      function createUploadedFile(file) {
+        const ext = file.name.split(".").pop()?.toLowerCase() || "";
+        const type = ["csv", "xlsx", "xls"].includes(ext) ? "Tables" : ext === "png" || ext === "jpg" || ext === "jpeg" || ext === "webp" ? "Images" : "Documents";
+        return {
+          id: `upload-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+          name: file.name,
+          size: formatSize(file.size),
+          sizeBytes: file.size,
+          type,
           scope: "recent",
           favorite: false,
           trashed: false,
-          source: "External Upload",
+          source: "手动上传",
           sourceTone: "neutral",
           sourceIcon: "upload",
-          folder: "My Assets",
-          tags: ["Uploads", "Documents"],
+          folderId: "uploads",
+          folder: "手动上传",
+          tags: ["Uploads", type],
           createdAt: "Today, just now",
           engine: "Manual Upload",
           previewMode: "icon",
-          previewIcon: "picture_as_pdf",
+          previewIcon: type === "Images" ? "image" : type === "Tables" ? "table_chart" : "description",
           previewIconTone: "primary",
-          snippet: "\"The newly uploaded file is now in the cloud folder. You can keep using AI for summarizing, rewriting, translating, or structuring the output.\"",
-          insights: ["Summarize content", "Generate PRD", "Continue with AI editing"]
+          snippet: "\"新上传的文档已自动保存到文件中心。你可以把它作为课件继续学习、提问、做笔记。\"",
+          insights: ["学习模式 · 文档问答", "笔记工具 · 学习摘录", "AI 工具 · 总结与改写"]
         };
-        state.files.unshift(uploaded);
-        state.selectedFileId = uploaded.id;
+      }
+
+      refs.uploadBtn.addEventListener("click", () => refs.uploadInput.click());
+      refs.uploadInput.addEventListener("change", (event) => {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+        const uploaded = files.map(createUploadedFile);
+        state.files.unshift(...uploaded);
+        state.selectedFileId = uploaded[0].id;
         state.scope = "recent";
+        saveState();
         render();
+        event.target.value = "";
+      });
+
+      refs.newFolderBtnTop.addEventListener("click", () => {
+        const name = window.prompt("新文件夹名称", `学习资料 ${state.folders.length + 1}`);
+        if (!name) return;
+        state.folders.push({
+          id: `folder-${Date.now()}`,
+          name: name.trim(),
+          count: 0,
+          size: "0 MB",
+          icon: "folder",
+          tone: "primary",
+          scope: "all"
+        });
+        saveState();
+        renderFolders();
       });
 
       refs.aiEditBtn.addEventListener("click", () => {
         const file = getSelectedFile();
         alert(`Moved "${file.name}" into the AI editing flow.`);
+      });
+
+      refs.openStudyBtn.addEventListener("click", () => {
+        const file = getSelectedFile();
+        window.location.href = `./files-study-detail.html?id=${encodeURIComponent(file.id)}`;
       });
 
       refs.exportBtn.addEventListener("click", () => {
@@ -800,12 +977,14 @@
           file.trashed = true;
           state.scope = "trash";
         }
+        saveState();
         render();
       });
 
       refs.clearTrashBtn.addEventListener("click", () => {
         state.files = state.files.filter((file) => !file.trashed);
         state.scope = "all";
+        saveState();
         render();
       });
 
@@ -818,6 +997,7 @@
         renderFiles();
       });
 
+      saveState();
       render();
     </script>
   </body>

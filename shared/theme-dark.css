@@ -1,0 +1,374 @@
+:root {
+  --bg: #f5f3ee;
+  --window: #fcfbf7;
+  --panel: rgba(255, 255, 255, 0.94);
+  --panel-soft: rgba(249, 247, 242, 0.92);
+  --panel-strong: #ffffff;
+  --card: rgba(255, 255, 255, 0.98);
+  --line: rgba(17, 17, 17, 0.08);
+  --line-strong: rgba(17, 17, 17, 0.14);
+  --text: #171717;
+  --muted: #737373;
+  --brand: #cadbbb;
+  --brand-deep: #b9d1a5;
+  --brand-soft: rgba(202, 219, 187, 0.24);
+  --brand-soft-strong: rgba(202, 219, 187, 0.34);
+  --success: #77a25d;
+  --warning: #171717;
+  --accent: #efeee9;
+  --ink: #171717;
+  --mint: #cadbbb;
+  --amber: #171717;
+  --hubitos-brand: #171717;
+  --hubitos-line: rgba(17, 17, 17, 0.08);
+  --shadow: 0 20px 50px rgba(20, 20, 20, 0.06);
+  --soft-shadow: 0 10px 24px rgba(20, 20, 20, 0.04);
+}
+
+html,
+body {
+  color: var(--text) !important;
+  background: linear-gradient(180deg, #f8f6f0 0%, #f2f0ea 100%) !important;
+}
+
+html,
+body,
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #c9c6bf transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #c9c6bf;
+  border-radius: 999px;
+}
+
+body,
+button,
+input,
+textarea,
+select,
+a {
+  color: var(--text);
+}
+
+a {
+  color: #111111;
+}
+
+::placeholder {
+  color: #b9b6b0 !important;
+}
+
+.app-window,
+.files-window {
+  background: linear-gradient(180deg, #fcfbf7 0%, #faf8f3 100%) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.home-shell,
+.chat-shell,
+.workflow-shell,
+.hermes-shell,
+.projects-shell,
+.agents-shell,
+.detail-shell,
+.tools-shell,
+.skills-shell,
+.mcp-shell,
+.files-shell {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+.hubitos-sidebar {
+  background: rgba(251, 250, 246, 0.88) !important;
+  border-right: 1px solid var(--hubitos-line) !important;
+}
+
+.hubitos-brand-name,
+.hubitos-nav-item.is-active,
+.history-item.active,
+.history-item:hover {
+  color: #171717 !important;
+}
+
+.hubitos-brand-subtitle,
+.hubitos-sidebar-title,
+.history-item,
+.hubitos-settings-link,
+.conversation-meta,
+.panel-kicker,
+.recent-title {
+  color: var(--muted) !important;
+}
+
+.hubitos-nav-item {
+  color: #6c6c6c !important;
+}
+
+.hubitos-nav-item.is-active {
+  background: #ece9e2 !important;
+  box-shadow: none !important;
+}
+
+.history-item.active,
+.history-item:hover {
+  background: #efede8 !important;
+}
+
+.hubitos-primary-action,
+.new-project-btn,
+.primary-pill,
+.primary-btn,
+.prompt-send,
+.workflow-action,
+.launch-btn,
+.subtle-btn.brand,
+#uploadBtn,
+#aiEditBtn {
+  color: #171717 !important;
+  background: var(--brand) !important;
+  box-shadow: none !important;
+}
+
+.ghost-pill,
+.ghost-btn,
+.subtle-btn,
+.workflow-secondary,
+.outline-btn,
+.filter-chip,
+.action-btn,
+.segment-btn,
+.seg-btn,
+.tool-chip,
+.tool-action,
+.icon-btn,
+.avatar-btn,
+#exportBtn,
+#deleteBtn,
+#listViewBtn,
+#gridViewBtn {
+  color: #2b2b2b !important;
+  background: #ffffff !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: none !important;
+}
+
+.icon-btn,
+.avatar-btn {
+  border-radius: 12px !important;
+}
+
+.topbar,
+.workflow-topbar,
+.home-topbar,
+.hermes-topbar,
+.hubitos-shell-header {
+  background: transparent !important;
+  border-bottom: 0 !important;
+  backdrop-filter: none;
+}
+
+.panel,
+.signal-panel,
+.workspace-card,
+.task-card,
+.hero-panel,
+.ops-panel,
+.stream-card,
+.entry-card,
+.workflow-card,
+.result-card,
+.chat-card,
+.form-card,
+.signal-item,
+.metric-card,
+.meta-card,
+.intro-meta-item,
+.stage-card,
+.account-card,
+.setting-row,
+.repair-policy-item,
+.project-card,
+.tool-card,
+.agent-card,
+.template-card,
+.skill-card,
+.library-card,
+.card,
+.glass-panel,
+.recent-section,
+.route-banner,
+.composer-wrap,
+.prompt-composer,
+.active-tool-bar,
+.result-list li,
+.drawer-bubble,
+.drawer-answer {
+  background: var(--panel) !important;
+  border-color: var(--line) !important;
+  color: var(--text) !important;
+  box-shadow: var(--soft-shadow) !important;
+}
+
+.topbar-kicker,
+.panel-kicker,
+.eyebrow,
+.hero-badge,
+.unit-badge,
+.queue-badge,
+.deliverable-badge,
+.running-status-pill,
+.workflow-status-badge,
+.assistant-tag,
+.status-pill,
+.compare-badge,
+.compare-stat,
+.active-tool-label {
+  background: var(--brand-soft) !important;
+  color: #4f5f42 !important;
+}
+
+.send-btn,
+.active-tool-btn,
+.compare-column.selected .compare-pick {
+  background: var(--brand) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.topbar,
+.home-topbar,
+.workflow-topbar,
+.hermes-topbar {
+  padding-top: 18px !important;
+  padding-bottom: 18px !important;
+}
+
+.market-tab,
+.category-tab,
+.workflow-tab,
+.seg-btn,
+.segment-btn,
+.category-chip,
+.filter-chip,
+.action-btn,
+.ghost-pill,
+.ghost-btn,
+.primary-btn,
+.primary-pill,
+.outline-btn,
+.context-toggle-btn {
+  border-radius: 10px !important;
+}
+
+.market-tab,
+.category-tab,
+.workflow-tab {
+  color: #7b7b7b !important;
+}
+
+.market-tab.active,
+.category-tab.active,
+.workflow-tab.active,
+.seg-btn.active,
+.segment-btn.active,
+.category-chip.active,
+.filter-chip.active {
+  color: #25301f !important;
+}
+
+.market-tab.active::after,
+.category-tab.active::after {
+  background: var(--brand) !important;
+}
+
+.search-shell input,
+.toolbar-search input,
+.form-grid input,
+.form-grid select,
+.input-like,
+.inline-output-select,
+.composer textarea {
+  border-color: var(--line) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.search-shell .icon,
+.toolbar-search .icon,
+.toolbar-search .material-symbols-outlined {
+  color: #949494 !important;
+}
+
+.page-header h1,
+.page-title,
+.detail-top h2,
+.workflow-head h3,
+.panel h2,
+.panel h3,
+h1,
+h2,
+h3 {
+  color: #171717 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.page-header p,
+.page-copy,
+.hero-copy,
+.card-copy,
+.repo-line,
+.topbar-copy,
+.workflow-card-meta,
+.workflow-card-foot,
+.conversation-meta {
+  color: #767676 !important;
+}
+
+.recent-item,
+.project-card,
+.workflow-card,
+.tool-card,
+.agent-card,
+.skill-card,
+.library-card,
+.template-card,
+.palette-card,
+.config-card,
+.workflow-node,
+.asset-card {
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid rgba(17, 17, 17, 0.05) !important;
+  box-shadow: none !important;
+}
+
+.avatar-btn,
+.hubitos-profile-avatar,
+.account-avatar,
+.assistant-badge,
+.active-tool-icon,
+.recent-item-icon {
+  box-shadow: none !important;
+}
+
+.avatar-btn,
+.hubitos-profile-avatar,
+.account-avatar {
+  background: linear-gradient(180deg, #f6dd85 0%, #e45f3d 100%) !important;
+  color: #171717 !important;
+}

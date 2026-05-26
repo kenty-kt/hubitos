@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>X 内容工作流详情</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+    <link rel="stylesheet" href="./workflows-x-publisher-detail.css" />
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="detail-shell">
+          <header class="hero-panel">
+            <a class="back-link" href="./workflows-home.html">← 返回工作流列表</a>
+            <div class="hero-top">
+              <div>
+                <span class="hero-kicker">X 内容自动化</span>
+                <h1>AI 内容产出并发布到 X</h1>
+                <p class="hero-copy">这是一个独立详情页工作流，用来把选题、AI 生成、审核、排期、发布和互动复盘串成一条完整链路，不会覆盖现有列表页内容。</p>
+              </div>
+              <div class="hero-status-card">
+                <div class="hero-status-label">当前状态</div>
+                <div class="hero-status-value">等待配置</div>
+                <div class="hero-status-note">第一步先完成 X 授权，授权后再补齐品牌语气、内容来源和发布时间窗。</div>
+              </div>
+            </div>
+          </header>
+
+          <section class="detail-grid single-column">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-kicker">基础配置</span>
+                  <h2>先把这些参数定下来</h2>
+                </div>
+              </div>
+              <div class="config-form" id="configForm">
+                <section class="auth-card" id="authCard">
+                  <div class="auth-copy">
+                    <span class="auth-kicker">第一步</span>
+                    <h3>授权发布平台</h3>
+                    <p>你可以连接多个目标平台。当前支持 X、Meta 和 LinkedIn，授权后工作流才能读取信号、生成发布队列并执行自动发布。</p>
+                  </div>
+                  <div class="platform-grid">
+                    <div class="platform-card">
+                      <div>
+                        <div class="platform-name">X</div>
+                        <div class="platform-copy">短帖、线程与互动信号</div>
+                      </div>
+                      <div class="auth-actions">
+                        <span class="auth-status" id="authStatusX">未授权</span>
+                        <button class="primary-pill" id="authorizeXBtn" type="button">授权 X</button>
+                      </div>
+                    </div>
+                    <div class="platform-card">
+                      <div>
+                        <div class="platform-name">Meta</div>
+                        <div class="platform-copy">Facebook / Instagram 内容发布</div>
+                      </div>
+                      <div class="auth-actions">
+                        <span class="auth-status" id="authStatusMeta">未授权</span>
+                        <button class="primary-pill" id="authorizeMetaBtn" type="button">授权 Meta</button>
+                      </div>
+                    </div>
+                    <div class="platform-card">
+                      <div>
+                        <div class="platform-name">LinkedIn</div>
+                        <div class="platform-copy">专业内容与品牌观点分发</div>
+                      </div>
+                      <div class="auth-actions">
+                        <span class="auth-status" id="authStatusLinkedin">未授权</span>
+                        <button class="primary-pill" id="authorizeLinkedinBtn" type="button">授权 LinkedIn</button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <label class="field">
+                  <span>增长目标</span>
+                  <span class="field-input-wrap">
+                    <input type="text" name="objective" placeholder="例如：涨粉、引流官网、获取 demo 预约" />
+                    <button class="field-generate-btn inside" type="button" data-generate-field="objective">一键生成</button>
+                  </span>
+                </label>
+                <label class="field">
+                  <span>内容主题</span>
+                  <span class="field-input-wrap">
+                    <input type="text" name="topic" placeholder="例如：AI agent、工作流自动化、独立开发" />
+                    <button class="field-generate-btn inside" type="button" data-generate-field="topic">一键生成</button>
+                  </span>
+                </label>
+                <label class="field">
+                  <span>目标受众</span>
+                  <span class="field-input-wrap textarea-wrap">
+                    <textarea name="audience" rows="4" placeholder="例如：海外 SaaS 创始人，关注效率、自动化和增长"></textarea>
+                    <button class="field-generate-btn inside textarea-btn" type="button" data-generate-field="audience">一键生成</button>
+                  </span>
+                </label>
+                <label class="field">
+                  <span>参考来源</span>
+                  <span class="field-input-wrap textarea-wrap">
+                    <textarea name="sources" rows="4" placeholder="例如：5 个竞品账号、2 个行业列表、官网博客、Notion 素材库"></textarea>
+                    <button class="field-generate-btn inside textarea-btn" type="button" data-generate-field="sources">一键生成</button>
+                  </span>
+                </label>
+                <label class="field">
+                  <span>发布时间窗</span>
+                  <span class="field-input-wrap">
+                    <input type="text" name="window" placeholder="例如：工作日 09:30 / 14:00 / 20:30" />
+                    <button class="field-generate-btn inside" type="button" data-generate-field="window">一键生成</button>
+                  </span>
+                </label>
+                <label class="field">
+                  <span>品牌语气</span>
+                  <span class="field-input-wrap textarea-wrap">
+                    <textarea name="tone" rows="4" placeholder="例如：专业、有观点、简洁、不夸张，不像机器人"></textarea>
+                    <button class="field-generate-btn inside textarea-btn" type="button" data-generate-field="tone">一键生成</button>
+                  </span>
+                </label>
+                <div class="form-actions">
+                  <button class="ghost-pill" id="saveDraftBtn" type="button">保存草稿</button>
+                  <button class="primary-pill" id="launchBtn" type="button">生成发布方案</button>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section class="detail-grid secondary">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-kicker">运行状态</span>
+                  <h2>部署状态</h2>
+                </div>
+              </div>
+              <div class="deployment-card">
+                <div class="deployment-row">
+                  <span class="deployment-label">工作流编排器</span>
+                  <span class="deployment-status live" id="orchestratorStatus">运行中</span>
+                </div>
+                <div class="deployment-row">
+                  <span class="deployment-label">内容生成服务</span>
+                  <span class="deployment-status standby" id="generationStatus">待命</span>
+                </div>
+                <div class="deployment-row">
+                  <span class="deployment-label">自动发布执行器</span>
+                  <span class="deployment-status pending" id="publisherStatus">等待授权</span>
+                </div>
+                <div class="deployment-foot" id="deploymentFoot">完成至少一个平台授权后，自动发布执行器会进入待发布准备状态。</div>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-kicker">资源消耗</span>
+                  <h2>Token 消耗</h2>
+                </div>
+              </div>
+              <div class="token-grid">
+                <div class="token-card">
+                  <div class="token-value" id="tokenUsedValue">0</div>
+                  <div class="token-label">本次已消耗</div>
+                </div>
+                <div class="token-card">
+                  <div class="token-value" id="tokenBudgetValue">24,000</div>
+                  <div class="token-label">预估预算</div>
+                </div>
+                <div class="token-card">
+                  <div class="token-value" id="tokenStageValue">待机中</div>
+                  <div class="token-label">当前阶段</div>
+                </div>
+              </div>
+              <div class="token-foot" id="tokenFoot">授权和基础配置不会大量消耗 token，生成发布方案后会开始累计。</div>
+            </article>
+          </section>
+
+          <section class="panel result-panel" id="resultPanel">
+            <div class="panel-head">
+              <div>
+                <span class="panel-kicker">运行结果</span>
+              </div>
+              <div class="result-head-actions">
+                <label class="review-toggle">
+                  <input id="bypassReviewToggle" type="checkbox" />
+                  <span>免审</span>
+                </label>
+                <button class="ghost-pill" id="approveAllBtn" type="button">全部审核通过</button>
+              </div>
+            </div>
+            <div class="result-empty" id="resultEmpty">点击“生成发布方案”后，这里会按数据流展示每一条待发布内容、平台、类型和发布时间。</div>
+            <div class="result-content hidden" id="resultContent">
+              <div class="result-summary" id="resultSummary"></div>
+              <div class="result-stream" id="resultStream"></div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "workflows",
+        showHistory: true,
+        historyTitle: "自动任务记录",
+        primaryLabel: "+ 新建对话",
+        primaryId: "newChatBtn",
+        homeHref: "../home/home.html",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
+        workflowsHref: "./workflows-home.html",
+        projectsHref: "../projects/projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+    </script>
+    <script src="./workflows-x-publisher-detail.js?v=20260514-7"></script>
+  </body>
+</html>

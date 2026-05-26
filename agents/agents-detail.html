@@ -27,7 +27,7 @@
 
       body {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         padding: 16px;
       }
@@ -38,18 +38,18 @@
 
       .app-window {
         width: min(1280px, calc(100vw - 32px));
-        height: min(980px, calc(100vh - 32px));
-        min-height: 720px;
+        min-height: calc(100vh - 32px);
+        height: auto;
         display: grid;
         grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
-        overflow: hidden;
+        overflow: visible;
         border-radius: 28px;
         background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
         box-shadow: var(--shadow);
         border: 1px solid rgba(255, 255, 255, 0.2);
       }
 
-      .detail-shell { display: grid; grid-template-rows: 72px 1fr; min-width: 0; }
+      .detail-shell { display: grid; grid-template-rows: 72px auto; min-width: 0; }
 
       .topbar {
         display: flex;
@@ -73,14 +73,14 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) 300px;
         min-height: 0;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .detail-main {
         padding: 20px 16px 16px;
         min-width: 0;
         display: grid;
-        grid-template-rows: auto auto 1fr;
+        grid-template-rows: auto auto auto 1fr;
         gap: 12px;
       }
 
@@ -119,6 +119,162 @@
       .field + .field { margin-top: 12px; }
       .field label { display: block; margin-bottom: 8px; font-size: 12px; color: #8e7671; font-weight: 700; }
       .input-like { min-height: 44px; padding: 10px 14px; border-radius: 16px; background: #f6f0ef; color: #41302d; line-height: 1.55; }
+
+      .workflow-card {
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.84);
+        border: 1px solid rgba(238, 225, 223, 0.9);
+        box-shadow: 0 18px 36px rgba(164, 70, 36, 0.05);
+        padding: 16px;
+      }
+
+      .workflow-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .workflow-head h3 {
+        margin: 4px 0 0;
+        font-size: 22px;
+        line-height: 1.15;
+      }
+
+      .workflow-head small {
+        color: #9b7f7a;
+        font-weight: 700;
+      }
+
+      .workflow-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .mini-btn {
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: #fff;
+        color: #5a403c;
+        cursor: pointer;
+      }
+
+      .workflow-board {
+        margin-top: 14px;
+        position: relative;
+        min-height: 360px;
+        border-radius: 24px;
+        border: 1px solid rgba(240, 216, 212, 0.86);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.06), transparent 26%),
+          linear-gradient(180deg, #fffdfd 0%, #fff7f6 100%);
+        overflow: auto;
+      }
+
+      .workflow-board-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(236, 214, 209, 0.52) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(236, 214, 209, 0.52) 1px, transparent 1px);
+        background-size: 28px 28px;
+        opacity: 0.48;
+      }
+
+      .workflow-link {
+        position: absolute;
+        height: 2px;
+        background: rgba(217, 45, 32, 0.22);
+        transform-origin: left center;
+      }
+
+      .workflow-link::after {
+        content: "";
+        position: absolute;
+        right: -3px;
+        top: -4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(217, 45, 32, 0.36);
+      }
+
+      .workflow-node {
+        position: absolute;
+        width: 228px;
+        padding: 14px;
+        border-radius: 22px;
+        border: 1px solid rgba(235, 209, 204, 0.95);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 16px 32px rgba(171, 54, 35, 0.08);
+      }
+
+      .workflow-node-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .workflow-index {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff1ed;
+        color: var(--brand);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .workflow-status {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: #fff1ed;
+        color: var(--brand);
+        font-size: 10px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .workflow-node-title {
+        margin-top: 10px;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.3;
+      }
+
+      .workflow-node-copy {
+        margin-top: 6px;
+        color: #8a7875;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .workflow-skill-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .workflow-skill-tags .skill-tag {
+        background: linear-gradient(180deg, #fff1ef 0%, #f8e2df 100%);
+      }
+
+      .workflow-tools {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+      }
 
       .canvas-card {
         padding: 12px;
@@ -219,13 +375,41 @@
         width: 36px; height: 36px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%); color: #fff;
       }
 
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%) translateY(24px);
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: rgba(36, 27, 26, 0.92);
+        color: #fff;
+        font-size: 13px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        z-index: 60;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
       @media (max-width: 1100px) {
         body { padding: 0; }
-        .app-window { width: 100vw; height: 100vh; min-height: 100vh; border-radius: 0; }
+        .app-window { width: 100vw; min-height: 100vh; border-radius: 0; }
         .detail-content { grid-template-columns: 1fr; }
         .detail-side { border-left: 0; border-top: 1px solid rgba(233, 215, 213, 0.72); }
+        .workflow-head,
+        .workflow-item-head,
+        .workflow-skill-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
       }
     </style>
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
   </head>
   <body>
     <div class="desktop-stage">
@@ -245,32 +429,48 @@
             <div class="detail-main">
               <div class="detail-top">
                 <div>
-                  <small id="detailVersion">Agent Configuration</small>
+                  <small id="detailVersion">智能体设置</small>
                   <h2 id="detailTitle">Precision Analyst v2.4</h2>
                 </div>
                 <div class="detail-actions">
-                  <a class="outline-btn" href="./agents-center.html" style="text-decoration:none;display:inline-flex;align-items:center;">Cancel</a>
-                  <button class="primary-btn" id="deployBtn" type="button">Deploy Agent</button>
+                  <a class="outline-btn" href="./agents-center.html" style="text-decoration:none;display:inline-flex;align-items:center;">取消</a>
+                  <button class="primary-btn" id="deployBtn" type="button">启用智能体</button>
                 </div>
               </div>
 
               <div class="form-card">
                 <div class="field">
-                  <label>Role Description</label>
-                  <div class="input-like" id="detailRole">Senior financial analyst focused on Q3 market volatility.</div>
+                  <label>角色说明</label>
+                  <div class="input-like" id="detailRole">专注财务波动分析的高级分析师。</div>
                 </div>
                 <div class="field">
-                  <label>Primary Goal</label>
-                  <div class="input-like" id="detailGoal">Turn live SEC filings into actionable insights.</div>
+                  <label>主要目标</label>
+                  <div class="input-like" id="detailGoal">把最新财务披露信息整理成可执行结论。</div>
+                </div>
+              </div>
+
+              <div class="workflow-card">
+                <div class="workflow-head">
+                  <div>
+                    <small>可编排执行链路</small>
+                    <h3>多个 Workflow 协同运行</h3>
+                  </div>
+                  <div class="workflow-actions">
+                    <button class="mini-btn" id="addWorkflowBtn" type="button">+ 添加 Workflow</button>
+                    <button class="primary-btn" id="loadFullFlowBtn" type="button">载入全流程模板</button>
+                  </div>
+                </div>
+                <div class="workflow-board" id="workflowBoard">
+                  <div class="workflow-board-grid"></div>
                 </div>
               </div>
 
               <div class="canvas-card">
                 <div class="canvas-title">
-                  <span>Flow Orchestration</span>
+                  <span>流程编排</span>
                   <div class="minor">
                     <span class="minor-pill" id="flowBadge">v2.4</span>
-                    <span class="minor-pill">Auto-save</span>
+                    <span class="minor-pill">自动保存</span>
                   </div>
                 </div>
                 <div class="canvas-surface" id="flowCanvas"></div>
@@ -287,21 +487,21 @@
 
             <aside class="detail-side">
               <div class="side-section">
-                <h4>Focused Models</h4>
+                <h4>使用中的模型</h4>
                 <div class="model-list" id="modelList"></div>
               </div>
               <div class="side-section">
-                <h4>Enabled Skills</h4>
+                <h4>已启用技能</h4>
                 <div class="skill-tags" id="skillTags"></div>
               </div>
               <div class="side-section runtime-card">
                 <div>
-                  <h4 style="margin: 0 0 8px; color: #fff;">Test Run Console</h4>
-                  <div style="font-size: 11px; color: #a99895;">Script for test-running the agent</div>
+                  <h4 style="margin: 0 0 8px; color: #fff;">测试运行台</h4>
+                  <div style="font-size: 11px; color: #a99895;">先试跑一轮，看看智能体会怎么执行</div>
                 </div>
                 <div class="runtime-log" id="runtimeLog"></div>
                 <div class="runtime-input">
-                  <input id="runtimeInput" type="text" placeholder="Enter a test query..." />
+                  <input id="runtimeInput" type="text" placeholder="输入一条测试任务..." />
                   <button id="runtimeSend" type="button">➤</button>
                 </div>
               </div>
@@ -311,6 +511,8 @@
       </main>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script src="../shared/i18n.js"></script>
     <script src="../shared/sidebar.js"></script>
     <script>
@@ -318,11 +520,12 @@
         active: "agents",
         fixed: false,
         showHistory: true,
-        historyTitle: "History",
+        historyTitle: "最近对话",
         historyContainerId: "historyList",
-        primaryLabel: "+ New Chat",
+        primaryLabel: "+ 新建对话",
         primaryId: "newConversationBtn",
         chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
         projectsHref: "../projects/projects-center.html",
         filesHref: "../files/files-center.html",
         agentsHref: "./agents-center.html",
@@ -390,12 +593,126 @@
             { x: 86, y: 84, title: "Input Queue", text: "Collect content to review", sub: "Text / image / links" },
             { x: 302, y: 64, title: "Reviewer", text: "Run rules and model checks", sub: "Output review decisions" }
           ]
+        },
+        "agent-private-growth": {
+          name: "私域增长数字员工",
+          version: "v4.0",
+          role: "面向东南亚市场的全链路增长数字员工，负责内容、互动、私域沉淀、商品发布和销售转化。",
+          goal: "把内容分发、互动承接、Zalo 私域运营和商品销售串成一个可执行的自动化流程。",
+          models: [
+            { code: "G4", name: "GPT-4o", active: true },
+            { code: "C3", name: "Claude 3.5", active: false },
+            { code: "DM", name: "DeepSeek", active: false }
+          ],
+          skills: ["Content Planning", "Comment Engagement", "Zalo CRM", "Catalog Publishing", "Sales Follow-up"],
+          workflows: [
+            {
+              id: "wf-content",
+              name: "内容产出",
+              status: "运行中",
+              desc: "围绕目标商品和目标人群生成短视频脚本、图文文案和发布素材。",
+              skills: ["Content Planning", "Creative Writing", "Image Prompting"]
+            },
+            {
+              id: "wf-engage",
+              name: "互动运营",
+              status: "待运行",
+              desc: "接住评论区和私信里的高意向用户，自动分层并生成回复。",
+              skills: ["Comment Engagement", "Lead Scoring"]
+            },
+            {
+              id: "wf-zalo",
+              name: "Zalo 私域建联与运营",
+              status: "待运行",
+              desc: "把高意向用户导入 Zalo，完成建联、社群分层和持续触达。",
+              skills: ["Zalo CRM", "Community Operations"]
+            },
+            {
+              id: "wf-product",
+              name: "商品发布",
+              status: "待运行",
+              desc: "同步商品标题、卖点、主图说明和上架节奏到多平台。",
+              skills: ["Catalog Publishing", "Product Copy"]
+            },
+            {
+              id: "wf-sales",
+              name: "商品销售",
+              status: "待运行",
+              desc: "跟进订单线索、促成成交并生成复购提醒。",
+              skills: ["Sales Follow-up", "Conversion Playbook"]
+            }
+          ],
+          flow: [
+            { x: 58, y: 72, title: "Content", text: "Create campaign assets", sub: "Short video / posts / hooks" },
+            { x: 250, y: 54, title: "Engagement", text: "Handle comments and DMs", sub: "Intent detection and follow-up" },
+            { x: 446, y: 122, title: "Zalo Ops", text: "Move leads into private domain", sub: "Segmentation / nurturing / group ops" },
+            { x: 668, y: 56, title: "Product Publish", text: "Sync product listing", sub: "Catalog copy / publishing schedule" },
+            { x: 878, y: 132, title: "Sales", text: "Close and retain customers", sub: "Order conversion / repeat purchase" }
+          ]
         }
       };
 
+      const workflowSkillBacklog = {
+        "wf-content": ["Trend Mining", "Localization", "Landing Copy"],
+        "wf-engage": ["Reply Automation", "DM Routing", "Risk Review"],
+        "wf-zalo": ["Welcome Sequence", "Tagging Rules", "Promo Broadcast"],
+        "wf-product": ["Price Sync", "Inventory Notice", "SKU Mapping"],
+        "wf-sales": ["Upsell Script", "Coupon Trigger", "After-sales Care"]
+      };
+
+      const workflowTemplatePool = [
+        {
+          id: "wf-content",
+          name: "内容产出",
+          status: "运行中",
+          desc: "围绕目标商品和目标人群生成短视频脚本、图文文案和发布素材。",
+          skills: ["Content Planning", "Creative Writing", "Image Prompting"]
+        },
+        {
+          id: "wf-engage",
+          name: "互动运营",
+          status: "待运行",
+          desc: "接住评论区和私信里的高意向用户，自动分层并生成回复。",
+          skills: ["Comment Engagement", "Lead Scoring"]
+        },
+        {
+          id: "wf-zalo",
+          name: "Zalo 私域建联与运营",
+          status: "待运行",
+          desc: "把高意向用户导入 Zalo，完成建联、社群分层和持续触达。",
+          skills: ["Zalo CRM", "Community Operations"]
+        },
+        {
+          id: "wf-product",
+          name: "商品发布",
+          status: "待运行",
+          desc: "同步商品标题、卖点、主图说明和上架节奏到多平台。",
+          skills: ["Catalog Publishing", "Product Copy"]
+        },
+        {
+          id: "wf-sales",
+          name: "商品销售",
+          status: "待运行",
+          desc: "跟进订单线索、促成成交并生成复购提醒。",
+          skills: ["Sales Follow-up", "Conversion Playbook"]
+        }
+      ];
+
       const params = new URLSearchParams(window.location.search);
-      const selectedId = params.get("id") || "agent-analyst";
+      const selectedId = params.get("id") || "agent-private-growth";
       const agent = agents[selectedId] || agents["agent-analyst"];
+      const workflowState = {
+        items: (agent.workflows || []).map((item) => ({ ...item }))
+      };
+
+      function escapeHtml(text) {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
 
       document.getElementById("detailTitle").textContent = agent.name;
       document.getElementById("flowBadge").textContent = agent.version;
@@ -405,10 +722,10 @@
       document.getElementById("modelList").innerHTML = agent.models
         .map(
           (model) => `
-            <div class="model-item ${model.active ? "active" : ""}">
+              <div class="model-item ${model.active ? "active" : ""}">
               <div class="left">
-                <span class="model-chip">${model.code}</span>
-                <div><div style="font-size: 13px; font-weight: 700;">${model.name}</div></div>
+                <span class="model-chip">${escapeHtml(model.code)}</span>
+                <div><div style="font-size: 13px; font-weight: 700;">${escapeHtml(model.name)}</div></div>
               </div>
               <div style="color:${model.active ? "var(--brand)" : "#8b7672"}; font-weight:700;">${model.active ? "✓" : ""}</div>
             </div>
@@ -416,7 +733,7 @@
         )
         .join("");
 
-      document.getElementById("skillTags").innerHTML = agent.skills.map((skill) => `<span class="skill-tag">${skill}</span>`).join("");
+      document.getElementById("skillTags").innerHTML = agent.skills.map((skill) => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("");
 
       document.getElementById("flowCanvas").innerHTML = `
         <div class="flow-link" style="left: 212px; top: 124px; width: 100px;"></div>
@@ -424,9 +741,9 @@
           .map(
             (node) => `
               <div class="flow-node" style="left:${node.x}px; top:${node.y}px;">
-                <small>${node.title}</small>
-                <strong>${node.text}</strong>
-                <div style="font-size:11px;color:#8a7875;">${node.sub}</div>
+                <small>${escapeHtml(node.title)}</small>
+                <strong>${escapeHtml(node.text)}</strong>
+                <div style="font-size:11px;color:#8a7875;">${escapeHtml(node.sub)}</div>
               </div>
             `
           )
@@ -440,15 +757,120 @@
         "[14:32:46] Node output: starting market tag clustering..."
       ];
       const runtimeLog = document.getElementById("runtimeLog");
-      runtimeLog.innerHTML = logs.map((log) => `<div>${log}</div>`).join("");
+      runtimeLog.innerHTML = logs.map((log) => `<div>${escapeHtml(log)}</div>`).join("");
 
       document.getElementById("runtimeSend").addEventListener("click", () => {
         const input = document.getElementById("runtimeInput");
         const value = input.value.trim();
         if (!value) return;
-        runtimeLog.innerHTML += `<div>[14:36:22] User: ${value}</div><div>[14:36:41] Output: routed the test request to ${agent.name}.</div>`;
+        runtimeLog.insertAdjacentHTML(
+          "beforeend",
+          `<div>${escapeHtml(`[14:36:22] User: ${value}`)}</div><div>${escapeHtml(`[14:36:41] Output: routed the test request to ${agent.name}.`)}</div>`
+        );
         runtimeLog.scrollTop = runtimeLog.scrollHeight;
         input.value = "";
+      });
+
+      function showToast(text) {
+        const toast = document.getElementById("toast");
+        toast.textContent = text;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), 1800);
+      }
+
+      function workflowCanvasLayout(count) {
+        const presets = [
+          { x: 32, y: 44 },
+          { x: 286, y: 40 },
+          { x: 540, y: 146 },
+          { x: 794, y: 54 },
+          { x: 1048, y: 154 }
+        ];
+        return presets.slice(0, count);
+      }
+
+      function renderWorkflowCanvas() {
+        const container = document.getElementById("workflowBoard");
+        const positions = workflowCanvasLayout(workflowState.items.length);
+        const links = workflowState.items
+          .slice(0, -1)
+          .map((workflow, index) => {
+            const start = positions[index];
+            const end = positions[index + 1];
+            const x1 = start.x + 228;
+            const y1 = start.y + 88;
+            const x2 = end.x;
+            const y2 = end.y + 88;
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            return `<div class="workflow-link" style="left:${x1}px; top:${y1}px; width:${length}px; transform: rotate(${angle}deg);"></div>`;
+          })
+          .join("");
+
+        const nodes = workflowState.items
+          .map((workflow, index) => {
+            const position = positions[index];
+            return `
+              <article class="workflow-node" style="left:${position.x}px; top:${position.y}px;">
+                <div class="workflow-node-head">
+                  <span class="workflow-index">${String(index + 1).padStart(2, "0")}</span>
+                  <span class="workflow-status">${escapeHtml(workflow.status)}</span>
+                </div>
+                <div class="workflow-node-title">${escapeHtml(workflow.name)}</div>
+                <div class="workflow-node-copy">${escapeHtml(workflow.desc)}</div>
+                <div class="workflow-skill-tags">
+                  ${workflow.skills.map((skill) => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")}
+                </div>
+                <div class="workflow-tools">
+                  <button class="mini-btn" type="button" data-assign-skill="${workflow.id}">指定技能</button>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+
+        container.innerHTML = `<div class="workflow-board-grid"></div>${links}${nodes}`;
+      }
+
+      function addWorkflow() {
+        const next = workflowTemplatePool.find((item) => !workflowState.items.some((workflow) => workflow.id === item.id));
+        if (!next) {
+          showToast("所有预设 workflow 都已经加入了。");
+          return;
+        }
+        workflowState.items.push({ ...next });
+        renderWorkflowCanvas();
+        showToast(`已加入 workflow：${next.name}`);
+      }
+
+      function loadFullFlow() {
+        window.location.href = "./agents-workflow-editor.html?id=agent-private-growth";
+      }
+
+      function assignSkill(workflowId) {
+        const workflow = workflowState.items.find((item) => item.id === workflowId);
+        if (!workflow) return;
+        const backlog = workflowSkillBacklog[workflowId] || [];
+        const nextSkill = backlog.find((skill) => !workflow.skills.includes(skill));
+        if (!nextSkill) {
+          showToast(`${workflow.name} 已经挂载完预设技能。`);
+          return;
+        }
+        workflow.skills.push(nextSkill);
+        renderWorkflowCanvas();
+        showToast(`已为 ${workflow.name} 指定技能：${nextSkill}`);
+      }
+
+      renderWorkflowCanvas();
+      document.getElementById("addWorkflowBtn").addEventListener("click", addWorkflow);
+      document.getElementById("loadFullFlowBtn").addEventListener("click", loadFullFlow);
+      document.getElementById("workflowBoard").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-assign-skill]");
+        if (!button) return;
+        assignSkill(button.dataset.assignSkill);
       });
     </script>
   </body>

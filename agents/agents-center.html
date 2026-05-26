@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hubitos AI OS - My Agents</title>
+    <title>Hubitos 智能体中心</title>
     <link rel="stylesheet" href="../shared/sidebar.css" />
     <style>
       :root {
@@ -400,6 +400,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
   </head>
   <body>
     <div class="desktop-stage">
@@ -410,19 +411,19 @@
           <header class="topbar">
             <div class="topbar-left">
               <div class="market-tabs" id="scopeTabs">
-                <button class="market-tab active" data-scope="mine" type="button">My Agents</button>
-                <button class="market-tab" data-scope="all" type="button">All Agents</button>
-                <button class="market-tab" data-scope="production" type="button">Production</button>
-                <button class="market-tab" data-scope="drafts" type="button">Drafts</button>
+                <button class="market-tab active" data-scope="mine" type="button">我的智能体</button>
+                <button class="market-tab" data-scope="all" type="button">全部智能体</button>
+                <button class="market-tab" data-scope="production" type="button">已上线</button>
+                <button class="market-tab" data-scope="drafts" type="button">草稿</button>
               </div>
             </div>
             <div class="topbar-right">
               <div class="search-shell">
                 <span class="icon">⌕</span>
-                <input id="searchInput" type="text" placeholder="Search agents, skills, or models..." />
+                <input id="searchInput" type="text" placeholder="搜索智能体、技能或模型..." />
               </div>
-              <button class="outline-btn" id="importBtn" type="button">⇪ Import</button>
-              <button class="primary-btn" id="newAgentBtn" type="button">+ New Agent</button>
+              <button class="outline-btn" id="importBtn" type="button">⇪ 导入</button>
+              <button class="primary-btn" id="newAgentBtn" type="button">+ 新建智能体</button>
               <button class="ghost-icon" type="button">◌</button>
               <button class="avatar-btn" type="button">K</button>
             </div>
@@ -431,10 +432,10 @@
           <section class="agents-list-panel">
             <div class="header-actions">
               <div class="segmented" id="tagTabs">
-                <button class="seg-btn active" data-tag="all" type="button">All</button>
-                <button class="seg-btn" data-tag="finance" type="button">Finance</button>
-                <button class="seg-btn" data-tag="research" type="button">Research</button>
-                <button class="seg-btn" data-tag="engineering" type="button">Engineering</button>
+                <button class="seg-btn active" data-tag="all" type="button">全部</button>
+                <button class="seg-btn" data-tag="finance" type="button">财务</button>
+                <button class="seg-btn" data-tag="research" type="button">调研</button>
+                <button class="seg-btn" data-tag="engineering" type="button">开发</button>
               </div>
               <div class="view-switch">
                 <button id="gridBtn" class="view-btn active" type="button">▥</button>
@@ -454,11 +455,12 @@
         active: "agents",
         fixed: false,
         showHistory: true,
-        historyTitle: "History",
+        historyTitle: "最近对话",
         historyContainerId: "historyList",
-        primaryLabel: "+ New Chat",
+        primaryLabel: "+ 新建对话",
         primaryId: "newConversationBtn",
         chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
         projectsHref: "../projects/projects-center.html",
         filesHref: "../files/files-center.html",
         agentsHref: "./agents-center.html",
@@ -479,42 +481,53 @@
             scope: "production",
             mine: true,
             tag: "finance",
-            status: { text: "Published", tone: "green" },
+            status: { text: "已上线", tone: "green" },
             icon: "◫",
-            desc: "High-precision financial data modeling and predictive market sentiment analysis engine."
+            desc: "擅长做高精度财务分析、市场情绪判断和趋势预测。"
           },
           {
             id: "agent-market",
-            name: "Market Research Assistant",
+            name: "市场调研助手",
             version: "v1.8",
             scope: "drafts",
             mine: true,
             tag: "research",
-            status: { text: "Private", tone: "gray" },
+            status: { text: "仅自己可见", tone: "gray" },
             icon: "◎",
-            desc: "Real-time competitive intelligence and market-trend synthesis for retail sectors."
+            desc: "适合做竞品扫描、行业信息整理和市场趋势总结。"
           },
           {
             id: "agent-code",
-            name: "Code Architect",
+            name: "代码架构助手",
             version: "v3.1",
             scope: "production",
             mine: true,
             tag: "engineering",
-            status: { text: "Draft", tone: "orange" },
+            status: { text: "草稿中", tone: "orange" },
             icon: "⌘",
-            desc: "Autonomous refactoring and architectural oversight for legacy enterprise codebases."
+            desc: "适合查看老项目结构、给出重构建议，并帮助拆解技术风险。"
+          },
+          {
+            id: "agent-private-growth",
+            name: "私域增长数字员工",
+            version: "v4.0",
+            scope: "production",
+            mine: true,
+            tag: "research",
+            status: { text: "已上线", tone: "green" },
+            icon: "✦",
+            desc: "覆盖内容产出、互动承接、Zalo 私域运营、商品发布与销售转化的全流程数字员工。"
           },
           {
             id: "agent-review",
-            name: "Content Review Specialist",
+            name: "内容审核助手",
             version: "v1.2",
             scope: "drafts",
             mine: true,
             tag: "research",
-            status: { text: "Private", tone: "gray" },
+            status: { text: "仅自己可见", tone: "gray" },
             icon: "✺",
-            desc: "High-speed policy compliance engine for multi-modal community platform generated content."
+            desc: "适合审核图文内容，识别风险表达，并给出更稳妥的改写建议。"
           }
         ]
       };

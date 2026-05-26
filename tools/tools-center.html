@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos 工具中心</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --muted: #7b6a66;
+        --brand: #d92d20;
+        --line: rgba(236, 214, 209, 0.92);
+        --card: rgba(255, 255, 255, 0.96);
+        --shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      body {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 16px;
+        overflow-y: auto;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+      }
+
+      .desktop-stage {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-window {
+        width: min(1728px, calc(100vw - 32px));
+        height: auto;
+        min-height: 720px;
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        overflow: visible;
+        border-radius: 28px;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .tools-shell {
+        min-width: 0;
+        min-height: 100%;
+        display: grid;
+        grid-template-rows: 72px auto;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        border-bottom: 1px solid rgba(235, 209, 204, 0.42);
+        background:
+          radial-gradient(circle at 18% 0%, rgba(217, 45, 32, 0.08), transparent 22%),
+          rgba(255, 252, 251, 0.86);
+      }
+
+      .topbar-left,
+      .topbar-right,
+      .market-tabs,
+      .toolbar,
+      .category-tabs,
+      .card-footer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .market-tabs {
+        gap: 28px;
+      }
+
+      .market-tab {
+        position: relative;
+        min-height: 72px;
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        color: #9c8885;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .market-tab.active {
+        color: var(--brand);
+      }
+
+      .market-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand);
+      }
+
+      .search-shell {
+        position: relative;
+      }
+
+      .search-shell input {
+        width: 320px;
+        height: 40px;
+        padding: 0 18px 0 44px;
+        border: 1px solid rgba(238, 220, 217, 0.95);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #352523;
+        outline: none;
+      }
+
+      .search-shell .icon {
+        position: absolute;
+        left: 16px;
+        top: 10px;
+        color: #a18d89;
+        font-size: 15px;
+      }
+
+      .primary-btn,
+      .filter-chip,
+      .action-btn {
+        min-height: 38px;
+        padding: 0 18px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .primary-btn {
+        color: #fff;
+        background: linear-gradient(180deg, #d92d20 0%, #bb180e 100%);
+        box-shadow: 0 12px 20px rgba(217, 45, 32, 0.18);
+      }
+
+      .action-btn,
+      .filter-chip {
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(236, 214, 209, 0.92);
+        color: #6f5f5c;
+        font-weight: 700;
+        transition: all 0.18s ease;
+      }
+
+      .avatar-btn,
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: transparent;
+        color: #604945;
+        cursor: pointer;
+      }
+
+      .avatar-btn {
+        background: linear-gradient(180deg, #fbe1dd 0%, #f5c4bb 100%);
+      }
+
+      .tools-main {
+        min-width: 0;
+        min-height: auto;
+        padding: 20px 24px 22px;
+        overflow: visible;
+        scrollbar-width: thin;
+        scrollbar-color: #e5bdb7 transparent;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+      }
+
+      .tools-main::-webkit-scrollbar { width: 6px; }
+      .tools-main::-webkit-scrollbar-track { background: transparent; }
+      .tools-main::-webkit-scrollbar-thumb { background: #e5bdb7; border-radius: 999px; }
+
+      .toolbar {
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .category-tabs {
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+
+      .category-tabs .filter-chip.active {
+        background: #a6c93f !important;
+        color: #111111 !important;
+        border-color: #a6c93f !important;
+        box-shadow: 0 6px 16px rgba(166, 201, 63, 0.22) !important;
+      }
+
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 300px);
+        gap: 16px;
+        align-content: start;
+        align-items: start;
+        grid-auto-rows: minmax(220px, auto);
+        width: 100%;
+        justify-content: start;
+      }
+
+      .tool-card {
+        padding: 18px;
+        border-radius: 24px;
+        border: 1px solid rgba(236, 214, 209, 0.9);
+        background: var(--card);
+        box-shadow: 0 18px 32px rgba(145, 54, 39, 0.08);
+        display: grid;
+        gap: 14px;
+        min-height: 240px;
+        align-content: start;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 36px rgba(145, 54, 39, 0.12);
+        border-color: rgba(217, 45, 32, 0.28);
+      }
+
+      .tool-card:focus-visible {
+        outline: 2px solid rgba(217, 45, 32, 0.7);
+        outline-offset: 2px;
+      }
+
+      .tool-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .tool-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #fff1ef 0%, #f8e0dc 100%);
+        color: var(--brand);
+        font-size: 18px;
+      }
+
+      .tool-type {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: #f4ecea;
+        color: #755e59;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .tool-card h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .tool-card p {
+        margin: 0;
+        color: var(--muted);
+        min-height: 70px;
+      }
+
+      .tool-tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #f7f2f1;
+        color: #715f5b;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .card-footer {
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 1px;
+      }
+
+      .card-meta {
+        color: #8e7773;
+        font-size: 12px;
+      }
+
+      .card-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%);
+        min-width: 220px;
+        max-width: 420px;
+        padding: 12px 18px;
+        border-radius: 999px;
+        background: rgba(31, 22, 22, 0.9);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+
+      .toast.show { opacity: 1; }
+
+      @media (max-width: 1480px) {
+        .tools-grid {
+          grid-template-columns: repeat(3, 300px);
+        }
+      }
+
+      @media (max-width: 1280px) {
+        body { padding: 0; }
+        .app-window {
+          width: 100vw;
+          height: 100vh;
+          min-height: 100vh;
+          border-radius: 0;
+        }
+        .tools-grid {
+          grid-template-columns: repeat(2, 300px);
+        }
+      }
+
+      @media (max-width: 760px) {
+        .tools-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="tools-shell">
+          <header class="topbar">
+            <div class="topbar-left">
+              <div class="market-tabs" id="scopeTabs">
+                <button class="market-tab active" data-scope="mine" type="button">我的智能体</button>
+                <button class="market-tab" data-scope="all" type="button">全部智能体</button>
+              </div>
+            </div>
+            <div class="topbar-right">
+              <div class="search-shell">
+                <span class="icon">⌕</span>
+                <input id="searchInput" type="text" placeholder="搜索智能体、技能、MCP 或标签..." />
+              </div>
+              <button class="icon-btn" type="button">◌</button>
+            </div>
+          </header>
+
+          <main class="tools-main">
+            <section class="toolbar">
+              <div class="category-tabs" id="tagTabs"></div>
+            </section>
+
+            <section class="tools-grid" id="toolsGrid"></section>
+          </main>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      const toolsLang = (() => {
+        try {
+          const url = new URL(window.location.href);
+          const queryLang = url.searchParams.get("lang");
+          if (queryLang === "zh" || queryLang === "en") return queryLang;
+          const stored = window.localStorage.getItem("hubitos-language");
+          return stored === "zh" ? "zh" : "en";
+        } catch (error) {
+          return "en";
+        }
+      })();
+      const isToolsEnglish = toolsLang === "en";
+      const tt = (zh, en) => (isToolsEnglish ? en : zh);
+
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "tools",
+        showHistory: true,
+        historyTitle: tt("最近对话", "Recent Conversations"),
+        historyContainerId: "historyList",
+        primaryLabel: tt("+ 新建对话", "+ New Chat"),
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "./tools-center.html",
+        workflowsHref: "../workflows/workflows-home.html",
+        projectsHref: "../projects/projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+
+      const state = {
+        scope: "mine",
+        tag: "all",
+        search: "",
+        tools: [
+          {
+            id: "agent-prd-writer",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("PRD 写作助手", "PRD Writing Assistant"),
+            desc: tt("把零散需求整理成结构清楚的 PRD，自动补上目标、范围、流程和验收标准。", "Turn scattered requirements into a clear PRD and automatically fill in goals, scope, process, and acceptance criteria."),
+            tags: [tt("内容写作", "Content Writing")],
+            icon: "✎",
+            invokeText: tt("请用 PRD 写作助手把这个需求整理成结构化 PRD，并补上目标、范围、关键流程和验收标准。", "Use the PRD Writing Assistant to turn this requirement into a structured PRD and fill in goals, scope, key flows, and acceptance criteria.")
+          },
+          {
+            id: "agent-market-research",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("市场调研助手", "Market Research Assistant"),
+            desc: tt("帮你分析竞品、整理定位差异，并输出对比表和策略建议。", "Analyze competitors, summarize positioning differences, and produce comparison tables plus strategic suggestions."),
+            tags: [tt("调研分析", "Research & Analysis")],
+            icon: "✦",
+            invokeText: tt("请调用市场调研助手，继续这段对话，并输出竞品分析和建议总结。", "Invoke the Market Research Assistant to continue this conversation and output competitor analysis plus a recommendation summary.")
+          },
+          {
+            id: "agent-competitor-analysis-skill",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("竞品分析智能体", "Competitor Analysis Agent"),
+            desc: tt("按《竞品分析 Skill》的结构，系统分析官网、用户、功能、商业模式、优势短板和我方机会点。", "Use the Competitor Analysis Skill structure to analyze a product's website, users, features, business model, strengths, weaknesses, and opportunity gaps."),
+            tags: [tt("调研分析", "Research & Analysis")],
+            icon: "▣",
+            invokeText: tt(
+              "请使用《竞品分析 Skill》分析以下对象，并严格按 Skill 的结构输出 HTML 级别的结构化竞品分析结果。\n竞品名称：扣子 Coze\n竞品官网 / 产品链接：https://www.coze.cn/\n所属行业：AI Agent / AI 办公平台\n目标市场：中文市场\n目标用户：个人办公用户、内容创作者、开发者、企业团队\n关注维度：产品定位、目标用户、核心功能、用户路径、商业模式、定价策略、增长获客、竞争优势、短板风险、我方机会点\n是否需要对标其他竞品：否\n输出格式要求：结构化 HTML 页面\n是否需要给出我方机会点：是",
+              "Use the Competitor Analysis Skill to analyze the following target and output a structured competitor analysis in an HTML-ready format.\nCompetitor Name: Coze\nProduct URL: https://www.coze.cn/\nIndustry: AI Agent / AI Productivity Platform\nTarget Market: Chinese market\nTarget Users: individual office users, creators, developers, enterprise teams\nFocus Areas: positioning, users, core features, user journey, business model, pricing, growth, strengths, weaknesses, and opportunity gaps\nBenchmark Other Competitors: No\nOutput Format: structured HTML page\nInclude Opportunity Gaps: Yes"
+            )
+          },
+          {
+            id: "agent-x-daily-report-skill",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("X 日报 HTML 报告助手", "X HTML Daily Report Assistant"),
+            desc: tt("基于 x-daily-report Skill，通过 prompt 描述抓取意图，系统优先用 AI 抽取关键词，再按固定时间生成 HTML 日报；若 AI 不可用则回退到本地规则提取，并默认执行内容质量过滤、引流词过滤和高危链接过滤。", "Use the x-daily-report Skill to fetch custom X keywords and accounts, then generate an HTML daily report on a fixed schedule with quality, spam, and risky-link filtering."),
+            tags: [tt("调研分析", "Research & Analysis"), tt("自动化运营", "Automation & Operations")],
+            icon: "𝕏",
+            href: "../workflows/workflows-home.html?workflow=wf-x-daily-report",
+            invokeText: tt(
+              "请使用 x-daily-report Skill，为我配置一个 X 日报任务：我先用 prompt 描述抓取意图，再由系统自动抽取关键词执行抓取，并执行内容质量过滤、引流词过滤和高危链接过滤。",
+              "Use the x-daily-report Skill to configure a custom X scraping workflow with scheduled HTML daily reports, and apply quality, spam, and risky-link filters."
+            )
+          },
+          {
+            id: "agent-image-prompt-reverse",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("反推图片提示词", "Image Prompt Reverse Engineer"),
+            desc: tt("分析上传图片，并生成可指导 AI 作图工具复刻类似作品的高质量文生图提示词。", "Analyze an uploaded image and generate a high-quality text-to-image prompt that can guide AI image tools to recreate a similar work."),
+            tags: [tt("视觉创作", "Visual Creation"), tt("内容写作", "Content Writing")],
+            icon: "🖼",
+            invokeText: tt("请分析这张图，并生成一个能够指导 AI 作图工具重新创作类似作品的文生图提示词。提示词中需从主题内容、场景设定、风格参考、色调色彩、构图视角、细节补充这些角度完整描述图片。", "Please analyze this image and generate a text-to-image prompt that can guide an AI image tool to recreate a similar work. The prompt should fully describe the image from the angles of subject matter, scene setup, style references, color palette, composition and camera angle, plus fine details.")
+          },
+          {
+            id: "agent-video-prompt-reverse",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("反推视频提示词", "Video Prompt Reverse Engineer"),
+            desc: tt("先拆分视频分镜，再逐个分析并整理成可用于生成类似视频的完整提示词。", "Break a video into shots, analyze each one, and turn it into a complete prompt for generating a similar video."),
+            tags: [tt("视觉创作", "Visual Creation"), tt("内容写作", "Content Writing")],
+            icon: "🎬",
+            invokeText: tt("请先把视频拆分成不同的分镜再对每一个分镜进行仔细的分析，包括画面风格、主题、动作描述、镜头变化、人物台词等。最后给我能生成类似视频的完整提示词。", "Please first split the video into different shots, then carefully analyze each shot, including visual style, theme, action description, camera changes, character dialogue, and more. Finally, give me a complete prompt that can generate a similar video.")
+          },
+          {
+            id: "agent-prompt-polish",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("提示词润色", "Prompt Polisher"),
+            desc: tt("从初始需求出发持续追问、理解并迭代，最后整理出更完整的高质量提示词。", "Start from an initial request, ask follow-up questions, deepen understanding, and iteratively turn it into a higher-quality prompt."),
+            tags: [tt("内容写作", "Content Writing")],
+            icon: "✦",
+            invokeText: tt("你是一个提示词优化专业，从我的初始需求开始反复问问题直到90%理解然后生成一个完美的提示词，输出后问我是否满意如果不满意则继续迭代更新我的初始需求是[......]", "You are a prompt optimization expert. Starting from my initial requirement, repeatedly ask questions until you reach 90% understanding, then generate a perfect prompt. After outputting it, ask whether I am satisfied, and if not, continue iterating and updating it. My initial requirement is [......]")
+          },
+          {
+            id: "agent-code-refactor",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("代码重构提示词", "Code Refactoring Prompt"),
+            desc: tt("让模型帮你重构组件，同时保证原有功能不变，并说明取舍和风险。", "Ask the model to refactor components while keeping the original behavior unchanged, and explain trade-offs and risks."),
+            tags: [tt("编程开发", "Coding & Development")],
+            icon: "⌘",
+            invokeText: tt("请重构这个组件，保持原有功能不变，并在给代码前先说明取舍和可能的风险。", "Refactor this component, keep the original behavior unchanged, and explain trade-offs plus possible risks before giving the code.")
+          },
+          {
+            id: "agent-telegram-bot",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("Telegram 机器人助手", "Telegram Bot Assistant"),
+            desc: tt("帮你管理 Telegram 机器人流程，识别消息类型，并按规则回复。", "Manage Telegram bot workflows, identify message types, and reply according to rules."),
+            tags: [tt("自动化运营", "Automation & Operations")],
+            icon: "✈",
+            invokeText: tt("请调用 Telegram 机器人助手，帮我设计下一步机器人流程、消息分流和回复规则。", "Invoke the Telegram Bot Assistant to design the next bot workflow, message routing, and reply rules.")
+          },
+          {
+            id: "agent-zalo-support",
+            type: tt("智能体", "Agent"),
+            scope: "all",
+            title: tt("Zalo 客服助手", "Zalo Support Assistant"),
+            desc: tt("处理 Zalo 上的客服对话，保持统一语气，并在把握不大时转给人工。", "Handle customer conversations on Zalo, keep a consistent tone, and hand over to humans when confidence is low."),
+            tags: [tt("客服支持", "Customer Support")],
+            icon: "☎",
+            invokeText: tt("请调用 Zalo 客服助手，帮我设计客服回复流程，并在需要时转人工。", "Invoke the Zalo Support Assistant to design the support reply flow and escalate to humans when needed.")
+          },
+          {
+            id: "agent-social-workflow",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("社媒自动任务入口", "Social Media Workflow Entry"),
+            desc: tt("打开 Twitter 和 Facebook 的一键自动任务页面，缺的信息由系统边问边补齐。", "Open the one-click Twitter and Facebook workflow page, with missing information filled through follow-up questions."),
+            tags: [tt("自动化运营", "Automation & Operations")],
+            icon: "⇢",
+            href: "../workflows/workflows-home.html",
+            invokeText: tt("请打开社媒自动任务入口，帮我直接运行一个 Twitter 或 Facebook 自动任务，不想手动配置。", "Open the social media workflow entry and run a Twitter or Facebook workflow directly without manual configuration.")
+          },
+          {
+            id: "agent-model-compare",
+            type: tt("智能体", "Agent"),
+            scope: "all",
+            title: tt("多模型对比提示词", "Multi-Model Comparison Prompt"),
+            desc: tt("让多个模型同时回答同一个问题，再从里面选一个更好的继续往下聊。", "Have multiple models answer the same question at once, then choose the best one to continue."),
+            tags: [tt("调研分析", "Research & Analysis")],
+            icon: "⇄",
+            invokeText: tt("请进入多模型对比模式，让多个模型回答同一个问题，并帮我选一个继续。", "Enter multi-model comparison mode, let several models answer the same question, and help me pick one to continue.")
+          },
+          {
+            id: "skill-seo",
+            type: tt("技能", "Skill"),
+            scope: "all",
+            title: tt("SEO 优化专家", "SEO Optimization Expert"),
+            desc: tt("自动分析关键词竞争度，并生成更适合搜索流量的内容结构。", "Automatically analyze keyword competition and generate content structures better suited for search traffic."),
+            tags: [tt("内容写作", "Content Writing")],
+            icon: "↗",
+            invokeText: tt("请调用 SEO 优化专家，帮我做关键词分析和内容结构建议。", "Invoke the SEO Optimization Expert to help with keyword analysis and content structure suggestions.")
+          },
+          {
+            id: "skill-refactor",
+            type: tt("技能", "Skill"),
+            scope: "all",
+            title: tt("代码重构助手", "Code Refactoring Assistant"),
+            desc: tt("自动发现代码坏味道，并给出更清楚的重构建议和拆分计划。", "Automatically detect code smells and provide clearer refactoring suggestions plus a decomposition plan."),
+            tags: [tt("编程开发", "Coding & Development")],
+            icon: "⌬",
+            invokeText: tt("请调用代码重构助手，帮我识别问题并给出重构建议。", "Invoke the Code Refactoring Assistant to identify problems and provide refactoring suggestions.")
+          },
+          {
+            id: "skill-translate",
+            type: tt("技能", "Skill"),
+            scope: "all",
+            title: tt("本地化翻译官", "Localization Translator"),
+            desc: tt("不只翻译文字，还会按目标市场调整语气和表达方式。", "Not only translates text, but also adapts tone and phrasing for the target market."),
+            tags: [tt("内容写作", "Content Writing")],
+            icon: "文",
+            invokeText: tt("请调用本地化翻译官，帮我按目标市场调整语气和表达。", "Invoke the Localization Translator to adapt tone and phrasing for the target market.")
+          },
+          {
+            id: "skill-ui-audit",
+            type: tt("技能", "Skill"),
+            scope: "all",
+            title: tt("UI 调色板大师", "UI Palette Master"),
+            desc: tt("根据品牌调性，生成更协调的界面配色和组件建议。", "Generate more coherent interface colors and component suggestions based on brand tone."),
+            tags: [tt("设计体验", "Design & UX")],
+            icon: "◈",
+            invokeText: tt("请调用 UI 调色板大师，帮我做配色和界面风格建议。", "Invoke the UI Palette Master to help with color and interface style suggestions.")
+          },
+          {
+            id: "skill-wireframe",
+            type: tt("技能", "Skill"),
+            scope: "mine",
+            title: tt("线框图草稿助手", "Wireframe Draft Assistant"),
+            desc: tt("根据需求说明快速整理页面结构、模块顺序和交互草图建议。", "Quickly organize page structure, module order, and interaction sketch suggestions from the requirement brief."),
+            tags: [tt("设计体验", "Design & UX")],
+            icon: "▧",
+            invokeText: tt("请调用线框图草稿助手，帮我整理页面结构和模块布局草图。", "Invoke the Wireframe Draft Assistant to organize page structure and module layout sketches.")
+          },
+          {
+            id: "agent-ux-review",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("体验评审助手", "UX Review Assistant"),
+            desc: tt("帮你检查页面信息层级、按钮路径和关键操作是否顺手。", "Check whether the page information hierarchy, button paths, and key interactions feel smooth."),
+            tags: [tt("设计体验", "Design & UX")],
+            icon: "◎",
+            invokeText: tt("请调用体验评审助手，帮我检查当前页面的操作路径和体验问题。", "Invoke the UX Review Assistant to inspect the current page for interaction paths and experience issues.")
+          },
+          {
+            id: "mcp-fetch",
+            type: "MCP",
+            scope: "all",
+            title: tt("网页抓取工具箱", "Web Scraping Toolkit"),
+            desc: tt("帮智能体抓网页内容、转成 Markdown，也支持动态渲染页面。", "Help agents scrape web content, convert it to Markdown, and handle dynamically rendered pages."),
+            tags: [tt("调研分析", "Research & Analysis")],
+            icon: "↓",
+            invokeText: tt("请调用网页抓取工具箱，帮我抓取网页并整理成可继续编辑的内容。", "Invoke the Web Scraping Toolkit to scrape a webpage and turn it into editable content.")
+          },
+          {
+            id: "mcp-github",
+            type: "MCP",
+            scope: "all",
+            title: tt("GitHub 开发组件", "GitHub Dev Toolkit"),
+            desc: tt("适合做代码审查、问题分类，以及给出 PR 合并建议。", "Useful for code review, issue triage, and PR merge suggestions."),
+            tags: [tt("编程开发", "Coding & Development")],
+            icon: "⌘",
+            invokeText: tt("请调用 GitHub 开发组件，帮我做代码审查和问题分类。", "Invoke the GitHub Dev Toolkit to help with code review and issue triage.")
+          },
+          {
+            id: "mcp-finance",
+            type: "MCP",
+            scope: "all",
+            title: tt("金融数据流", "Financial Data Stream"),
+            desc: tt("接入汇率、加密货币和美股数据，也支持自动生成分析报告。", "Connect to FX, crypto, and U.S. stock data, and generate analysis reports automatically."),
+            tags: [tt("调研分析", "Research & Analysis")],
+            icon: "¤",
+            invokeText: tt("请调用金融数据流，帮我拉取数据并生成分析总结。", "Invoke the Financial Data Stream to fetch data and generate an analytical summary.")
+          },
+          {
+            id: "mcp-secure",
+            type: "MCP",
+            scope: "all",
+            title: tt("安全保护器", "Security Protector"),
+            desc: tt("在本地扫描和打码敏感信息，保护智能体处理隐私内容时更安全。", "Scan and mask sensitive information locally to keep agents safer when handling private content."),
+            tags: [tt("客服支持", "Customer Support")],
+            icon: "◍",
+            invokeText: tt("请调用安全保护器，帮我检查并处理敏感信息。", "Invoke the Security Protector to inspect and handle sensitive information.")
+          },
+          {
+            id: "agent-support-ticket",
+            type: tt("智能体", "Agent"),
+            scope: "mine",
+            title: tt("工单分流助手", "Ticket Routing Assistant"),
+            desc: tt("自动识别用户问题类型，把咨询、投诉和售后请求分给合适的人处理。", "Automatically identify user issue types and route inquiries, complaints, and after-sales requests to the right people."),
+            tags: [tt("客服支持", "Customer Support")],
+            icon: "☏",
+            invokeText: tt("请调用工单分流助手，帮我把用户问题按类型分类并分配处理。", "Invoke the Ticket Routing Assistant to classify user issues by type and route them for handling.")
+          },
+          {
+            id: "skill-reply-polish",
+            type: tt("技能", "Skill"),
+            scope: "mine",
+            title: tt("客服回复润色", "Support Reply Polisher"),
+            desc: tt("把原始回复改得更清楚、更礼貌，也更符合品牌语气。", "Polish raw replies to make them clearer, more polite, and more aligned with brand tone."),
+            tags: [tt("客服支持", "Customer Support")],
+            icon: "✉",
+            invokeText: tt("请调用客服回复润色，帮我把这段客服回复改得更清楚、更礼貌。", "Invoke Support Reply Polisher to make this support reply clearer and more polite.")
+          }
+        ]
+      };
+
+      const ACTIVE_TOOL_KEY = "hubitos-active-tool";
+
+      const refs = {
+        scopeTabs: document.getElementById("scopeTabs"),
+        searchInput: document.getElementById("searchInput"),
+        tagTabs: document.getElementById("tagTabs"),
+        toolsGrid: document.getElementById("toolsGrid"),
+        toast: document.getElementById("toast")
+      };
+
+      const tagOptions = [
+        { key: "all", label: tt("全部", "All") },
+        { key: tt("内容写作", "Content Writing"), label: tt("内容写作", "Content Writing") },
+        { key: tt("调研分析", "Research & Analysis"), label: tt("调研分析", "Research & Analysis") },
+        { key: tt("编程开发", "Coding & Development"), label: tt("编程开发", "Coding & Development") },
+        { key: tt("设计体验", "Design & UX"), label: tt("设计体验", "Design & UX") },
+        { key: tt("自动化运营", "Automation & Operations"), label: tt("自动化运营", "Automation & Operations") },
+        { key: tt("客服支持", "Customer Support"), label: tt("客服支持", "Customer Support") }
+      ];
+
+      document.title = tt("Hubitos 工具中心", "Hubitos Tools Center");
+      document.querySelector('[data-scope="mine"]').textContent = tt("我的智能体", "My Agents");
+      document.querySelector('[data-scope="all"]').textContent = tt("全部智能体", "All Agents");
+      document.getElementById("searchInput").placeholder = tt("搜索智能体、技能、MCP 或标签...", "Search agents, skills, MCPs, or tags...");
+
+      function showToast(text) {
+        refs.toast.textContent = text;
+        refs.toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => refs.toast.classList.remove("show"), 1800);
+      }
+
+      function filteredTools() {
+        return state.tools.filter((tool) => {
+          const matchesScope = state.scope === "all" || tool.scope === "mine";
+          const matchesTag = state.tag === "all" || tool.tags.includes(state.tag);
+          const text = `${tool.title} ${tool.desc} ${tool.tags.join(" ")}`.toLowerCase();
+          const matchesSearch = text.includes(state.search.toLowerCase());
+          return matchesScope && matchesTag && matchesSearch;
+        });
+      }
+
+      function renderTags() {
+        refs.tagTabs.innerHTML = tagOptions
+          .map(
+            (tag) => `
+              <button class="filter-chip ${state.tag === tag.key ? "active" : ""}" data-tag="${tag.key}" type="button">
+                ${tag.label}
+              </button>
+            `
+          )
+          .join("");
+      }
+
+      function renderTools() {
+        const tools = filteredTools();
+        refs.toolsGrid.innerHTML = tools
+          .map(
+            (tool) => `
+              <button class="tool-card" data-tool-id="${tool.id}" type="button">
+                <div class="tool-header">
+                  <div class="tool-icon">${tool.icon}</div>
+                </div>
+                <div>
+                  <h3>${tool.title}</h3>
+                  <p>${tool.desc}</p>
+                </div>
+                <div class="card-footer">
+                </div>
+              </button>
+            `
+          )
+          .join("");
+
+        if (!tools.length) {
+          refs.toolsGrid.innerHTML = `
+            <article class="tool-card" style="grid-column: 1 / -1;">
+              <h3>${tt("没有找到内容", "No Results Found")}</h3>
+              <p>${tt("换个分类或关键词试试。", "Try a different category or keyword.")}</p>
+            </article>
+          `;
+        }
+      }
+
+      function render() {
+        renderTags();
+        renderTools();
+      }
+
+      refs.scopeTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-scope]");
+        if (!button) return;
+        state.scope = button.dataset.scope;
+        refs.scopeTabs.querySelectorAll("[data-scope]").forEach((item) => item.classList.toggle("active", item.dataset.scope === state.scope));
+        renderTools();
+      });
+
+      refs.tagTabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-tag]");
+        if (!button) return;
+        state.tag = button.dataset.tag;
+        render();
+      });
+
+      refs.searchInput.addEventListener("input", (event) => {
+        state.search = event.target.value;
+        renderTools();
+      });
+
+      refs.toolsGrid.addEventListener("click", (event) => {
+        const card = event.target.closest("[data-tool-id]");
+        if (!card) return;
+        const tool = state.tools.find((item) => item.id === card.dataset.toolId);
+        if (!tool) return;
+        if (tool.href) {
+          showToast(`正在打开 ${tool.title}...`);
+          setTimeout(() => {
+            window.location.href = tool.href;
+          }, 220);
+          return;
+        }
+        window.localStorage.setItem(
+          ACTIVE_TOOL_KEY,
+          JSON.stringify({
+            id: tool.id,
+            type: tool.type,
+            title: tool.title,
+            desc: tool.desc,
+            icon: tool.icon,
+            invokeText: tool.invokeText,
+            tags: tool.tags
+          })
+        );
+        showToast(`正在用 ${tool.title} 打开对话...`);
+        setTimeout(() => {
+          window.location.href = "../chat/chat-workspace.html";
+        }, 220);
+      });
+
+      render();
+    </script>
+  </body>
+</html>

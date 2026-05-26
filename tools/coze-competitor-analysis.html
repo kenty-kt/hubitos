@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>扣子竞品分析</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+    <style>
+      :root {
+        --text: #241b1a;
+        --muted: #7b6a66;
+        --brand: #d92d20;
+        --line: rgba(236, 214, 209, 0.92);
+        --card: rgba(255, 255, 255, 0.96);
+        --shadow: 0 28px 60px rgba(118, 39, 27, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(217, 45, 32, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(166, 27, 19, 0.16), transparent 26%),
+          #160f0f;
+      }
+
+      body {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      .desktop-stage {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-window {
+        width: min(1728px, calc(100vw - 32px));
+        min-height: 720px;
+        display: grid;
+        grid-template-columns: var(--hubitos-sidebar-width) minmax(0, 1fr);
+        overflow: hidden;
+        border-radius: 28px;
+        background: linear-gradient(180deg, #fff9f8 0%, #fffdfc 100%);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .report-shell {
+        min-width: 0;
+        padding: 26px 28px 32px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .hero, .section {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: 0 18px 34px rgba(145, 54, 39, 0.08);
+      }
+
+      .hero {
+        padding: 28px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .kicker, .label {
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--brand);
+      }
+
+      h1, h2, h3 {
+        margin: 0;
+        letter-spacing: -0.03em;
+      }
+
+      h1 {
+        font-size: 38px;
+        line-height: 1.05;
+      }
+
+      .hero-grid, .grid, .table-wrap {
+        display: grid;
+        gap: 16px;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+
+      .panel, .block {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 18px;
+        background: rgba(255, 251, 249, 0.96);
+      }
+
+      .panel p, .block p, li {
+        color: var(--muted);
+        line-height: 1.72;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .chips span {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: #5a4743;
+        font-size: 12px;
+      }
+
+      .section {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+
+      th, td {
+        padding: 14px 12px;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid rgba(236, 214, 209, 0.92);
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      th {
+        background: #fff4f1;
+        color: var(--text);
+        font-size: 13px;
+      }
+
+      .fact {
+        display: inline-flex;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: #eefaf4;
+        color: #167c52;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .guess {
+        display: inline-flex;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: #fff6e5;
+        color: #a15f00;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      @media (max-width: 1080px) {
+        .hero-grid,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="desktop-stage">
+      <main class="app-window">
+        <div id="sharedSidebar"></div>
+
+        <section class="report-shell">
+          <section class="hero">
+            <div class="kicker">Competitor Analysis Skill</div>
+            <div>
+              <h1>扣子 Coze 竞品分析</h1>
+              <div class="chips">
+                <span>AI Agent 平台</span>
+                <span>AI 办公工作台</span>
+                <span>中文市场</span>
+                <span>平台型产品</span>
+              </div>
+            </div>
+            <div class="hero-grid">
+              <div class="panel">
+                <div class="label">核心结论</div>
+                <p>扣子正在从“AI 办公助手”升级为“Agent 工作操作系统”。它的核心竞争力不是某个单点功能，而是把对话、文件、设备、技能、编程和视频创作组织成一个统一工作台。</p>
+                <p><span class="fact">事实</span> 登录态已经存在 `文件 / 邮箱 / 设备 / 技能商店 / 视频创作 / 扣子编程 / Agent World` 等独立入口。</p>
+                <p><span class="guess">推测</span> 长期方向不是工具集合，而是一个可扩展的 Agent 平台。</p>
+              </div>
+              <div class="panel">
+                <div class="label">一句话定位</div>
+                <p>面向中文用户的 Agent 工作台与 AI 办公执行平台。</p>
+                <div class="label" style="margin-top: 12px;">关键差异点</div>
+                <ul>
+                  <li>执行入口与能力入口分层清晰</li>
+                  <li>文件、设备与技能市场形成平台骨架</li>
+                  <li>编程与视频创作被单独做成工作区</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <div class="kicker">1. 产品定位分析</div>
+                <h2>产品定位</h2>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="block">
+                <div class="label">核心价值</div>
+                <p>把 AI 对话、内容资产、执行环境、能力扩展和应用生成整合到一个工作环境里，让用户从“问问题”过渡到“让 Agent 真的做事”。</p>
+              </div>
+              <div class="block">
+                <div class="label">主要场景</div>
+                <p>办公助理、内容生成、文件处理、设备执行、AI 应用构建、多模态创作。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <div class="kicker">2. 目标用户分析</div>
+                <h2>目标用户</h2>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>用户类型</th>
+                  <th>典型需求</th>
+                  <th>核心痛点</th>
+                  <th>产品价值</th>
+                  <th>付费意愿</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>个人办公用户</td>
+                  <td>写作、文件整理、提醒、邮件协助</td>
+                  <td>工具分散、重复劳动多</td>
+                  <td>一站式 AI 工作台</td>
+                  <td>中</td>
+                </tr>
+                <tr>
+                  <td>内容创作者</td>
+                  <td>视频创作、文案、素材生成</td>
+                  <td>创作链条长、切工具频繁</td>
+                  <td>生成式工作区直达产出</td>
+                  <td>中到高</td>
+                </tr>
+                <tr>
+                  <td>开发者 / 高阶用户</td>
+                  <td>搭建 AI 应用、自动化流程</td>
+                  <td>从 prompt 到应用落地断层大</td>
+                  <td>扣子编程承接应用生成</td>
+                  <td>高</td>
+                </tr>
+                <tr>
+                  <td>团队 / 企业</td>
+                  <td>统一执行、协作、资产沉淀</td>
+                  <td>AI 工具多但不成体系</td>
+                  <td>平台化部署与扩展潜力</td>
+                  <td>高</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <div class="kicker">3. 核心功能分析</div>
+                <h2>核心功能模块</h2>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>功能模块</th>
+                  <th>功能说明</th>
+                  <th>解决的问题</th>
+                  <th>用户价值</th>
+                  <th>重要程度</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>文件</td>
+                  <td>全部文件 / 记忆 / 收藏夹</td>
+                  <td>输入输出资产分散</td>
+                  <td>知识与结果物沉淀到 Agent 体系</td>
+                  <td>高</td>
+                </tr>
+                <tr>
+                  <td>设备</td>
+                  <td>设备管理入口</td>
+                  <td>执行环境与工作流割裂</td>
+                  <td>把 Agent 延伸到真实终端执行</td>
+                  <td>高</td>
+                </tr>
+                <tr>
+                  <td>技能商店</td>
+                  <td>技能市场 / 我的技能</td>
+                  <td>能力扩展难、复用弱</td>
+                  <td>用市场化方式安装和复用能力</td>
+                  <td>高</td>
+                </tr>
+                <tr>
+                  <td>扣子编程</td>
+                  <td>AI 应用生成工作区</td>
+                  <td>从想法到应用落地链路长</td>
+                  <td>非传统开发流程也可产出应用</td>
+                  <td>高</td>
+                </tr>
+                <tr>
+                  <td>视频创作</td>
+                  <td>生成型视频工作区</td>
+                  <td>创作启动门槛高</td>
+                  <td>直接进入视频生成任务</td>
+                  <td>中到高</td>
+                </tr>
+                <tr>
+                  <td>邮箱 / 日程</td>
+                  <td>业务通信与时间入口</td>
+                  <td>AI 脱离真实办公链路</td>
+                  <td>强化“执行型 AI”心智</td>
+                  <td>中</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <div class="kicker">4. 用户路径分析</div>
+                <h2>用户路径</h2>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>用户阶段</th>
+                  <th>用户行为</th>
+                  <th>产品触点</th>
+                  <th>关键体验</th>
+                  <th>潜在问题</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>认知</td>
+                  <td>访问官网</td>
+                  <td>公开页 /overview</td>
+                  <td>世界观强、记忆点大</td>
+                  <td>功能价值不够直接</td>
+                </tr>
+                <tr>
+                  <td>注册 / 登录</td>
+                  <td>进入工作台</td>
+                  <td>登录态左侧导航</td>
+                  <td>快速看到平台能力版图</td>
+                  <td>能力多，首次理解成本高</td>
+                </tr>
+                <tr>
+                  <td>首次使用</td>
+                  <td>点击具体栏目</td>
+                  <td>文件 / 设备 / 技能商店 / 编程等</td>
+                  <td>开始进入独立工作区</td>
+                  <td>空状态页较多，容易迷茫</td>
+                </tr>
+                <tr>
+                  <td>留存</td>
+                  <td>反复使用并沉淀资产</td>
+                  <td>文件 / 记忆 / 收藏夹 / 技能</td>
+                  <td>形成知识和执行复用</td>
+                  <td>若反馈弱，难形成习惯</td>
+                </tr>
+                <tr>
+                  <td>付费</td>
+                  <td>进入订阅或积分体系</td>
+                  <td>订阅管理 / 积分消耗</td>
+                  <td>商业化路径存在</td>
+                  <td>若基础价值未建立，转化压力大</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <div class="kicker">5. 商业模式与定价</div>
+                <h2>商业模式</h2>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="block">
+                <div class="label">事实</div>
+                <p><span class="fact">事实</span> 页面中出现 `订阅管理 / 积分消耗 / 个人免费版 / 个人进阶版` 等结构，说明至少存在免费版与付费升级层。</p>
+              </div>
+              <div class="block">
+                <div class="label">推测</div>
+                <p><span class="guess">推测</span> 其商业化更可能是 `免费试用 + 订阅分层 + 积分消耗 + 企业扩展` 的组合，而不是单一订阅制。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <div class="kicker">6. 增长与获客</div>
+                <h2>增长路径</h2>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="block">
+                <div class="label">公开页增长</div>
+                <p>通过 `Agent World` 世界观、跨端行动力、FAQ 等内容建立品牌认知。</p>
+              </div>
+              <div class="block">
+                <div class="label">产品内增长</div>
+                <p>通过 `技能商店`、`视频创作`、`扣子编程` 等工作区扩展用户使用深度。</p>
+              </div>
+              <div class="block">
+                <div class="label">生态增长</div>
+                <p><span class="guess">推测</span> 技能市场、模板与应用工作区构成平台生态增长飞轮。</p>
+              </div>
+              <div class="block">
+                <div class="label">可借鉴点</div>
+                <p>不是只靠 SEO 或内容获客，而是把“产品本身”做成增长与留存入口。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div>
+                <div class="kicker">7. 优势、短板与我方机会</div>
+                <h2>战略判断</h2>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="block">
+                <div class="label">主要优势</div>
+                <ul>
+                  <li>平台能力完整，不是单点工具</li>
+                  <li>执行环境、文件、技能、代码、创作被统一进一个工作台</li>
+                  <li>产品叙事与生态方向明确</li>
+                </ul>
+              </div>
+              <div class="block">
+                <div class="label">主要短板</div>
+                <ul>
+                  <li>首次理解成本高</li>
+                  <li>多个入口之间的边界仍需更清晰</li>
+                  <li>部分页空状态过强，首屏反馈不足</li>
+                </ul>
+              </div>
+              <div class="block">
+                <div class="label">我方机会</div>
+                <ul>
+                  <li>把入口分层和首次使用路径做得更清楚</li>
+                  <li>强化空状态引导与结果反馈</li>
+                  <li>把文件、知识、执行环境之间的关系做得更容易理解</li>
+                </ul>
+              </div>
+              <div class="block">
+                <div class="label">最终判断</div>
+                <p>如果要和扣子竞争，核心不在“功能更多”，而在于：路径更清楚、模块关系更可理解、用户更快拿到结果、沉淀闭环更强。</p>
+              </div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "competitor-analysis",
+        showHistory: true,
+        historyTitle: "最近对话",
+        primaryLabel: "+ 新建对话",
+        primaryId: "newConversationBtn",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "./tools-center.html",
+        competitorAnalysisHref: "./coze-competitor-analysis.html",
+        workflowsHref: "../workflows/workflows-home.html",
+        projectsHref: "../projects/projects-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+    </script>
+  </body>
+</html>
