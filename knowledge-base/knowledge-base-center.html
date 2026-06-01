@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubitos AI OS - 频道知识库</title>
+    <link rel="stylesheet" href="../shared/sidebar.css" />
+    <link rel="stylesheet" href="../shared/theme-dark.css" />
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --paper: #ffffff;
+        --paper-soft: #f8fbff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #dbe4ee;
+        --line-strong: #c7d3df;
+        --accent: #0f766e;
+        --accent-soft: rgba(240, 253, 250, 0.96);
+        --shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(14, 165, 233, 0.08), transparent 24%),
+          radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.08), transparent 22%),
+          var(--bg);
+      }
+
+      body {
+        padding: 16px;
+      }
+
+      .workspace {
+        width: min(1760px, calc(100vw - 32px));
+        min-height: calc(100vh - 32px);
+        margin: 0 auto;
+        border-radius: 30px;
+        overflow: clip;
+        background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+
+      .shell {
+        margin-left: var(--hubitos-sidebar-width);
+        width: calc(100% - var(--hubitos-sidebar-width));
+        min-height: calc(100vh - 32px);
+        display: grid;
+        grid-template-columns: 80px 360px minmax(0, 1fr);
+        background: linear-gradient(180deg, #fdfefe 0%, #f8fbff 100%);
+      }
+
+      .shell.nav-collapsed {
+        grid-template-columns: 80px 0 minmax(0, 1fr);
+      }
+
+      .micro-rail {
+        border-right: 1px solid var(--line);
+        background: linear-gradient(180deg, #f8fbff 0%, #f1f6fb 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 22px 10px;
+      }
+
+      .rail-logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #0f766e, #0b5f59);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .rail-spacer {
+        flex: 1;
+      }
+
+      .rail-toggle {
+        margin-top: 4px;
+      }
+
+      .rail-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #64748b;
+        display: grid;
+        place-items: center;
+        font-size: 21px;
+      }
+
+      .rail-icon.active {
+        background: #ffffff;
+        border-color: var(--line);
+        color: var(--ink);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      }
+
+      .knowledge-nav {
+        border-right: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.78);
+        display: grid;
+        grid-template-rows: auto auto auto minmax(0, 1fr);
+        min-width: 0;
+        overflow: hidden;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+      }
+
+      .shell.nav-collapsed .knowledge-nav {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-8px);
+      }
+
+      .pane-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 24px 24px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .pane-head h1,
+      .content-head h2,
+      .section-title {
+        margin: 0;
+        letter-spacing: -0.04em;
+      }
+
+      .pane-head h1 {
+        font-size: 26px;
+      }
+
+      .pane-tools {
+        display: flex;
+        gap: 10px;
+      }
+
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--muted);
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+      }
+
+      .tree-row[data-drop-folder] {
+        cursor: pointer;
+      }
+
+      .tree-row.is-drop-target {
+        background: #eef6f4;
+        box-shadow: inset 0 0 0 1px rgba(15, 118, 110, 0.18);
+      }
+
+      .search-box {
+        position: relative;
+        padding: 16px 20px 0;
+      }
+
+      .search-box input {
+        width: 100%;
+        height: 46px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        padding: 0 16px 0 46px;
+        font: inherit;
+        outline: none;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 34px;
+        top: 28px;
+        color: #94a3b8;
+        font-size: 18px;
+      }
+
+      .tree-wrap {
+        overflow: auto;
+        padding: 16px 12px 22px 16px;
+      }
+
+      .tree {
+        display: grid;
+        gap: 10px;
+      }
+
+      .tree-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 12px;
+        border-radius: 14px;
+        color: #475569;
+      }
+
+      .tree-row.active {
+        background: #eef6f4;
+        color: #0f172a;
+        box-shadow: inset 0 0 0 1px rgba(15, 118, 110, 0.12);
+      }
+
+      .tree-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .tree-icon {
+        width: 22px;
+        text-align: center;
+        color: #64748b;
+      }
+
+      .tree-title {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .tree-depth-1 { padding-left: 24px; }
+      .tree-depth-2 { padding-left: 42px; }
+      .tree-depth-3 { padding-left: 60px; }
+
+      .tree-count {
+        min-width: 30px;
+        height: 28px;
+        padding: 0 9px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #475569;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .content-pane {
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr);
+        min-width: 0;
+      }
+
+      .content-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 24px 24px 18px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.76);
+      }
+
+      .content-head h2 {
+        font-size: 24px;
+      }
+
+      .content-head-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .back-btn {
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .content-body {
+        display: grid;
+        gap: 22px;
+        padding: 22px;
+        overflow: auto;
+        min-width: 0;
+        align-content: start;
+      }
+
+      .folder-section,
+      .files-section {
+        display: grid;
+        gap: 14px;
+      }
+
+      .files-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .view-toggle {
+        display: flex;
+        gap: 8px;
+      }
+
+      .view-toggle-btn {
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid #dbe4ee;
+        background: #fff;
+        color: var(--muted);
+        font: inherit;
+      }
+
+      .view-toggle-btn.active {
+        border-color: rgba(15, 118, 110, 0.2);
+        background: #eef6f4;
+        color: var(--ink);
+      }
+
+      .section-title {
+        font-size: 22px;
+      }
+
+      .folder-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .folder-card {
+        display: grid;
+        gap: 10px;
+        padding: 18px 16px;
+        border-radius: 18px;
+        border: 1px solid #dbe4ee;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        box-shadow: 0 18px 32px rgba(15, 23, 42, 0.05);
+        cursor: pointer;
+      }
+
+      .folder-card strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .folder-meta {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .table {
+        border-radius: 18px;
+        border: 1px solid #dbe4ee;
+        overflow: hidden;
+        background: rgba(255,255,255,.92);
+      }
+
+      .file-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .file-card {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid #dbe4ee;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        box-shadow: 0 18px 32px rgba(15, 23, 42, 0.05);
+        cursor: pointer;
+      }
+
+      .file-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .file-card-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .file-card-title span:last-child {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+      }
+
+      .file-card-meta {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .table-head,
+      .table-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.9fr) minmax(96px, 0.45fr);
+        gap: 12px;
+        align-items: center;
+        padding: 14px 16px;
+      }
+
+      .table-head {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--line);
+        background: #f8fbff;
+      }
+
+      .table-row {
+        border-bottom: 1px solid #eef3f8;
+        cursor: pointer;
+      }
+
+      .table-row.dragging {
+        opacity: 0.45;
+      }
+
+      .table-row:last-child {
+        border-bottom: 0;
+      }
+
+      .file-name {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .file-name span:last-child,
+      .person span:last-child {
+        overflow-wrap: anywhere;
+      }
+
+      .file-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: #eef4fb;
+        color: #3b82f6;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+      }
+
+      .person {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1d4ed8;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        flex: 0 0 auto;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .doc-view {
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) 360px;
+        border: 1px solid #dbe4ee;
+        border-radius: 24px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 18px 32px rgba(15, 23, 42, 0.05);
+      }
+
+      .doc-main {
+        min-width: 0;
+        display: grid;
+        border-right: 1px solid #e5edf5;
+        background: #ffffff;
+      }
+
+      .note-tab {
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1px solid #dbe4ee;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .note-tab.active {
+        border-color: rgba(15, 118, 110, 0.2);
+        background: #eef6f4;
+      }
+
+      .doc-sheet {
+        padding: 26px 28px 32px;
+        overflow: auto;
+      }
+
+      .doc-sheet h3 {
+        margin: 0 0 22px;
+        font-size: 22px;
+      }
+
+      .doc-sheet p {
+        margin: 0 0 26px;
+        color: #334155;
+        font-size: 15px;
+        line-height: 1.9;
+        white-space: pre-wrap;
+      }
+
+      .doc-side {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        background: #fbfdff;
+      }
+
+      .doc-side-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5edf5;
+      }
+
+      .doc-note-tabs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .doc-tab-panel {
+        display: none;
+        min-height: 0;
+      }
+
+      .doc-tab-panel.active {
+        display: grid;
+      }
+
+      .doc-note-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5edf5;
+      }
+
+      .note-search-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #64748b;
+      }
+
+      .add-note-btn {
+        min-height: 40px;
+        padding: 0 16px;
+        border-radius: 999px;
+        border: 0;
+        background: #0f172a;
+        color: #fff;
+        font: inherit;
+      }
+
+      .note-list {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        overflow: auto;
+      }
+
+      .chat-panel {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) auto;
+        min-height: 0;
+      }
+
+      .chat-list {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        overflow: auto;
+      }
+
+      .chat-bubble {
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+      }
+
+      .chat-bubble.user {
+        background: #eef6f4;
+        border-color: rgba(15, 118, 110, 0.14);
+      }
+
+      .chat-bubble strong {
+        display: block;
+        font-size: 13px;
+      }
+
+      .chat-bubble p {
+        margin: 8px 0 0;
+        color: #475569;
+        line-height: 1.6;
+      }
+
+      .chat-compose {
+        display: grid;
+        gap: 10px;
+        padding: 16px;
+        border-top: 1px solid #e5edf5;
+        background: #fff;
+      }
+
+      .chat-compose textarea {
+        width: 100%;
+        min-height: 92px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        border: 1px solid #dbe4ee;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        resize: vertical;
+        outline: none;
+      }
+
+      .chat-compose-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .note-card {
+        padding: 16px;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+      }
+
+      .note-card strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .note-card p {
+        margin: 10px 0 0;
+        color: #64748b;
+        line-height: 1.6;
+      }
+
+      .note-time {
+        display: block;
+        margin-top: 14px;
+        color: #94a3b8;
+        font-size: 12px;
+      }
+
+      .doc-side-footer {
+        display: flex;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 16px;
+        border-top: 1px solid #e5edf5;
+        background: #fff;
+      }
+
+      .footer-pill {
+        min-height: 40px;
+        border-radius: 999px;
+        border: 1px solid #dbe4ee;
+        background: #fff;
+        color: #7c3aed;
+        font: inherit;
+      }
+
+      @media (max-width: 1480px) {
+        .shell {
+          grid-template-columns: 72px 300px minmax(0, 1fr);
+        }
+
+        .folder-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .file-card-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .doc-view {
+          grid-template-columns: 1fr;
+        }
+
+        .doc-main {
+          border-right: 0;
+          border-bottom: 1px solid #e5edf5;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        body {
+          padding: 0;
+        }
+
+        .workspace {
+          width: 100vw;
+          min-height: 100vh;
+          border-radius: 0;
+        }
+
+        .shell {
+          grid-template-columns: 76px 320px minmax(0, 1fr);
+        }
+
+        .content-body,
+        .content-head,
+        .pane-head {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+
+        .folder-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .file-card-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="workspace">
+      <div id="sharedSidebar"></div>
+
+      <main class="shell">
+        <aside class="micro-rail">
+          <div class="rail-logo">◈</div>
+          <button class="rail-icon rail-toggle" id="expandNavBtn" type="button">◫</button>
+          <button class="rail-icon" type="button">⌂</button>
+          <button class="rail-icon active" type="button">⛁</button>
+          <button class="rail-icon" type="button">⇄</button>
+          <button class="rail-icon" type="button">▥</button>
+          <div class="rail-spacer"></div>
+        </aside>
+
+        <section class="knowledge-nav">
+          <div class="pane-head">
+            <h1>Knowledge Base</h1>
+            <div class="pane-tools">
+              <button class="icon-btn" type="button">＋</button>
+              <button class="icon-btn" id="collapseNavBtn" type="button">◫</button>
+            </div>
+          </div>
+
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" placeholder="Search..." />
+          </div>
+
+          <div class="tree-wrap">
+            <div class="tree">
+              <div class="tree-row active" data-drop-folder="general">
+                <div class="tree-label">
+                  <span class="tree-icon">🗀</span>
+                  <span class="tree-title">General Knowledge</span>
+                </div>
+                <span class="tree-count">10</span>
+              </div>
+              <div class="tree-row tree-depth-1" data-drop-folder="onboarding">
+                <div class="tree-label">
+                  <span class="tree-icon">🗀</span>
+                  <span class="tree-title">Onboarding</span>
+                </div>
+                <span class="tree-count">3</span>
+              </div>
+              <div class="tree-row tree-depth-2">
+                <div class="tree-label">
+                  <span class="tree-icon">🗁</span>
+                  <span class="tree-title">Subfolder 1</span>
+                </div>
+                <span class="tree-count">5</span>
+              </div>
+              <div class="tree-row tree-depth-2">
+                <div class="tree-label">
+                  <span class="tree-icon">🗁</span>
+                  <span class="tree-title">Subfolder 2</span>
+                </div>
+                <span class="tree-count">10</span>
+              </div>
+              <div class="tree-row tree-depth-1" data-drop-folder="integrations">
+                <div class="tree-label">
+                  <span class="tree-icon">🗀</span>
+                  <span class="tree-title">Integrations</span>
+                </div>
+              </div>
+              <div class="tree-row tree-depth-1" data-drop-folder="documents">
+                <div class="tree-label">
+                  <span class="tree-icon">🗀</span>
+                  <span class="tree-title">Documents</span>
+                </div>
+              </div>
+              <div class="tree-row">
+                <div class="tree-label">
+                  <span class="tree-icon">🗁</span>
+                  <span class="tree-title">Onboarding Design</span>
+                </div>
+              </div>
+              <div class="tree-row">
+                <div class="tree-label">
+                  <span class="tree-icon">🗁</span>
+                  <span class="tree-title">Team Interviews</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-pane">
+          <div class="content-head">
+            <div class="content-head-left">
+              <button class="back-btn" id="backButton" type="button" style="display:none;">← 返回</button>
+              <h2 id="contentTitle">General Knowledge</h2>
+            </div>
+            <button class="btn-secondary" type="button">切换知识库</button>
+          </div>
+
+          <div class="content-body" id="contentBody">
+            <section class="folder-section" id="foldersSection">
+              <div class="folder-grid">
+                <article class="folder-card" data-open-folder="onboarding">
+                </article>
+
+                <article class="folder-card" data-open-folder="integrations">
+                </article>
+
+                <article class="folder-card" data-open-folder="documents">
+                </article>
+              </div>
+            </section>
+
+            <section class="files-section" id="filesSection">
+              <h3 class="section-title" id="filesTitle">Files</h3>
+              <div class="table" id="filesTable">
+                <div class="table-head" id="filesTableHead">
+                  <div>Name</div>
+                  <div>Workflow / Agent</div>
+                  <div>Status</div>
+                </div>
+                <div id="fileRows"></div>
+              </div>
+            </section>
+
+            <section id="detailSection" style="display:none;"></section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/sidebar.js"></script>
+    <script>
+      window.HubitosSidebar.mount("#sharedSidebar", {
+        active: "knowledge-base",
+        fixed: true,
+        showHistory: true,
+        historyTitle: "最近对话",
+        primaryLabel: "+ 新建知识库",
+        primaryId: "newKnowledgeBaseBtn",
+        chatHref: "../chat/chat-workspace.html",
+        toolsHref: "../tools/tools-center.html",
+        workflowsHref: "../workflows/workflows-home.html",
+        projectsHref: "../projects/projects-center.html",
+        knowledgeBaseHref: "./knowledge-base-center.html",
+        filesHref: "../files/files-center.html",
+        agentsHref: "../agents/agents-center.html",
+        skillsHref: "../skills/skills-center.html",
+        mcpHref: "../mcp/mcp-center.html"
+      });
+
+      const fileDetails = {
+        "onboarding-guide": {
+          title: "Onboarding-Guide.pdf",
+          summary: "该文档用于帮助新成员快速理解频道知识库的结构、命名规则、更新方式和调用场景。",
+          meta: ["来源：Onboarding Workflow", "状态：已同步", "最近更新：今天 09:20"],
+          workflow: "Onboarding Workflow",
+          status: "已同步",
+          folder: "onboarding",
+          preview: `价格(USDT)数量总量\n\n$74,461.99\n$74,462.00\n$74,462.61\n$74,463.73\n$74,463.74\n$74,463.80\n$74,461.98 ↑\n$74,461.98\n$74,461.97\n$74,461.41\n$74,461.40\n$74,461.23`,
+          notes: [
+            { title: "价格 $74,", body: "价格 $74, 这一组数据需要进一步标记为高频变化区间。", time: "2026.04.16 20:10" },
+            { title: "自主AI 24x7操盘 · 顶级模型", body: "这份文档适合拆成多个价格监测问答条目，方便后续检索。", time: "2026.04.02 19:23" },
+            { title: "自主AI 24x7操盘 · 顶级模型", body: "可把异常价格波动单独沉淀为风险提示说明。", time: "2026.04.02 17:15" }
+          ],
+          chat: [
+            { role: "assistant", text: "这份文档主要记录价格区间样本，适合提炼为监测类知识条目。" },
+            { role: "user", text: "哪些内容适合优先沉淀进知识库？" },
+            { role: "assistant", text: "建议先提取高频价格区间、波动提醒逻辑和异常情况说明。" }
+          ],
+          sections: [
+            { title: "文档摘要", body: "文档覆盖频道知识库的基本结构、文件命名方式、条目维护流程以及如何把高表现内容沉淀为可检索知识。" },
+            { title: "适用场景", list: ["新人培训", "频道接手交接", "workflow 初始启用", "知识库标准说明"] }
+          ]
+        },
+        roadmap: {
+          title: "Product-Roadmap.docx",
+          summary: "产品路线图文档，用来对齐知识库模块、workflow 联动模块与数据回流能力的建设计划。",
+          meta: ["来源：发布编排 Agent", "状态：待整理", "最近更新：昨天 17:40"],
+          workflow: "发布编排 Agent",
+          status: "待整理",
+          folder: "integrations",
+          preview: `Roadmap Draft\n\nQ2: 知识库结构统一\nQ3: 文件夹与文档联动\nQ4: AI 检索与问答增强\n\n核心目标：让频道知识库可维护、可调用、可复盘。`,
+          notes: [
+            { title: "路线图摘要", body: "建议把 Q3 的文件夹联动与权限模型拆开。", time: "2026.05.08 10:22" },
+            { title: "优先级提醒", body: "当前最关键的是统一条目结构和回流路径。", time: "2026.05.06 09:12" }
+          ],
+          chat: [
+            { role: "assistant", text: "这份路线图更适合提炼成能力建设阶段说明。" },
+            { role: "user", text: "知识库模块应该先做哪块？" },
+            { role: "assistant", text: "建议先完成文件夹-文档-检索结构统一，再推进回流与问答联动。" }
+          ],
+          sections: [
+            { title: "文档摘要", body: "文档描述了知识库中台、内容工作流、平台接入和数据回流的阶段性规划，方便团队统一节奏。" },
+            { title: "适用场景", list: ["版本规划评审", "需求梳理", "优先级讨论", "跨团队协作对齐"] }
+          ]
+        },
+        "faq-notes": {
+          title: "Social-FAQ-Notes.md",
+          summary: "社媒运营和知识库问答中的高频问题草稿，适合转化为 FAQ 文档或问答对训练素材。",
+          meta: ["来源：复盘回写 Agent", "状态：可检索", "最近更新：3 天前"],
+          workflow: "复盘回写 Agent",
+          status: "可检索",
+          folder: "documents",
+          preview: `FAQ Notes\n\n1. 为什么要先用知识库规则生成？\n2. 内容回流后怎样写回 Prompt？\n3. 如果数据不足，如何复盘？\n4. 如果知识库没有答案，系统应如何回复？`,
+          notes: [
+            { title: "FAQ 结构", body: "建议把问题按“内容、发布、回流、异常”四类拆分。", time: "2026.05.01 18:40" },
+            { title: "检索建议", body: "高频问题可以单独切片，提升 RAG 命中率。", time: "2026.04.28 14:16" }
+          ],
+          chat: [
+            { role: "assistant", text: "这份 FAQ 草稿已经很适合作为知识库问答对底稿。" },
+            { role: "user", text: "如果知识库没有答案该怎么回复？" },
+            { role: "assistant", text: "应明确回答：当前知识库暂无相关信息，建议联系人工确认。" }
+          ],
+          sections: [
+            { title: "文档摘要", body: "包含用户常见提问、标准回答草稿、需人工确认的边界问题，以及可直接拆分的 RAG 切片线索。" },
+            { title: "适用场景", list: ["FAQ 管理", "问答系统训练", "客服辅助", "知识库补充"] }
+          ]
+        },
+        "brand-voice": {
+          title: "Brand-Voice-Playbook.txt",
+          summary: "品牌语气说明文档，规范各频道在不同场景中的措辞、语气边界和表达禁区。",
+          meta: ["来源：内容策略 Agent", "状态：已同步", "最近更新：昨天 11:08"],
+          workflow: "内容策略 Agent",
+          status: "已同步",
+          folder: "documents",
+          preview: `Brand Voice Playbook\n\n1. 语气：专业、温和、清晰\n2. 避免：夸大承诺、过度营销、含糊措辞\n3. CTA：优先引导收藏、评论、私信而非硬转化`,
+          notes: [
+            { title: "语气提醒", body: "建议把不同平台的 CTA 语气拆成独立条目，便于检索。", time: "2026.05.31 11:08" }
+          ],
+          chat: [
+            { role: "assistant", text: "这份文档适合作为所有内容生成前的统一语气约束。 " }
+          ],
+          sections: [
+            { title: "文档摘要", body: "统一规范内容语气、措辞、表达边界和不同平台的 CTA 使用方式。" },
+            { title: "适用场景", list: ["内容生成前约束", "频道语气统一", "品牌审校"] }
+          ]
+        },
+        "channel-policy": {
+          title: "Channel-Policy.json",
+          summary: "频道策略配置，记录发布时间、禁止词、频率上限和人工审核要求。",
+          meta: ["来源：发布编排 Agent", "状态：可检索", "最近更新：今天 08:32"],
+          workflow: "发布编排 Agent",
+          status: "可检索",
+          folder: "integrations",
+          preview: `{\n  "channel": "x-growth",\n  "max_posts_per_day": 3,\n  "review_required": true,\n  "blocked_terms": ["保证收益", "官方承诺"]\n}`,
+          notes: [
+            { title: "策略同步", body: "适合与发布节点联动，减少人工重复配置。", time: "2026.06.01 08:32" }
+          ],
+          chat: [
+            { role: "assistant", text: "这份 JSON 更适合作为 workflow 执行时的运行参数来源。" }
+          ],
+          sections: [
+            { title: "文档摘要", body: "以结构化 JSON 形式维护频道发布策略与审校规则。" },
+            { title: "适用场景", list: ["自动发布配置", "规则校验", "频道参数读取"] }
+          ]
+        },
+        "comment-dataset": {
+          title: "Comment-Insights-Dataset.csv",
+          summary: "评论回流数据集，按内容 ID、评论情绪、问题类型和处理状态拆分。",
+          meta: ["来源：复盘回写 Agent", "状态：待整理", "最近更新：2 天前"],
+          workflow: "复盘回写 Agent",
+          status: "待整理",
+          folder: "documents",
+          preview: `content_id,sentiment,topic,action\n014,positive,workflow clarity,archive\n014,neutral,prompt detail,review\n013,negative,too abstract,revise`,
+          notes: [
+            { title: "切片建议", body: "建议按主题与情绪拆成多个小知识片段，提高召回精度。", time: "2026.05.30 16:20" }
+          ],
+          chat: [
+            { role: "assistant", text: "这份 CSV 适合进一步清洗后送入复盘知识库。 " }
+          ],
+          sections: [
+            { title: "文档摘要", body: "帮助团队理解评论区反馈分布，并支撑后续情绪复盘和策略修正。" },
+            { title: "适用场景", list: ["评论复盘", "情绪分析", "FAQ 挖掘"] }
+          ]
+        },
+        "visual-prompts": {
+          title: "Visual-Prompt-Library.xlsx",
+          summary: "高表现视觉 Prompt 库，记录风格、构图、背景元素、品牌色和适用频道。",
+          meta: ["来源：图片生成 Agent", "状态：已同步", "最近更新：今天 07:48"],
+          workflow: "图片生成 Agent",
+          status: "已同步",
+          folder: "onboarding",
+          preview: `Sheet: Prompt Library\nRow 1: style=editorial poster, accent=teal, target=x-growth\nRow 2: style=dashboard card, accent=blue, target=faq-docs`,
+          notes: [
+            { title: "复用提醒", body: "适合跟节点 3 的图像生成一起联动做模板调用。", time: "2026.06.01 07:48" }
+          ],
+          chat: [
+            { role: "assistant", text: "这个视觉库可以作为图像 prompt 的标准来源。 " }
+          ],
+          sections: [
+            { title: "文档摘要", body: "集中管理高收藏、高点击图片的 Prompt 模板与适用说明。" },
+            { title: "适用场景", list: ["图片生成", "风格统一", "模板复用"] }
+          ]
+        },
+        "workflow-map": {
+          title: "Workflow-Topology.html",
+          summary: "工作流拓扑说明页，帮助团队快速理解内容生成、发布、回流和复盘的链路。",
+          meta: ["来源：Onboarding Workflow", "状态：可检索", "最近更新：4 天前"],
+          workflow: "Onboarding Workflow",
+          status: "可检索",
+          folder: "onboarding",
+          preview: `<section>\n  <h1>Workflow Topology</h1>\n  <p>内容策略 -> 图片生成 -> 发布 -> 数据回流 -> 复盘回写</p>\n</section>`,
+          notes: [
+            { title: "拓扑页", body: "适合给新成员快速理解端到端链路。", time: "2026.05.28 14:00" }
+          ],
+          chat: [
+            { role: "assistant", text: "这类 HTML 文档很适合作为可视化说明页使用。 " }
+          ],
+          sections: [
+            { title: "文档摘要", body: "把 workflow 结构做成可视化 HTML，方便演示和知识传递。" },
+            { title: "适用场景", list: ["新人理解流程", "对外演示", "跨团队同步"] }
+          ]
+        },
+        "ops-slides": {
+          title: "Ops-Review-Deck.pptx",
+          summary: "运营复盘演示文稿，整理每周内容表现、异常问题和优化动作。",
+          meta: ["来源：复盘回写 Agent", "状态：已同步", "最近更新：本周一"],
+          workflow: "复盘回写 Agent",
+          status: "已同步",
+          folder: "documents",
+          preview: `Slide 1: Weekly Ops Review\nSlide 2: Top Performing Content\nSlide 3: Underperforming Themes\nSlide 4: Next Prompt Direction`,
+          notes: [
+            { title: "汇报材料", body: "适合沉淀管理层汇报用的标准结构。", time: "2026.05.26 09:10" }
+          ],
+          chat: [
+            { role: "assistant", text: "这类幻灯片可以反向生成 FAQ 或周报模板。 " }
+          ],
+          sections: [
+            { title: "文档摘要", body: "标准化呈现周期运营复盘结果，支持团队评审和管理汇报。" },
+            { title: "适用场景", list: ["周报汇报", "复盘评审", "策略讨论"] }
+          ]
+        },
+        "user-interviews": {
+          title: "User-Interview-Transcripts.docx",
+          summary: "用户访谈纪要文档，记录目标用户对内容风格、知识库可用性和渠道策略的反馈。",
+          meta: ["来源：内容策略 Agent", "状态：待整理", "最近更新：5 天前"],
+          workflow: "内容策略 Agent",
+          status: "待整理",
+          folder: "general",
+          preview: `Interview Notes\n\n- 用户认为图示内容更容易被收藏\n- 希望 AI 解释更具体\n- 需要更多面向运营负责人的模板`,
+          notes: [
+            { title: "访谈价值", body: "这些内容适合反向输入到知识库的目标用户画像中。", time: "2026.05.27 15:30" }
+          ],
+          chat: [
+            { role: "assistant", text: "访谈纪要很适合作为生成 FAQ 和场景文档的来源。 " }
+          ],
+          sections: [
+            { title: "文档摘要", body: "沉淀真实用户反馈，用于修正频道内容方向和知识库结构。 " },
+            { title: "适用场景", list: ["用户研究", "内容方向调整", "知识库优化"] }
+          ]
+        }
+      };
+
+      const backButton = document.getElementById("backButton");
+      const contentTitle = document.getElementById("contentTitle");
+      const foldersSection = document.getElementById("foldersSection");
+      const filesSection = document.getElementById("filesSection");
+      const detailSection = document.getElementById("detailSection");
+      const fileRows = document.getElementById("fileRows");
+      const filesTitle = document.getElementById("filesTitle");
+      const filesTableHead = document.getElementById("filesTableHead");
+      const shell = document.querySelector(".shell");
+      const collapseNavBtn = document.getElementById("collapseNavBtn");
+      const expandNavBtn = document.getElementById("expandNavBtn");
+      let activeDocTab = "notes";
+      let activeFileId = null;
+      let activeFolderId = "general";
+      let activeFileView = "list";
+
+      function getFilesByFolder(folderId) {
+        return Object.entries(fileDetails)
+          .filter(([, file]) => file.folder === folderId || (folderId === "general" && !file.folder))
+          .map(([id]) => id);
+      }
+
+      function renderFileRows(ids) {
+        if (activeFileView === "grid") {
+          filesTableHead.style.display = "none";
+          fileRows.innerHTML = `
+            <div class="file-card-grid">
+              ${ids
+                .map((id) => {
+                  const detail = fileDetails[id];
+                  return `
+                    <article class="file-card" data-open-file="${id}" draggable="true">
+                      <div class="file-card-top">
+                        <div class="file-card-title">
+                          <span class="file-icon">▤</span>
+                          <span>${detail.title}</span>
+                        </div>
+                        <span class="status">${detail.status}</span>
+                      </div>
+                      <div class="file-card-meta">
+                        <span>来源：${detail.workflow}</span>
+                        <span>${detail.meta[2] || ""}</span>
+                      </div>
+                    </article>
+                  `;
+                })
+                .join("")}
+            </div>
+          `;
+          bindFileRowEvents();
+          return;
+        }
+
+        filesTableHead.style.display = "grid";
+        fileRows.innerHTML = ids
+          .map((id) => {
+            const detail = fileDetails[id];
+            return `
+              <div class="table-row" data-open-file="${id}" draggable="true">
+                <div class="file-name">
+                  <span class="file-icon">▤</span>
+                  <span>${detail.title}</span>
+                </div>
+                <div class="person">
+                  <span class="avatar">${detail.workflow.charAt(0)}</span>
+                  <span>${detail.workflow}</span>
+                </div>
+                <div><span class="status">${detail.status}</span></div>
+              </div>
+            `;
+          })
+          .join("");
+        bindFileRowEvents();
+      }
+
+      function renderFolderFiles(folderId) {
+        activeFolderId = folderId;
+        const titleMap = {
+          general: "General Knowledge / Files",
+          onboarding: "Onboarding / Files",
+          integrations: "Integrations / Files",
+          documents: "Documents / Files"
+        };
+        contentTitle.textContent = titleMap[folderId] || "Files";
+        foldersSection.style.display = "none";
+        filesSection.style.display = "";
+        filesTitle.textContent = titleMap[folderId] || "Files";
+        detailSection.style.display = "none";
+        detailSection.innerHTML = "";
+        backButton.style.display = "inline-flex";
+        renderFileRows(getFilesByFolder(folderId));
+      }
+
+      function renderFileDetail(detail) {
+        contentTitle.textContent = detail.title;
+        foldersSection.style.display = "none";
+        filesSection.style.display = "none";
+        detailSection.style.display = "block";
+        backButton.style.display = "inline-flex";
+        detailSection.innerHTML = `
+          <article class="doc-view">
+            <section class="doc-main">
+              <div class="doc-sheet">
+                <h3>${detail.title}</h3>
+                <p>${detail.preview}</p>
+              </div>
+            </section>
+            <aside class="doc-side">
+              <div class="doc-side-head">
+                <div class="doc-note-tabs">
+                  <button class="note-tab ${activeDocTab === "chat" ? "active" : ""}" type="button" data-doc-tab="chat">聊天</button>
+                  <button class="note-tab ${activeDocTab === "notes" ? "active" : ""}" type="button" data-doc-tab="notes">笔记 (${detail.notes.length})</button>
+                </div>
+              </div>
+              <div class="doc-tab-panel ${activeDocTab === "notes" ? "active" : ""}">
+                <div class="doc-note-actions">
+                  <div class="note-search-actions">
+                    <span>⌕</span>
+                    <span>☰</span>
+                  </div>
+                  <button class="add-note-btn" type="button" data-add-note>＋ 添加笔记</button>
+                </div>
+                <div class="note-list">
+                  ${detail.notes
+                    .map(
+                      (note) => `
+                        <article class="note-card">
+                          <strong>${note.title}</strong>
+                          <p>${note.body}</p>
+                          <span class="note-time">${note.time}</span>
+                        </article>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </div>
+              <div class="doc-tab-panel ${activeDocTab === "chat" ? "active" : ""}">
+                <div class="chat-panel">
+                  <div class="chat-list">
+                    ${detail.chat
+                      .map(
+                        (message) => `
+                          <article class="chat-bubble ${message.role === "user" ? "user" : ""}">
+                            <strong>${message.role === "user" ? "你" : "知识库助手"}</strong>
+                            <p>${message.text}</p>
+                          </article>
+                        `
+                      )
+                      .join("")}
+                  </div>
+                  <div class="chat-compose">
+                    <textarea placeholder="继续基于这份文档发问..."></textarea>
+                    <div class="chat-compose-actions">
+                      <button class="add-note-btn" type="button">发送</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="doc-side-footer">
+                <button class="footer-pill" type="button">🗨 带笔记聊天</button>
+              </div>
+            </aside>
+          </article>
+        `;
+      }
+
+      function resetView() {
+        contentTitle.textContent = "General Knowledge";
+        foldersSection.style.display = "";
+        filesSection.style.display = "";
+        filesTitle.textContent = "Files";
+        activeFolderId = "general";
+        renderFileRows(["user-interviews", "onboarding-guide", "roadmap", "faq-notes", "brand-voice"]);
+        detailSection.style.display = "none";
+        detailSection.innerHTML = "";
+        backButton.style.display = "none";
+      }
+
+      function bindFileRowEvents() {
+        document.querySelectorAll("[data-open-file]").forEach((item) => {
+          item.ondragstart = (event) => {
+            item.classList.add("dragging");
+            event.dataTransfer.setData("text/plain", item.dataset.openFile);
+          };
+          item.ondragend = () => {
+            item.classList.remove("dragging");
+          };
+          item.onclick = () => {
+            activeFileId = item.dataset.openFile;
+            renderFileDetail(fileDetails[item.dataset.openFile]);
+          };
+        });
+      }
+
+      function renderTreeSelection(folderId) {
+        document.querySelectorAll("[data-drop-folder]").forEach((item) => {
+          item.classList.toggle("active", item.dataset.dropFolder === folderId);
+        });
+      }
+
+      detailSection.addEventListener("click", (event) => {
+        const tab = event.target.closest("[data-doc-tab]");
+        if (tab) {
+          activeDocTab = tab.dataset.docTab;
+          const currentTitle = contentTitle.textContent;
+          const currentDetail = Object.values(fileDetails).find((item) => item.title === currentTitle);
+          if (currentDetail) renderFileDetail(currentDetail);
+          return;
+        }
+
+        const addNote = event.target.closest("[data-add-note]");
+        if (addNote && activeFileId && fileDetails[activeFileId]) {
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2, "0");
+          const mm = String(now.getMinutes()).padStart(2, "0");
+          const yyyy = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, "0");
+          const day = String(now.getDate()).padStart(2, "0");
+          fileDetails[activeFileId].notes.unshift({
+            title: "新笔记",
+            body: "这是刚添加的笔记内容，后续可以继续接真实编辑与保存能力。",
+            time: `${yyyy}.${month}.${day} ${hh}:${mm}`
+          });
+          renderFileDetail(fileDetails[activeFileId]);
+        }
+      });
+
+      document.querySelectorAll("[data-open-folder]").forEach((item) => {
+        item.addEventListener("click", () => {
+          renderFolderFiles(item.dataset.openFolder);
+          renderTreeSelection(item.dataset.openFolder);
+        });
+      });
+
+      document.querySelectorAll("[data-drop-folder]").forEach((item) => {
+        item.addEventListener("click", () => {
+          renderFolderFiles(item.dataset.dropFolder);
+          renderTreeSelection(item.dataset.dropFolder);
+        });
+      });
+
+      document.querySelectorAll("[data-drop-folder]").forEach((item) => {
+        item.addEventListener("dragover", (event) => {
+          event.preventDefault();
+          item.classList.add("is-drop-target");
+        });
+        item.addEventListener("dragleave", () => {
+          item.classList.remove("is-drop-target");
+        });
+        item.addEventListener("drop", (event) => {
+          event.preventDefault();
+          item.classList.remove("is-drop-target");
+          const fileId = event.dataTransfer.getData("text/plain");
+          const folderId = item.dataset.dropFolder;
+          if (!fileId || !fileDetails[fileId]) return;
+          fileDetails[fileId].folder = folderId;
+          renderFileRows(getFilesByFolder(folderId));
+          renderTreeSelection(folderId);
+        });
+      });
+
+      filesSection.insertAdjacentHTML(
+        "afterbegin",
+        `
+          <div class="files-toolbar">
+            <h3 class="section-title" id="filesTitleStatic">Files</h3>
+            <div class="view-toggle">
+              <button class="view-toggle-btn active" type="button" data-file-view="list">列表</button>
+              <button class="view-toggle-btn" type="button" data-file-view="grid">图卡</button>
+            </div>
+          </div>
+        `
+      );
+
+      filesSection.querySelectorAll("[data-file-view]").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeFileView = button.dataset.fileView;
+          filesSection.querySelectorAll("[data-file-view]").forEach((btn) => btn.classList.toggle("active", btn === button));
+          renderFileRows(getFilesByFolder(activeFolderId));
+        });
+      });
+
+      filesTitle.remove();
+      const filesTitleStatic = document.getElementById("filesTitleStatic");
+      const originalRenderFolderFiles = renderFolderFiles;
+      renderFolderFiles = function (folderId) {
+        originalRenderFolderFiles(folderId);
+        filesTitleStatic.textContent = ({
+          general: "General Knowledge / Files",
+          onboarding: "Onboarding / Files",
+          integrations: "Integrations / Files",
+          documents: "Documents / Files"
+        })[folderId] || "Files";
+      };
+
+      bindFileRowEvents();
+      renderTreeSelection("general");
+      collapseNavBtn.addEventListener("click", () => {
+        shell.classList.toggle("nav-collapsed");
+        collapseNavBtn.textContent = shell.classList.contains("nav-collapsed") ? "▣" : "◫";
+      });
+      expandNavBtn.addEventListener("click", () => {
+        shell.classList.toggle("nav-collapsed");
+        collapseNavBtn.textContent = shell.classList.contains("nav-collapsed") ? "▣" : "◫";
+      });
+
+      backButton.addEventListener("click", resetView);
+    </script>
+  </body>
+</html>

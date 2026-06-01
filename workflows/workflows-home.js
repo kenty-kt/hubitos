@@ -105,16 +105,18 @@ const workflowState = {
     {
       id: "wf-x-content-pipeline",
       scope: "mine",
-      title: wt("AI 内容产出并发布到 X", "AI Content Production & Publishing for X"),
+      title: wt("社媒AI运营", "Social Media AI Operations"),
       platform: "X",
       mode: wt("查看详情", "View Details"),
       eta: wt("约 5 分钟配置", "About 5 min setup"),
       badge: wt("新建", "New"),
-      description: wt("单独进入详情页配置 AI 产出、审核、排期与 X 发布，不影响现有工作流列表。", "Open a dedicated detail page to configure AI generation, review, scheduling, and X publishing without changing the current workflow list."),
-      tags: [wt("独立详情页", "Dedicated Detail Page"), "X", wt("内容自动化", "Content Automation")],
-      prompt: "请继续完善这个 X 平台的 AI 内容产出与自动发布工作流，补齐内容策略、发布节奏和互动建议。",
+      description: wt("进入详情页统一配置选题、内容生成、审核、排期、发布与互动跟进，面向 X 等社媒渠道持续运营。", "Open the detail page to manage topic planning, content generation, review, scheduling, publishing, and engagement follow-up for ongoing social media operations across X and similar channels."),
+      tags: [],
+      prompt: "请继续完善这个社媒 AI 运营工作流，补齐内容策略、发布节奏和互动建议。",
       required: [],
-      detailHref: "./workflows-x-publisher-detail.html"
+      detailHref: "./workflows-x-publisher-detail.html",
+      hideTags: true,
+      hideChatEntry: true
     },
     {
       id: "wf-x-daily-report",
@@ -424,13 +426,15 @@ function renderWorkflowCards() {
         </div>
       </div>
       <p>${escapeHtml(workflow.description)}</p>
+      ${workflow.hideTags || !workflow.tags.length ? "" : `
       <div class="workflow-card-meta">
         ${workflow.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
       </div>
+      `}
       <div class="workflow-card-foot">
         <span>${workflow.detailHref ? wt("进入详情页配置", "Open Detail Page") : workflow.backendTaskId ? wt("已连接本地调度，可直接查看最新结果", "Connected to the local scheduler, latest results are ready") : workflow.required.length ? wt(`还差 ${workflow.required.length} 项信息`, `${workflow.required.length} items missing`) : wt("现在就能运行", "Ready to Run")}</span>
         <div class="workflow-card-actions">
-          <button class="workflow-secondary" type="button" data-chat-workflow="${workflow.id}">${escapeHtml(wt("去对话里继续", "Continue in Chat"))}</button>
+          ${workflow.hideChatEntry ? "" : `<button class="workflow-secondary" type="button" data-chat-workflow="${workflow.id}">${escapeHtml(wt("去对话里继续", "Continue in Chat"))}</button>`}
           <button class="workflow-action" type="button" data-run-workflow="${workflow.id}">${escapeHtml(workflow.detailHref ? wt("查看详情", "View Details") : workflow.backendTaskId ? wt("查看结果", "View Results") : workflowState.scope === "mine" ? wt("补充设置", "Configure") : wt("立即使用", "Use Now"))}</button>
         </div>
       </div>

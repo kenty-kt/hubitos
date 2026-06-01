@@ -223,6 +223,7 @@
       { key: "tools", label: translate("智能体"), icon: "⌘", href: config.toolsHref || "#" },
       { key: "workflows", label: translate("自动任务"), icon: "↗", href: config.workflowsHref || "../workflows/workflows-home.html" },
       { key: "projects", label: translate("项目"), icon: "▣", href: config.projectsHref || "#" },
+      { key: "knowledge-base", label: translate("频道知识库"), icon: "◈", href: config.knowledgeBaseHref || "../knowledge-base/knowledge-base-center.html" },
       { key: "files", label: translate("文件"), icon: "◫", href: config.filesHref || "#" },
       { key: "employees", label: translate("数字员工"), icon: "◎", href: config.employeesHref || "../agents/agents-workflow-editor.html?id=agent-private-growth" },
       { key: "commerce", label: translate("商业"), icon: "◇", href: config.commerceHref || "#" }
