@@ -432,7 +432,7 @@
       .table-head,
       .table-row {
         display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.9fr) minmax(96px, 0.45fr);
+        grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.9fr) 72px;
         gap: 12px;
         align-items: center;
         padding: 14px 16px;
@@ -513,6 +513,19 @@
         font-size: 11px;
         font-weight: 700;
         white-space: nowrap;
+      }
+
+      .row-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #dc2626;
+        font-size: 16px;
       }
 
       .doc-view {
@@ -694,6 +707,22 @@
 
       .chat-compose-actions {
         display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .chat-link-action {
+        border: 0;
+        background: transparent;
+        color: #7c3aed;
+        font: inherit;
+        padding: 0;
+        cursor: pointer;
+      }
+
+      .chat-send-wrap {
+        display: flex;
         justify-content: flex-end;
       }
 
@@ -721,24 +750,6 @@
         margin-top: 14px;
         color: #94a3b8;
         font-size: 12px;
-      }
-
-      .doc-side-footer {
-        display: flex;
-        justify-content: flex-start;
-        gap: 12px;
-        padding: 16px;
-        border-top: 1px solid #e5edf5;
-        background: #fff;
-      }
-
-      .footer-pill {
-        min-height: 40px;
-        border-radius: 999px;
-        border: 1px solid #dbe4ee;
-        background: #fff;
-        color: #7c3aed;
-        font: inherit;
       }
 
       @media (max-width: 1480px) {
@@ -827,6 +838,12 @@
 
           <div class="tree-wrap">
             <div class="tree">
+              <div class="tree-row" data-drop-folder="all">
+                <div class="tree-label">
+                  <span class="tree-icon">🗂</span>
+                  <span class="tree-title">All</span>
+                </div>
+              </div>
               <div class="tree-row active" data-drop-folder="general">
                 <div class="tree-label">
                   <span class="tree-icon">🗀</span>
@@ -842,14 +859,14 @@
                 <span class="tree-count">3</span>
               </div>
               <div class="tree-row tree-depth-2">
-                <div class="tree-label">
+                <div class="tree-label" data-open-folder="subfolder-1">
                   <span class="tree-icon">🗁</span>
                   <span class="tree-title">Subfolder 1</span>
                 </div>
                 <span class="tree-count">5</span>
               </div>
               <div class="tree-row tree-depth-2">
-                <div class="tree-label">
+                <div class="tree-label" data-open-folder="subfolder-2">
                   <span class="tree-icon">🗁</span>
                   <span class="tree-title">Subfolder 2</span>
                 </div>
@@ -867,18 +884,6 @@
                   <span class="tree-title">Documents</span>
                 </div>
               </div>
-              <div class="tree-row">
-                <div class="tree-label">
-                  <span class="tree-icon">🗁</span>
-                  <span class="tree-title">Onboarding Design</span>
-                </div>
-              </div>
-              <div class="tree-row">
-                <div class="tree-label">
-                  <span class="tree-icon">🗁</span>
-                  <span class="tree-title">Team Interviews</span>
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -893,26 +898,12 @@
           </div>
 
           <div class="content-body" id="contentBody">
-            <section class="folder-section" id="foldersSection">
-              <div class="folder-grid">
-                <article class="folder-card" data-open-folder="onboarding">
-                </article>
-
-                <article class="folder-card" data-open-folder="integrations">
-                </article>
-
-                <article class="folder-card" data-open-folder="documents">
-                </article>
-              </div>
-            </section>
-
             <section class="files-section" id="filesSection">
-              <h3 class="section-title" id="filesTitle">Files</h3>
               <div class="table" id="filesTable">
                 <div class="table-head" id="filesTableHead">
                   <div>Name</div>
                   <div>Workflow / Agent</div>
-                  <div>Status</div>
+                  <div>操作</div>
                 </div>
                 <div id="fileRows"></div>
               </div>
@@ -1038,7 +1029,7 @@
           meta: ["来源：发布编排 Agent", "状态：可检索", "最近更新：今天 08:32"],
           workflow: "发布编排 Agent",
           status: "可检索",
-          folder: "integrations",
+          folder: "subfolder-2",
           preview: `{\n  "channel": "x-growth",\n  "max_posts_per_day": 3,\n  "review_required": true,\n  "blocked_terms": ["保证收益", "官方承诺"]\n}`,
           notes: [
             { title: "策略同步", body: "适合与发布节点联动，减少人工重复配置。", time: "2026.06.01 08:32" }
@@ -1076,7 +1067,7 @@
           meta: ["来源：图片生成 Agent", "状态：已同步", "最近更新：今天 07:48"],
           workflow: "图片生成 Agent",
           status: "已同步",
-          folder: "onboarding",
+          folder: "subfolder-1",
           preview: `Sheet: Prompt Library\nRow 1: style=editorial poster, accent=teal, target=x-growth\nRow 2: style=dashboard card, accent=blue, target=faq-docs`,
           notes: [
             { title: "复用提醒", body: "适合跟节点 3 的图像生成一起联动做模板调用。", time: "2026.06.01 07:48" }
@@ -1150,21 +1141,19 @@
 
       const backButton = document.getElementById("backButton");
       const contentTitle = document.getElementById("contentTitle");
-      const foldersSection = document.getElementById("foldersSection");
       const filesSection = document.getElementById("filesSection");
       const detailSection = document.getElementById("detailSection");
       const fileRows = document.getElementById("fileRows");
-      const filesTitle = document.getElementById("filesTitle");
       const filesTableHead = document.getElementById("filesTableHead");
       const shell = document.querySelector(".shell");
       const collapseNavBtn = document.getElementById("collapseNavBtn");
       const expandNavBtn = document.getElementById("expandNavBtn");
-      let activeDocTab = "notes";
       let activeFileId = null;
       let activeFolderId = "general";
       let activeFileView = "list";
 
       function getFilesByFolder(folderId) {
+        if (folderId === "all") return Object.keys(fileDetails);
         return Object.entries(fileDetails)
           .filter(([, file]) => file.folder === folderId || (folderId === "general" && !file.folder))
           .map(([id]) => id);
@@ -1191,6 +1180,9 @@
                         <span>来源：${detail.workflow}</span>
                         <span>${detail.meta[2] || ""}</span>
                       </div>
+                      <div>
+                        <button class="row-action" type="button" data-delete-file="${id}" aria-label="删除文件">🗑</button>
+                      </div>
                     </article>
                   `;
                 })
@@ -1215,7 +1207,7 @@
                   <span class="avatar">${detail.workflow.charAt(0)}</span>
                   <span>${detail.workflow}</span>
                 </div>
-                <div><span class="status">${detail.status}</span></div>
+                <div><button class="row-action" type="button" data-delete-file="${id}" aria-label="删除文件">🗑</button></div>
               </div>
             `;
           })
@@ -1226,15 +1218,16 @@
       function renderFolderFiles(folderId) {
         activeFolderId = folderId;
         const titleMap = {
+          all: "All Files",
           general: "General Knowledge / Files",
           onboarding: "Onboarding / Files",
+          "subfolder-1": "Subfolder 1 / Files",
+          "subfolder-2": "Subfolder 2 / Files",
           integrations: "Integrations / Files",
           documents: "Documents / Files"
         };
         contentTitle.textContent = titleMap[folderId] || "Files";
-        foldersSection.style.display = "none";
         filesSection.style.display = "";
-        filesTitle.textContent = titleMap[folderId] || "Files";
         detailSection.style.display = "none";
         detailSection.innerHTML = "";
         backButton.style.display = "inline-flex";
@@ -1243,7 +1236,6 @@
 
       function renderFileDetail(detail) {
         contentTitle.textContent = detail.title;
-        foldersSection.style.display = "none";
         filesSection.style.display = "none";
         detailSection.style.display = "block";
         backButton.style.display = "inline-flex";
@@ -1258,33 +1250,10 @@
             <aside class="doc-side">
               <div class="doc-side-head">
                 <div class="doc-note-tabs">
-                  <button class="note-tab ${activeDocTab === "chat" ? "active" : ""}" type="button" data-doc-tab="chat">聊天</button>
-                  <button class="note-tab ${activeDocTab === "notes" ? "active" : ""}" type="button" data-doc-tab="notes">笔记 (${detail.notes.length})</button>
+                  <button class="note-tab active" type="button">聊天</button>
                 </div>
               </div>
-              <div class="doc-tab-panel ${activeDocTab === "notes" ? "active" : ""}">
-                <div class="doc-note-actions">
-                  <div class="note-search-actions">
-                    <span>⌕</span>
-                    <span>☰</span>
-                  </div>
-                  <button class="add-note-btn" type="button" data-add-note>＋ 添加笔记</button>
-                </div>
-                <div class="note-list">
-                  ${detail.notes
-                    .map(
-                      (note) => `
-                        <article class="note-card">
-                          <strong>${note.title}</strong>
-                          <p>${note.body}</p>
-                          <span class="note-time">${note.time}</span>
-                        </article>
-                      `
-                    )
-                    .join("")}
-                </div>
-              </div>
-              <div class="doc-tab-panel ${activeDocTab === "chat" ? "active" : ""}">
+              <div class="doc-tab-panel active">
                 <div class="chat-panel">
                   <div class="chat-list">
                     ${detail.chat
@@ -1301,13 +1270,13 @@
                   <div class="chat-compose">
                     <textarea placeholder="继续基于这份文档发问..."></textarea>
                     <div class="chat-compose-actions">
-                      <button class="add-note-btn" type="button">发送</button>
+                      <button class="chat-link-action" type="button" data-chat-summary>总结一下</button>
+                      <div class="chat-send-wrap">
+                        <button class="add-note-btn" type="button">发送</button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="doc-side-footer">
-                <button class="footer-pill" type="button">🗨 带笔记聊天</button>
               </div>
             </aside>
           </article>
@@ -1316,10 +1285,8 @@
 
       function resetView() {
         contentTitle.textContent = "General Knowledge";
-        foldersSection.style.display = "";
         filesSection.style.display = "";
-        filesTitle.textContent = "Files";
-        activeFolderId = "general";
+        activeFolderId = "all";
         renderFileRows(["user-interviews", "onboarding-guide", "roadmap", "faq-notes", "brand-voice"]);
         detailSection.style.display = "none";
         detailSection.innerHTML = "";
@@ -1335,9 +1302,23 @@
           item.ondragend = () => {
             item.classList.remove("dragging");
           };
-          item.onclick = () => {
+          item.onclick = (event) => {
+            if (event.target.closest("[data-delete-file]")) return;
             activeFileId = item.dataset.openFile;
             renderFileDetail(fileDetails[item.dataset.openFile]);
+          };
+        });
+        document.querySelectorAll("[data-delete-file]").forEach((button) => {
+          button.onclick = (event) => {
+            event.stopPropagation();
+            const fileId = button.dataset.deleteFile;
+            const detail = fileDetails[fileId];
+            if (!detail) return;
+            const confirmed = window.confirm(`确认删除文件 “${detail.title}” 吗？`);
+            if (!confirmed) return;
+            delete fileDetails[fileId];
+            if (activeFileId === fileId) activeFileId = null;
+            renderFileRows(getFilesByFolder(activeFolderId));
           };
         });
       }
@@ -1349,30 +1330,15 @@
       }
 
       detailSection.addEventListener("click", (event) => {
-        const tab = event.target.closest("[data-doc-tab]");
-        if (tab) {
-          activeDocTab = tab.dataset.docTab;
-          const currentTitle = contentTitle.textContent;
-          const currentDetail = Object.values(fileDetails).find((item) => item.title === currentTitle);
-          if (currentDetail) renderFileDetail(currentDetail);
-          return;
-        }
-
-        const addNote = event.target.closest("[data-add-note]");
-        if (addNote && activeFileId && fileDetails[activeFileId]) {
-          const now = new Date();
-          const hh = String(now.getHours()).padStart(2, "0");
-          const mm = String(now.getMinutes()).padStart(2, "0");
-          const yyyy = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, "0");
-          const day = String(now.getDate()).padStart(2, "0");
-          fileDetails[activeFileId].notes.unshift({
-            title: "新笔记",
-            body: "这是刚添加的笔记内容，后续可以继续接真实编辑与保存能力。",
-            time: `${yyyy}.${month}.${day} ${hh}:${mm}`
-          });
-          renderFileDetail(fileDetails[activeFileId]);
-        }
+        const summaryBtn = event.target.closest("[data-chat-summary]");
+        if (!summaryBtn || !activeFileId || !fileDetails[activeFileId]) return;
+        const detail = fileDetails[activeFileId];
+        detail.chat.push({ role: "user", text: "总结一下" });
+        detail.chat.push({
+          role: "assistant",
+          text: `总结一下：${detail.summary || "当前文档主要用于知识库沉淀与检索增强。"}`
+        });
+        renderFileDetail(detail);
       });
 
       document.querySelectorAll("[data-open-folder]").forEach((item) => {
@@ -1413,7 +1379,7 @@
         "afterbegin",
         `
           <div class="files-toolbar">
-            <h3 class="section-title" id="filesTitleStatic">Files</h3>
+            <div></div>
             <div class="view-toggle">
               <button class="view-toggle-btn active" type="button" data-file-view="list">列表</button>
               <button class="view-toggle-btn" type="button" data-file-view="grid">图卡</button>
@@ -1431,20 +1397,8 @@
       });
 
       filesTitle.remove();
-      const filesTitleStatic = document.getElementById("filesTitleStatic");
-      const originalRenderFolderFiles = renderFolderFiles;
-      renderFolderFiles = function (folderId) {
-        originalRenderFolderFiles(folderId);
-        filesTitleStatic.textContent = ({
-          general: "General Knowledge / Files",
-          onboarding: "Onboarding / Files",
-          integrations: "Integrations / Files",
-          documents: "Documents / Files"
-        })[folderId] || "Files";
-      };
-
       bindFileRowEvents();
-      renderTreeSelection("general");
+      renderTreeSelection("all");
       collapseNavBtn.addEventListener("click", () => {
         shell.classList.toggle("nav-collapsed");
         collapseNavBtn.textContent = shell.classList.contains("nav-collapsed") ? "▣" : "◫";
