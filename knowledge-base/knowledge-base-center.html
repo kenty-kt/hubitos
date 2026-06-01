@@ -838,47 +838,47 @@
 
           <div class="tree-wrap">
             <div class="tree">
-              <div class="tree-row" data-drop-folder="all">
+              <div class="tree-row" data-drop-folder="all" data-folder-id="all">
                 <div class="tree-label">
                   <span class="tree-icon">🗂</span>
                   <span class="tree-title">All</span>
                 </div>
               </div>
-              <div class="tree-row active" data-drop-folder="general">
+              <div class="tree-row active" data-drop-folder="general" data-folder-id="general">
                 <div class="tree-label">
                   <span class="tree-icon">🗀</span>
                   <span class="tree-title">General Knowledge</span>
                 </div>
                 <span class="tree-count">10</span>
               </div>
-              <div class="tree-row tree-depth-1" data-drop-folder="onboarding">
+              <div class="tree-row tree-depth-1" data-drop-folder="onboarding" data-folder-id="onboarding">
                 <div class="tree-label">
                   <span class="tree-icon">🗀</span>
                   <span class="tree-title">Onboarding</span>
                 </div>
                 <span class="tree-count">3</span>
               </div>
-              <div class="tree-row tree-depth-2">
-                <div class="tree-label" data-open-folder="subfolder-1">
+              <div class="tree-row tree-depth-2" data-folder-id="subfolder-1">
+                <div class="tree-label">
                   <span class="tree-icon">🗁</span>
                   <span class="tree-title">Subfolder 1</span>
                 </div>
                 <span class="tree-count">5</span>
               </div>
-              <div class="tree-row tree-depth-2">
-                <div class="tree-label" data-open-folder="subfolder-2">
+              <div class="tree-row tree-depth-2" data-folder-id="subfolder-2">
+                <div class="tree-label">
                   <span class="tree-icon">🗁</span>
                   <span class="tree-title">Subfolder 2</span>
                 </div>
                 <span class="tree-count">10</span>
               </div>
-              <div class="tree-row tree-depth-1" data-drop-folder="integrations">
+              <div class="tree-row tree-depth-1" data-drop-folder="integrations" data-folder-id="integrations">
                 <div class="tree-label">
                   <span class="tree-icon">🗀</span>
                   <span class="tree-title">Integrations</span>
                 </div>
               </div>
-              <div class="tree-row tree-depth-1" data-drop-folder="documents">
+              <div class="tree-row tree-depth-1" data-drop-folder="documents" data-folder-id="documents">
                 <div class="tree-label">
                   <span class="tree-icon">🗀</span>
                   <span class="tree-title">Documents</span>
@@ -894,7 +894,6 @@
               <button class="back-btn" id="backButton" type="button" style="display:none;">← 返回</button>
               <h2 id="contentTitle">General Knowledge</h2>
             </div>
-            <button class="btn-secondary" type="button">切换知识库</button>
           </div>
 
           <div class="content-body" id="contentBody">
@@ -1284,13 +1283,21 @@
       }
 
       function resetView() {
-        contentTitle.textContent = "General Knowledge";
+        contentTitle.textContent = "All Files";
         filesSection.style.display = "";
         activeFolderId = "all";
-        renderFileRows(["user-interviews", "onboarding-guide", "roadmap", "faq-notes", "brand-voice"]);
+        renderFileRows(getFilesByFolder("all"));
         detailSection.style.display = "none";
         detailSection.innerHTML = "";
         backButton.style.display = "none";
+        renderTreeSelection("all");
+      }
+
+      function toggleKnowledgeNav() {
+        shell.classList.toggle("nav-collapsed");
+        const collapsed = shell.classList.contains("nav-collapsed");
+        collapseNavBtn.textContent = collapsed ? "▣" : "◫";
+        expandNavBtn.textContent = collapsed ? "▣" : "◫";
       }
 
       function bindFileRowEvents() {
@@ -1341,18 +1348,12 @@
         renderFileDetail(detail);
       });
 
-      document.querySelectorAll("[data-open-folder]").forEach((item) => {
-        item.addEventListener("click", () => {
-          renderFolderFiles(item.dataset.openFolder);
-          renderTreeSelection(item.dataset.openFolder);
-        });
-      });
-
-      document.querySelectorAll("[data-drop-folder]").forEach((item) => {
-        item.addEventListener("click", () => {
-          renderFolderFiles(item.dataset.dropFolder);
-          renderTreeSelection(item.dataset.dropFolder);
-        });
+      document.querySelector(".tree-wrap").addEventListener("click", (event) => {
+        const target = event.target.closest("[data-folder-id]");
+        if (!target) return;
+        const folderId = target.dataset.folderId;
+        renderFolderFiles(folderId);
+        renderTreeSelection(folderId);
       });
 
       document.querySelectorAll("[data-drop-folder]").forEach((item) => {
@@ -1388,27 +1389,20 @@
         `
       );
 
-      filesSection.querySelectorAll("[data-file-view]").forEach((button) => {
-        button.addEventListener("click", () => {
-          activeFileView = button.dataset.fileView;
-          filesSection.querySelectorAll("[data-file-view]").forEach((btn) => btn.classList.toggle("active", btn === button));
-          renderFileRows(getFilesByFolder(activeFolderId));
-        });
+      filesSection.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-file-view]");
+        if (!button) return;
+        activeFileView = button.dataset.fileView;
+        filesSection.querySelectorAll("[data-file-view]").forEach((btn) => btn.classList.toggle("active", btn === button));
+        renderFileRows(getFilesByFolder(activeFolderId));
       });
 
       filesTitle.remove();
       bindFileRowEvents();
       renderTreeSelection("all");
-      collapseNavBtn.addEventListener("click", () => {
-        shell.classList.toggle("nav-collapsed");
-        collapseNavBtn.textContent = shell.classList.contains("nav-collapsed") ? "▣" : "◫";
-      });
-      expandNavBtn.addEventListener("click", () => {
-        shell.classList.toggle("nav-collapsed");
-        collapseNavBtn.textContent = shell.classList.contains("nav-collapsed") ? "▣" : "◫";
-      });
-
-      backButton.addEventListener("click", resetView);
+      collapseNavBtn.onclick = toggleKnowledgeNav;
+      expandNavBtn.onclick = toggleKnowledgeNav;
+      backButton.onclick = resetView;
     </script>
   </body>
 </html>
